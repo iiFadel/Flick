@@ -109,7 +109,7 @@ public sealed class DonutSettings
 public sealed class AppSettings
 {
     /// <summary>Current schema version. Increase when the format changes and add a migration.</summary>
-    public const int CurrentSchemaVersion = 30;
+    public const int CurrentSchemaVersion = 31; // fork: 31 = DragWheel
 
     public int SchemaVersion { get; set; } = CurrentSchemaVersion;
 
@@ -166,6 +166,9 @@ public sealed class AppSettings
     public DonutSettings Donut { get; set; } = new();
 
     public List<TriggerGesture> Triggers { get; set; } = TriggerGesture.Defaults();
+
+    // fork: drag-then-tap opens the Convert / Tools / Actions wheels (replaces TriggerKind.Drag gestures).
+    public DragWheelSettings DragWheel { get; set; } = new();
 
     /// <summary>Process names (without .exe) in which gestures never trigger.</summary>
     public List<string> ExcludedProcesses { get; set; } = [];

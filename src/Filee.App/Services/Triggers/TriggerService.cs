@@ -13,7 +13,7 @@ using SharpHook.Data;
 namespace Filee.App.Services.Triggers;
 
 /// <summary>Global gesture detection. Events are raised on the UI thread with physical screen coordinates.</summary>
-public sealed class TriggerService : IDisposable
+public sealed partial class TriggerService : IDisposable // fork: partial (TriggerService.Wheel.cs)
 {
     private readonly IPlatformServices _platform;
     private readonly ILogger<TriggerService> _log;
@@ -46,6 +46,7 @@ public sealed class TriggerService : IDisposable
         _detector.KeyChordTriggered += (g, x, y) => Post(() => SelectionGesture?.Invoke(this, new GestureEventArgs(g, x, y)));
         _detector.HoldTimerRequested += (token, ms) =>
             _ = Task.Delay(ms).ContinueWith(_ => _detector.HoldElapsed(token), TaskScheduler.Default);
+        InitWheel(); // fork:
     }
 
     /// <summary>A modifier+drag started (files may be dragged). Show the donut and wait for DragEnter.</summary>
@@ -122,7 +123,9 @@ public sealed class TriggerService : IDisposable
 
     public void Apply(AppSettings settings)
     {
-        _detector.Configure(settings.Triggers.Where(g => _platform.SupportsSelectionShortcut || g.Kind == TriggerKind.Drag).ToList());
+        // fork: drags open the wheels (ApplyWheel); the detector keeps the hold and keyboard gestures.
+        _detector.Configure(settings.Triggers.Where(g => _platform.SupportsSelectionShortcut && g.Kind != TriggerKind.Drag).ToList());
+        ApplyWheel(settings);
         _detector.Paused = settings.Paused;
         _flipKey = settings.Donut.EffectiveFlipKey(settings.Triggers);
         _flipWheel = settings.Donut.FlipWithWheel;
@@ -164,11 +167,13 @@ public sealed class TriggerService : IDisposable
                     _log.LogInformation("Trace: press {Button} at {X},{Y}, mask {Mask} = {Modifiers}", e.Data.Button, e.Data.X, e.Data.Y, e.RawEvent.Mask, Map(e.RawEvent.Mask));
                 var (x, y) = ButtonPoint(e);
                 _detector.MouseDown(Map(e.Data.Button), x, y, Map(e.RawEvent.Mask));
+                _wheel.MouseDown(Map(e.Data.Button), x, y, Map(e.RawEvent.Mask)); // fork:
             };
             _hook.MouseReleased += (_, e) =>
             {
                 var (x, y) = ButtonPoint(e);
                 _detector.MouseUp(Map(e.Data.Button), x, y);
+                _wheel.MouseUp(Map(e.Data.Button), x, y); // fork:
             };
             _hook.MouseDragged += (_, e) => OnMove(e);
             _hook.MouseMoved += (_, e) => OnMove(e);
@@ -178,8 +183,13 @@ public sealed class TriggerService : IDisposable
             {
                 OnKey(e.Data.KeyCode, down: true);
                 _detector.KeyDown(KeyName(e.Data.KeyCode), Map(e.RawEvent.Mask));
+                _wheel.KeyDown(KeyName(e.Data.KeyCode)); // fork:
             };
-            _hook.KeyReleased += (_, e) => OnKey(e.Data.KeyCode, down: false);
+            _hook.KeyReleased += (_, e) =>
+            {
+                OnKey(e.Data.KeyCode, down: false);
+                _wheel.KeyUp(KeyName(e.Data.KeyCode)); // fork:
+            };
             _hook.MouseWheel += (_, e) => OnWheel(e.Data);
             // Own the actual Run thread. SharpHook's RunAsync task completes BEFORE its finally
             // clears the native callback, so awaiting that task alone is not a safe restart barrier.
@@ -241,6 +251,7 @@ public sealed class TriggerService : IDisposable
         (_estX, _estY) = (e.Data.X, e.Data.Y);
         LastCursor = (e.Data.X, e.Data.Y);
         _detector.MouseMove(e.Data.X, e.Data.Y, Map(e.RawEvent.Mask), HeldButton(e.RawEvent.Mask));
+        _wheel.MouseMove(e.Data.X, e.Data.Y, HeldButton(e.RawEvent.Mask)); // fork:
     }
 
     private void OnRelativeMove(MouseHookEventArgs e)
@@ -250,6 +261,7 @@ public sealed class TriggerService : IDisposable
         if (Trace && HeldButton(e.RawEvent.Mask) != TriggerMouseButton.None)
             _log.LogInformation("Trace: relative move {Dx},{Dy} -> {X},{Y}, mask {Mask}", e.Data.X, e.Data.Y, _estX, _estY, e.RawEvent.Mask);
         _detector.MouseMove(_estX, _estY, Map(e.RawEvent.Mask), HeldButton(e.RawEvent.Mask));
+        _wheel.MouseMove(_estX, _estY, HeldButton(e.RawEvent.Mask)); // fork:
     }
 
     private bool InScope(TriggerGesture gesture, int x, int y)

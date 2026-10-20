@@ -1361,7 +1361,7 @@ public class UserDataStoreTests
         store.SaveSettings();
 
         var json = File.ReadAllText(Path.Combine(dir.Path, "settings.json"));
-        Assert.Contains("\"Drag\"", json);
+        Assert.Contains("\"KeyChord\"", json); // fork: no drag gesture by default (DragWheelSettings)
     }
 
     [Fact]

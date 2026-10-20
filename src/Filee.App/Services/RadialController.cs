@@ -33,7 +33,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Filee.App.Services;
 
-public sealed class RadialController(
+public sealed partial class RadialController( // fork: partial (RadialController.Wheel.cs)
     RadialViewModel viewModel,
     ConversionService conversions,
     WindowService windows,
@@ -233,11 +233,18 @@ public sealed class RadialController(
             if (viewModel.IsClickMode || SameFiles(files, viewModel.Files) || SameWebFiles(files, viewModel.Files))
                 return;
             viewModel.Load(files, clickMode: false);
+            ShowWheel(donut); // fork:
             donut.PlayOpenAnimation();
             WatchFlipKey();
         };
         window.Dropped += (hit, dropped) =>
         {
+            // fork: the drop that ends a drag whose wheel already converted (Enter) converts nothing more.
+            if (donut.IsInProgressMode)
+            {
+                dropped.Web?.Dispose();
+                return;
+            }
             _dropped = true;
             WatchFlipKey();
             if (hit.Kind is DonutHitKind.Segment or DonutHitKind.SubSegment)
@@ -460,7 +467,7 @@ public sealed class RadialController(
     private void WatchFlipKey() => triggers.WatchFlipKey = FlipsFromHook;
 
     /// <summary>A drag-mode donut shows files and nothing was dropped yet: the hook's flip key and wheel flip it.</summary>
-    private bool FlipsFromHook => _visible && !_dropped && !viewModel.IsClickMode && viewModel.HasFiles;
+    private bool FlipsFromHook => _wheelKind is null && _visible && !_dropped && !viewModel.IsClickMode && viewModel.HasFiles; // fork: wheels don't flip
 
     /// <summary>
     /// Top-left corner of a <paramref name="sidePx"/> square window centred on <paramref name="cursor"/>, moved into

@@ -403,10 +403,31 @@ internal static class SettingsMigrations
         if (settings.SchemaVersion < 21)
             InsertBefore(settings.EnginePriority, "wic", settings.EnginePriority.Contains("ffmpeg") ? "ffmpeg" : "pandoc");
 
+        // fork: v31: drag-then-tap wheels replace "hold the modifier, then drag" (see DragWheelSettings).
+        if (settings.SchemaVersion < 31)
+            MoveDragGestureToWheel(settings);
+
         if (settings.Triggers.Count == 0)
             settings.Triggers = TriggerGesture.Defaults();
 
         settings.SchemaVersion = AppSettings.CurrentSchemaVersion;
+    }
+
+    /// <summary>
+    /// fork: the first drag gesture's button, threshold, scope and on/off carry over to the wheel trigger (its keys
+    /// start at the defaults); every drag gesture is removed. Hold and keyboard gestures stay.
+    /// </summary>
+    internal static void MoveDragGestureToWheel(AppSettings settings)
+    {
+        var drags = settings.Triggers.Where(t => t.Kind == TriggerKind.Drag).ToList();
+        if (drags.Count == 0)
+            return;
+        var drag = drags.FirstOrDefault(t => t.Enabled) ?? drags[0];
+        settings.DragWheel.Enabled = drag.Enabled;
+        settings.DragWheel.Button = drag.Button;
+        settings.DragWheel.DragThreshold = drag.DragThreshold;
+        settings.DragWheel.Scope = drag.Scope;
+        settings.Triggers.RemoveAll(t => t.Kind == TriggerKind.Drag);
     }
 
     /// <summary>Upgrades presets and profiles written with settings schema <paramref name="from"/>.</summary>

@@ -26,7 +26,9 @@ public sealed partial class TriggerGestureViewModel : ObservableObject
     {
         _gesture = gesture;
         _save = save;
-        Kinds = Enum.GetValues<TriggerKind>().Select(k => new Choice<TriggerKind>(k, loc[$"triggers.kind.{k}"])).ToList();
+        // fork: drags open the wheels (DragWheelOptionsViewModel), so no drag gestures here.
+        Kinds = Enum.GetValues<TriggerKind>().Where(k => k != TriggerKind.Drag)
+            .Select(k => new Choice<TriggerKind>(k, loc[$"triggers.kind.{k}"])).ToList();
         Buttons = Enum.GetValues<TriggerMouseButton>().Where(b => b != TriggerMouseButton.None)
             .Select(b => new Choice<TriggerMouseButton>(b, loc[$"triggers.button.{b}"])).ToList();
         // The file manager has its own name on each system: Explorer, Finder, the Linux desktop's file manager.
@@ -39,7 +41,7 @@ public sealed partial class TriggerGestureViewModel : ObservableObject
         SystemLabel = loc["triggers.threshold_system"];
 
         Enabled = gesture.Enabled;
-        Kind = Kinds.First(k => k.Value == gesture.Kind);
+        Kind = Kinds.FirstOrDefault(k => k.Value == gesture.Kind) ?? Kinds[0]; // fork: no Drag choice
         Ctrl = gesture.Modifiers.HasFlag(ModifierKeys.Ctrl);
         Alt = gesture.Modifiers.HasFlag(ModifierKeys.Alt);
         Shift = gesture.Modifiers.HasFlag(ModifierKeys.Shift);
@@ -254,7 +256,11 @@ public sealed partial class TriggersPageViewModel : ObservableObject, IDisposabl
             Gestures.Add(new TriggerGestureViewModel(gesture, loc, Save));
         ExcludedApps = new ExcludedAppsViewModel(store.Settings.ExcludedProcesses, platform, Save);
         Flip = new FlipOptionsViewModel(store, loc, Save);
+        Wheel = new DragWheelOptionsViewModel(store, loc, Save); // fork:
     }
+
+    /// <summary>fork: drag, then tap a key to open a wheel.</summary>
+    public DragWheelOptionsViewModel Wheel { get; }
 
     /// <summary>The key and the wheel that flip the open donut.</summary>
     public FlipOptionsViewModel Flip { get; }
@@ -322,7 +328,7 @@ public sealed partial class TriggersPageViewModel : ObservableObject, IDisposabl
     [RelayCommand]
     private void Add()
     {
-        var gesture = new TriggerGesture { Modifiers = ModifierKeys.Alt, Button = TriggerMouseButton.Left };
+        var gesture = new TriggerGesture { Kind = TriggerKind.Hold, Modifiers = ModifierKeys.Alt, Button = TriggerMouseButton.Left }; // fork: no drag gestures
         _store.Settings.Triggers.Add(gesture);
         Gestures.Add(new TriggerGestureViewModel(gesture, _loc, Save));
         Save();

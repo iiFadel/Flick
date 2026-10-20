@@ -30,8 +30,9 @@
 
 ## Flow of a conversion
 
-1. **Trigger** – `TriggerService` receives global input from SharpHook and feeds `GestureDetector`.
-   A drag gesture (modifier + drag past the threshold) opens the donut *before* files are known.
+1. **Trigger** – `TriggerService` receives global input from SharpHook and feeds `DragWheelDetector` (drags) and
+   `GestureDetector` (hold and keyboard gestures). A drag past the threshold followed by a tap of a wheel's key opens
+   that wheel *before* files are known (see "Drag wheels" below).
 2. **Donut** – `RadialWindow` is transparent, topmost and not activated, so Explorer's drag continues.
    The first `DragEnter` delivers the file list; `RadialViewModel` picks a `ToolbarProfile` by extension
    (`ProfileSelector`: the first normal profile that has every file's extension; for a mix of types the first
@@ -92,6 +93,29 @@ second with the Engines page's `TransferRate` and units, rewritten four times a 
   no device names, at most 120 characters) and never replace an existing file (`name (2).ext`). Programs, installers and
   scripts are refused by extension, media type and first bytes; nothing downloaded is ever run, and every file goes
   through the same converters as any other.
+
+## Drag wheels (Flick)
+
+Flick replaces upstream's "hold the modifier, then drag" with Tangerine's "start dragging, then tap a key". Each key
+opens one wheel: Convert, Tools or Actions (`WheelKind`; keys in `AppSettings.DragWheel`, defaults Shift / Ctrl / Alt,
+macOS Shift / Command / Control, Settings → Triggers). Schema 31 moved the old drag gesture's button, threshold and
+scope there.
+
+`DragWheelDetector` (pure, unit tested) is the state machine: `Idle → Pressed → Dragging → Open(kind)`, with
+`Pending(kind)` for a key tapped before the threshold and `Cancelled` after Escape, until the button is released.
+Releasing the key keeps the wheel open; another wheel's key switches (`WheelSwitched`); arrows report `Navigate(±1)`
+(Right/Down clockwise), Enter `Apply`, Escape `Cancel`. Auto-repeat and keys held since before the press (Shift-click
+then drag) never open a wheel; the modifiers of each press catch up on key releases the hook missed.
+
+`TriggerService.Wheel.cs` feeds it from the hook and posts its events to the UI thread; `RadialController.Wheel.cs`
+opens the drag window for `WheelOpened`, shows the wheel's slices once the files enter (`RadialViewModel.ShowWheel`)
+with the first slice selected (`DonutMenu.Preselect`), and passes arrows and Enter to `DonutMenu.HandleDragKey`. A key
+holds the selection until the drag moves away from where it rested (`DonutMenu.Wheel.cs`), since the drag's own
+position keeps arriving through `SetExternalHit`. A drop on a slice converts with it; a drop in the hole or elsewhere
+cancels. After Enter started a conversion, the drop that ends the drag converts nothing more (`Converts` is false on
+the progress ring). The wheels replace flipping during a drag (Tab and the mouse wheel still flip in click mode).
+
+Until Phases 3 and 4 the Tools wheel shows the profile's back face and the Actions wheel is empty.
 
 ## Donut control
 

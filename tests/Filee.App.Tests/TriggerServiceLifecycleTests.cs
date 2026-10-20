@@ -99,7 +99,7 @@ public sealed class TriggerServiceLifecycleTests
         provider.PostMouse(EventType.MouseDraggedRelative, 3, 0, Held); // under the drag threshold
         provider.PostMouse(EventType.MouseDraggedRelative, 3, 1, Held); // 6 from the press: over it
 
-        var e = WaitForStart(started);
+        var e = WaitForStart(provider, started);
         Assert.Equal((506, 401), (e.X, e.Y));
         Assert.Equal((0, 0), service.LastCursor);
     }
@@ -115,7 +115,7 @@ public sealed class TriggerServiceLifecycleTests
         provider.PostMouse(EventType.MouseDragged, 101, 200, Held); // 1 from the press: must not start
         provider.PostMouse(EventType.MouseDragged, 110, 200, Held);
 
-        var e = WaitForStart(started);
+        var e = WaitForStart(provider, started);
         Assert.Equal((110, 200), (e.X, e.Y));
         Assert.Equal((110, 200), service.LastCursor);
     }
@@ -128,7 +128,7 @@ public sealed class TriggerServiceLifecycleTests
         provider.PostMouse(EventType.MousePressed, 50, 60, Held);
         provider.PostMouse(EventType.MouseDragged, 60, 60, Held);
 
-        var e = WaitForStart(started);
+        var e = WaitForStart(provider, started);
         Assert.Equal((60, 60), (e.X, e.Y));
         Assert.Equal((60, 60), service.LastCursor);
     }
@@ -176,22 +176,24 @@ public sealed class TriggerServiceLifecycleTests
         return read();
     }
 
+    // fork: drags open a wheel when a key is tapped after the threshold (DragWheelDetector); Shift opens Convert.
     private static (DelayedProvider Provider, TriggerService Service, Func<GestureEventArgs?> Started) StartGesture(bool wayland)
     {
         var provider = new DelayedProvider();
         provider.AllowExit.Set();
         var service = Create(provider, () => { }, wayland);
-        // Ctrl + left drag on every OS: the default drag gesture uses Option on macOS, which these presses don't hold.
-        service.Apply(new AppSettings { Triggers = [new TriggerGesture { Modifiers = ModifierKeys.Ctrl }] });
+        service.Apply(new AppSettings { DragWheel = { ConvertKey = "Shift" } });
         GestureEventArgs? started = null;
-        service.DragStarted += (_, e) => started = e;
+        service.WheelOpened += (_, x, y) => started = new GestureEventArgs(null, x, y);
         service.Start();
         Assert.True(SpinWait.SpinUntil(() => provider.Runs == 1, 2000));
         return (provider, service, () => started);
     }
 
-    private static GestureEventArgs WaitForStart(Func<GestureEventArgs?> started)
+    /// <summary>fork: taps Shift (the drag is past the threshold by now), then waits for the wheel to open.</summary>
+    private static GestureEventArgs WaitForStart(DelayedProvider provider, Func<GestureEventArgs?> started)
     {
+        provider.PostKey(EventType.KeyPressed, KeyCode.VcLeftShift, Held);
         Assert.True(SpinWait.SpinUntil(() => { Dispatcher.UIThread.RunJobs(); return started() is not null; }, 2000));
         return started()!;
     }
