@@ -33,7 +33,7 @@ Done when: the app runs from source and the spec file exists. Every later phase 
 - [ ] Three wheel kinds (Convert, Tools, Actions), tapping another modifier switches wheel without closing
 - [ ] Escape cancels, arrow keys move selection, Enter applies to the selected slice
 - [ ] Key bindings configurable in Settings (defaults: Shift, Ctrl, Alt on Windows)
-- [ ] Unit tests for every transition, including: tap before drag threshold, double tap, key held through drop, drop outside wheel, Escape mid-switch
+- [x] Unit tests for every transition, including: tap before drag threshold, double tap, key held through drop, drop outside wheel, Escape mid-switch
 - [ ] Manual check: the Explorer drag never breaks, source file is never moved or deleted
 
 Risk: holding Shift or Ctrl during an Explorer drag changes the drop effect (move/copy/link). Filee already forces Copy on drop, but verify Explorer's cursor and behaviour while the key is held. If Shift-as-trigger fights Explorer, use tap-and-release only and test both.
@@ -49,6 +49,7 @@ Done when: side by side with the recording at normal speed, you can't immediatel
 
 ## Phase 3: Tools wheel, no-UI tools (M)
 
+- [ ] Replace the Tools wheel stand-in (Phase 1 shows the profile's back face there, `RadialViewModel.Wheel.cs`)
 - [ ] Add an "operation" concept next to target-format presets (a same-format transform with parameters). Design it in plan mode first: it must fit `Preset`, `ToolbarProfile`, `JobQueue` and `OutputPathResolver` without breaking conversions
 - [ ] Instant tools: Compress and Metadata (images, video, audio, PDF), Mute, Normalize, Extract (archives)
 - [ ] Small value popover (one shared control), then: Speed, Split (video, PDF), Channels, Snapshot, Visualize, Add BG
@@ -56,6 +57,7 @@ Done when: side by side with the recording at normal speed, you can't immediatel
 
 ## Phase 4: Actions wheel (S to M)
 
+- [ ] Fill the Actions wheel (Phase 1 opens it empty with a "later version" note, `RadialViewModel.Wheel.cs`)
 - [ ] Copy (files to clipboard), Copy Path, Move (folder picker), Open Terminal here
 - [ ] Share: Windows share sheet (DataTransferManager) as the AirDrop equivalent
 - [ ] Float: always-on-top preview window for images and PDFs
