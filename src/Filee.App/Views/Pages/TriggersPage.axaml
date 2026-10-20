@@ -31,6 +31,61 @@
       </WrapPanel>
     </StackPanel>
 
+    <!-- fork: drag, then tap a key to open a wheel (DragWheelOptionsViewModel) -->
+    <Border x:Name="WheelCard" Classes="card">
+      <StackPanel Spacing="14" DataContext="{Binding Wheel}" x:DataType="vm:DragWheelOptionsViewModel">
+        <DockPanel>
+          <ToggleSwitch DockPanel.Dock="Left" IsChecked="{Binding Enabled}" OnContent="" OffContent="" Margin="0,0,8,0"
+                        AutomationProperties.Name="{DynamicResource triggers.wheel_title}" />
+          <TextBlock Classes="label" Text="{DynamicResource triggers.wheel_title}" VerticalAlignment="Center" />
+        </DockPanel>
+        <TextBlock Classes="caption" TextWrapping="Wrap" Text="{DynamicResource triggers.wheel_description}" />
+        <ItemsControl ItemsSource="{Binding Keys}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Spacing="8" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:WheelKeyViewModel">
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <TextBlock Text="{Binding Label}" VerticalAlignment="Center" MinWidth="130" />
+                <Border Classes="badge" MinWidth="120" Padding="12,6">
+                  <TextBlock Text="{Binding KeyText}" FontWeight="SemiBold" />
+                </Border>
+                <ToggleButton IsChecked="{Binding IsRecording}" KeyDown="OnWheelRecorderKeyDown">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <PathIcon Width="12" Height="12" Data="{StaticResource Icon.Record}" Foreground="{DynamicResource DangerBrush}" />
+                    <TextBlock Text="{DynamicResource triggers.record}" />
+                  </StackPanel>
+                </ToggleButton>
+                <Button Classes="ghost" Content="{DynamicResource triggers.wheel_reset}" Command="{Binding ResetCommand}" />
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock Classes="caption danger" TextWrapping="Wrap" Text="{Binding Error}"
+                   IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        <Grid ColumnDefinitions="*,16,*">
+          <StackPanel>
+            <TextBlock Classes="label" Text="{DynamicResource triggers.button}" />
+            <ComboBox ItemsSource="{Binding Buttons}" SelectedItem="{Binding Button}" HorizontalAlignment="Stretch" />
+          </StackPanel>
+          <StackPanel Grid.Column="2">
+            <TextBlock Classes="label" Text="{DynamicResource triggers.scope}" />
+            <ComboBox ItemsSource="{Binding Scopes}" SelectedItem="{Binding Scope}" HorizontalAlignment="Stretch" />
+          </StackPanel>
+        </Grid>
+        <StackPanel>
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Right" Text="{Binding ThresholdText}" FontWeight="SemiBold" />
+            <TextBlock Classes="label" Text="{DynamicResource triggers.threshold}" />
+          </DockPanel>
+          <Slider Minimum="0" Maximum="80" Value="{Binding DragThreshold}" TickFrequency="1" IsSnapToTickEnabled="True" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
     <ItemsControl ItemsSource="{Binding Gestures}">
       <ItemsControl.ItemsPanel>
         <ItemsPanelTemplate>

@@ -74,10 +74,11 @@ public sealed class TrayService(UserDataStore store, ILocalizer loc, IPlatformSe
         _open!.Header = loc["tray.open"];
         _pause!.Header = store.Settings.Paused ? loc["tray.resume"] : loc["tray.pause"];
         _quit!.Header = loc["tray.quit"];
-        var drag = store.Settings.Triggers.FirstOrDefault(t => t.Enabled && t.Kind == TriggerKind.Drag);
+        // fork: drag, then tap a wheel's key
+        var wheel = store.Settings.DragWheel;
         _tray.ToolTipText = store.Settings.Paused
             ? loc["triggers.paused"]
-            : loc.Format("tray.tooltip", drag is null ? "—" : GestureText.Modifiers(drag.Modifiers));
+            : loc.Format("tray.tooltip_wheel", wheel.Enabled ? WheelKeyText.All(wheel) : "—");
     }
 
     public void Dispose() => _tray?.Dispose();

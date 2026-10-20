@@ -285,7 +285,7 @@ public sealed partial class DonutMenu
     /// True when dropping or clicking at <paramref name="hit"/> converts: an enabled slice that isn't a group, or an
     /// enabled slice of a group's ring. Elsewhere the drag shows "no drop".
     /// </summary>
-    public bool Converts(DonutHit hit) => hit.Kind switch
+    public bool Converts(DonutHit hit) => !_progressMode && hit.Kind switch // fork: not the ring of a conversion already started
     {
         DonutHitKind.Segment => hit.Index >= 0 && hit.Index < Count && Items![hit.Index] is { IsGroup: false, IsEnabled: true },
         DonutHitKind.SubSegment => hit.Index >= 0 && hit.Index < Count && Items![hit.Index].Children is { } children &&
@@ -324,6 +324,9 @@ public sealed partial class DonutMenu
     /// </summary>
     public void SetExternalHit(DonutHit hit, Point? at = null)
     {
+        if (DragKeyHolds(at)) // fork: a wheel key has the selection (DonutMenu.Wheel.cs)
+            return;
+        ForgetKeySelection(hit); // fork:
         if (at is not null)
             _lastExternalAt = at; // a flip lights up what the drag rests on, on the other face
         TrackGroups(hit, at);

@@ -78,6 +78,7 @@ public partial class App : Application
         var platform = AppHost.Get<IPlatformServices>();
         triggers.DragStarted += (_, e) => radial.ShowForDrag(e.X, e.Y);
         triggers.DragEnded += (_, _) => radial.OnDragGestureEnded();
+        radial.ListenToWheels(); // fork: drag, then tap a key
         triggers.SelectionGesture += async (_, e) =>
         {
             if (_selectionPending || store.Settings.Paused)
@@ -114,7 +115,7 @@ public partial class App : Application
         // asked earlier, the alert ends up behind it.
         if (OperatingSystem.IsMacOS() && triggers.NeedsPermission && !Program.Options.Background
             && platform is Filee.Platform.MacOS.MacOSPlatformServices mac
-            && store.Settings.Triggers.Any(t => t.Enabled && t.Kind == TriggerKind.Drag))
+            && store.Settings.DragWheel.Enabled) // fork: drags open the wheels
             DispatcherTimer.RunOnce(() =>
             {
                 if (OperatingSystem.IsMacOS() && triggers.NeedsPermission)
