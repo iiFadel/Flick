@@ -75,14 +75,9 @@ public sealed class TriggerGesture
     public TriggerGesture Clone() => (TriggerGesture)MemberwiseClone();
 
     /// <summary>Default gestures for the current OS.</summary>
-    public static List<TriggerGesture> Defaults()
-    {
-        // On macOS Ctrl+click means right-click, and Option already means "copy" in Finder.
-        var dragModifier = OperatingSystem.IsMacOS() ? ModifierKeys.Alt : ModifierKeys.Ctrl;
-        return
-        [
-            new() { Kind = TriggerKind.Drag, Modifiers = dragModifier, Button = TriggerMouseButton.Left },
-            new() { Kind = TriggerKind.KeyChord, Modifiers = ModifierKeys.Ctrl | ModifierKeys.Alt, Button = TriggerMouseButton.None, Key = "Space" },
-        ];
-    }
+    /// <remarks>fork: no drag gesture; drags open the wheels through <see cref="DragWheelSettings"/>.</remarks>
+    public static List<TriggerGesture> Defaults() =>
+    [
+        new() { Kind = TriggerKind.KeyChord, Modifiers = ModifierKeys.Ctrl | ModifierKeys.Alt, Button = TriggerMouseButton.None, Key = "Space" },
+    ];
 }
