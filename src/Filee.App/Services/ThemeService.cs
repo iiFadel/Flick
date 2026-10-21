@@ -47,6 +47,13 @@ public sealed class ThemeService(IPlatformServices platform)
         ["warning"] = "WarningBrush",
     };
 
+    /// <summary>fork: wheel keys that take a custom theme's colour of another key.</summary>
+    private static readonly (string Key, string[] WheelKeys)[] WheelKeys =
+    [
+        ("SurfaceBrush", ["PetalFill", "WheelSubSliceBrush"]),
+        ("TextPrimaryBrush", ["WheelLabelBrush"]),
+    ];
+
     public void Apply(ThemeSettings theme, string language, CustomTheme? custom = null)
     {
         var app = Application.Current ?? throw new InvalidOperationException("No application.");
@@ -113,6 +120,11 @@ public sealed class ThemeService(IPlatformServices platform)
         foreach (var (name, value) in colors ?? new Dictionary<string, string>())
             if (CustomBrushKeys.TryGetValue(name, out var key) && Color.TryParse(value, out var color))
                 dictionary[key] = new SolidColorBrush(color);
+        // fork: the wheel's petals and labels (Styles/Flick.axaml) follow the user's surface and text colours.
+        foreach (var (key, wheelKeys) in WheelKeys)
+            if (dictionary.TryGetValue(key, out var brush))
+                foreach (var wheelKey in wheelKeys)
+                    dictionary[wheelKey] = brush;
 
         if (dictionary.Count == 0)
             res.ThemeDictionaries.Remove(variant);

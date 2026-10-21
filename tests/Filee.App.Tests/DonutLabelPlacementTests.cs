@@ -49,7 +49,7 @@ public class DonutLabelPlacementTests
         var (pixels, width, height) = Read(frame);
         var origin = donut.TranslatePoint(new Point(0, 0), window)!.Value;
         var center = new Point(origin.X + donut.Bounds.Width / 2, origin.Y + donut.Bounds.Height / 2);
-        var labelRadius = (OuterRadius + OuterRadius * HoleRatio) / 2;
+        var labelRadius = donut.Layout.LabelRadius; // fork: Tangerine's label circle
 
         for (var i = 0; i < 4; i++)
         {

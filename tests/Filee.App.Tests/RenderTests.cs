@@ -738,13 +738,14 @@ public class RenderTests
             Assert.Equal(14, donut.SliceCornerRadius);
             Save(window, $"donut-softness-28-{suffix}.png");
 
-            // The sharp corner of slice 2, cut away now, still picks slice 2.
+            // fork: Tangerine's petals: the sharp corner of slice 2, cut away, selects nothing; its middle selects it.
             var n = vm.Items.Count;
             var center = new Avalonia.Point(donut.Bounds.Width / 2, donut.Bounds.Height / 2);
-            var inner = vm.OuterRadius * vm.HoleRatio;
-            var corner = DonutGeometry.Wedge(center, inner, vm.OuterRadius, DonutGeometry.MidAngle(2, n), DonutGeometry.Span(n), 3).Start;
+            var corner = DonutGeometry.Wedge(center, donut.Layout.Inner, donut.Layout.Outer, DonutGeometry.MidAngle(2, n), DonutGeometry.Span(n), 3).Start;
             var inside = center + (corner - center) * 0.995;
-            Assert.Equal(new DonutHit(DonutHitKind.Segment, 2), donut.HitTest(inside));
+            Assert.Equal(DonutHitKind.Gap, donut.HitTest(inside).Kind);
+            var middle = DonutGeometry.PointAt(center, donut.Layout.LabelRadius, DonutGeometry.MidAngle(2, n));
+            Assert.Equal(new DonutHit(DonutHitKind.Segment, 2), donut.HitTest(middle));
 
             var index = n - 1;
             donut.SetExternalHit(new DonutHit(DonutHitKind.Segment, index));
@@ -786,12 +787,13 @@ public class RenderTests
             Pump();
             Assert.Equal(14, donut.SliceCornerRadius);
 
-            // A corner the rounding cut away still picks its slice.
+            // fork: a corner the rounding cut away selects nothing (Tangerine); the slice's middle selects it.
             var n = vm.Items.Count;
             var center = new Avalonia.Point(donut.Bounds.Width / 2, donut.Bounds.Height / 2);
-            var inner = vm.OuterRadius * vm.HoleRatio;
-            var corner = DonutGeometry.Wedge(center, inner, vm.OuterRadius, DonutGeometry.MidAngle(4, n), DonutGeometry.Span(n), 3).Start;
-            Assert.Equal(new DonutHit(DonutHitKind.Segment, 4), donut.HitTest(center + (corner - center) * 0.995));
+            var corner = DonutGeometry.Wedge(center, donut.Layout.Inner, donut.Layout.Outer, DonutGeometry.MidAngle(4, n), DonutGeometry.Span(n), 3).Start;
+            Assert.Equal(DonutHitKind.Gap, donut.HitTest(center + (corner - center) * 0.995).Kind);
+            var middle = DonutGeometry.PointAt(center, donut.Layout.LabelRadius, DonutGeometry.MidAngle(4, n));
+            Assert.Equal(new DonutHit(DonutHitKind.Segment, 4), donut.HitTest(middle));
             Save(window, "donut-geospatial-soft.png");
             window.Close();
         }

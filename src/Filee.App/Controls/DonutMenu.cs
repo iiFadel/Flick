@@ -44,6 +44,9 @@ public sealed class DonutItem
 
     /// <summary>A group with something to fan out.</summary>
     public bool CanExpand => Children is { Count: > 0 };
+
+    /// <summary>fork: a 24 × 24 line icon (WheelIcons): the slice is drawn as a tool, its icon over a small label.</summary>
+    public Geometry? Icon { get; init; }
 }
 
 /// <summary>Donut-shaped menu control.</summary>
@@ -134,6 +137,7 @@ public sealed partial class DonutMenu : Control
             OnAccentBrushProperty, ForegroundProperty, SecondaryForegroundProperty, SuccessBrushProperty, CornerRadiusProperty,
             CenterHintProperty, CenterHintWheelProperty);
         ItemsProperty.Changed.AddClassHandler<DonutMenu>((d, _) => d.OnItemsChanged());
+        RegisterLook(); // fork: DonutMenu.Look.cs
     }
 
     public DonutMenu()
@@ -204,7 +208,7 @@ public sealed partial class DonutMenu : Control
 
     private int Count => Items?.Count ?? 0;
     private Point Center => new(Bounds.Width / 2, Bounds.Height / 2);
-    private double InnerRadius => OuterRadius * Math.Clamp(HoleRatio, 0.2, 0.75);
+    private double InnerRadius => Layout.Inner; // fork: Tangerine's proportions; HoleRatio is no longer used
 
     // ───────────────────────── Public API ─────────────────────────
 
@@ -379,7 +383,7 @@ public sealed partial class DonutMenu : Control
             if (hit.Kind == DonutHitKind.Outside && Distance(p, Center) < inner && InFan(p, _expanded))
                 return new DonutHit(DonutHitKind.Segment, _expanded);
         }
-        return hit;
+        return WithGaps(hit, p); // fork: DonutMenu.Look.cs
     }
 
     // ───────────────────────── Layout ─────────────────────────
@@ -816,7 +820,7 @@ public sealed partial class DonutMenu : Control
         // A flip turns the ring (and its shadow and a group's ring) about the vertical axis; the hub stays.
         var flip = FlipTransform(center);
         using (context.PushTransform(flip))
-            RenderRing(context, center, r1, r2, n, typeface, typefaceRegular);
+            RenderWheel(context, center, n); // fork: Tangerine's look (DonutMenu.Look.cs) instead of RenderRing
 
         var reaching = _expanded >= 0 ? _expanded : _pendingGroup;
         if (!IsEditMode && reaching >= 0 && reaching < n && Items![reaching].Children is { Count: > 0 } reachable)
@@ -827,7 +831,7 @@ public sealed partial class DonutMenu : Control
                 DrawSubRing(context, center, typeface, typefaceRegular);
         }
 
-        DrawCenter(context, center, r1, typeface, typefaceRegular);
+        DrawWheelCenter(context, center); // fork: instead of DrawCenter
 
         if (IsEditMode && _hoverIndex >= 0 && _hoverIndex < n && _dimmedIndex < 0 && !IsFlipping)
             DrawEditButton(context, EditButtonCenter(_hoverIndex));

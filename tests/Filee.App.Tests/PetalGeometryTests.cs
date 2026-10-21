@@ -78,6 +78,35 @@ public class PetalGeometryTests
         AssertNear(new Point(-84.5312, 0), PetalGeometry.LabelPoint(Origin, Site, 0, 3));
     }
 
+    [Theory]
+    [InlineData(1)]
+    [InlineData(2)]
+    [InlineData(3)]
+    [InlineData(4)]
+    [InlineData(7)]
+    [InlineData(12)]
+    public void The_donuts_angles_agree_with_the_petals(int count)
+    {
+        for (var i = 0; i < count; i++)
+        {
+            Assert.Equal(PetalGeometry.MidAngle(i, count), DonutGeometry.MidAngle(i, count), 9);
+            Assert.Equal(i, DonutGeometry.IndexAt(PetalGeometry.MidAngle(i, count), count));
+            var label = PetalGeometry.LabelPoint(Origin, Site, i, count);
+            Assert.Equal(i, PetalGeometry.IndexAt(Origin, label, Site, count));
+            Assert.Equal(i, DonutGeometry.HitTest(Origin, label, Site.Inner, Site.Outer, count).Index);
+        }
+    }
+
+    [Fact]
+    public void A_petal_by_angle_is_the_petal_by_index()
+    {
+        var byIndex = PetalGeometry.Petal(Origin, Site, 1, 3);
+        var byAngle = PetalGeometry.Petal(Origin, Site, DonutGeometry.MidAngle(1, 3), DonutGeometry.Span(3));
+        AssertNear(byIndex.Start, byAngle.Start);
+        for (var i = 0; i < byIndex.Steps.Count; i++)
+            AssertNear(byIndex.Steps[i].To, byAngle.Steps[i].To);
+    }
+
     [Fact]
     public void One_slice_is_a_ring_with_its_gap_at_the_bottom()
     {

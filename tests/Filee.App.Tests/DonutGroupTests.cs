@@ -625,8 +625,8 @@ public class DonutGroupTests
     {
         var (donut, window) = Open();
         var c = Center(donut);
-        // The see-through ring between the hole and the slices, on the way from the hole to the group.
-        var seam = OnGroup(donut, donut.OuterRadius * donut.HoleRatio - 3);
+        // fork: the see-through hole (the track around it is drawn), on the way from the hole to the group.
+        var seam = OnGroup(donut, donut.Layout.Hole - 3);
         Assert.Equal(0, AlphaAt(donut, seam)); // closed: clicks there go through, as without groups
 
         donut.HandleKey(Key.Right);

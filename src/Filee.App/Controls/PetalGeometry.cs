@@ -68,11 +68,17 @@ public static class PetalGeometry
         At(center, layout.LabelRadius, SiteAngle(index, count));
 
     /// <summary>Outline of petal <paramref name="index"/> of <paramref name="count"/> (the site's path, step for step).</summary>
-    public static PetalOutline Petal(Point center, PetalLayout layout, int index, int count)
+    public static PetalOutline Petal(Point center, PetalLayout layout, int index, int count) =>
+        Petal(center, layout, MidAngle(index, count), 2 * Math.PI / count);
+
+    /// <summary>
+    /// Outline of a petal <paramref name="span"/> radians wide centred on <paramref name="mid"/> (clockwise from 12
+    /// o'clock), for slices that slide while the toolbar editor makes room.
+    /// </summary>
+    public static PetalOutline Petal(Point center, PetalLayout layout, double mid, double span)
     {
         var (inner, outer) = (layout.Inner, layout.Outer);
-        var a = SiteAngle(index, count);
-        var span = 2 * Math.PI / count;
+        var a = Math.PI / 2 - mid;
         var (l, s) = (a - span / 2, a + span / 2);
         double R(double radius) => Math.Asin(Math.Min(0.95, layout.Gap / 2 / Math.Max(radius, layout.Gap / 2 + 0.01)));
 

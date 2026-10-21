@@ -39,8 +39,8 @@ $fonts = [ordered]@{
     'NotoSansSC-Regular.otf'         = @("$cjk/SC/NotoSansSC-Regular.otf", 'FAA6C9DF652116DDE789D351359F3D7E5D2285A2B2A1F04A2D7244DF706D5EA9')
     'NotoSansSC-Bold.otf'            = @("$cjk/SC/NotoSansSC-Bold.otf", 'C6CB5A93ABAA9EDC8EE7463B7EBB7F42D618D40E6ED2F7A5371C97B0B64767C0')
     # fork: the wheel's rounded font. Google Fonts' static instances of Nunito v32 (the repo only has variable fonts).
-    'Nunito-Medium.ttf'              = @("$nunito/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhRTM.ttf", 'CEB6EEC0A584CAE83E8F3AB868E2F03977B38FF6E78632BC8A7EC69DCF9F7C18')
     'Nunito-SemiBold.ttf'            = @("$nunito/XRXI3I6Li01BKofiOc5wtlZ2di8HDGUmRTM.ttf", '1506FC96971E84D1A4CA89F0D1157A881B9CE217BBFA05D2B3C9E3C8F6723091')
+    'Nunito-Bold.ttf'                = @("$nunito/XRXI3I6Li01BKofiOc5wtlZ2di8HDFwmRTM.ttf", '1A025DFCE6E6E03BBE31BA82277EC5ED96DF8B8DD58B3DF6267269490B90B1DC')
 }
 
 New-Item -ItemType Directory -Force -Path $Destination | Out-Null

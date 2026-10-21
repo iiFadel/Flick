@@ -4,7 +4,8 @@
   translucent glass of the site is replaced by the colours it ends up as over a light desktop. Dark values are our design.
 -->
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:Filee.App.Controls">
 
   <Styles.Resources>
     <ResourceDictionary>
@@ -20,6 +21,7 @@
           <SolidColorBrush x:Key="PetalSelectedStrokeBrush" Color="#70C26534" />
           <Color x:Key="WheelShadowColor">#25263438</Color>
           <SolidColorBrush x:Key="WheelLabelBrush" Color="#000000" />
+          <SolidColorBrush x:Key="WheelSubSliceBrush" Color="#ECEEEE" />
           <SolidColorBrush x:Key="CenterPillBrush" Color="#B8FFFFFF" />
           <SolidColorBrush x:Key="CenterPillBorderBrush" Color="#B3FFFFFF" />
           <BoxShadows x:Key="CenterPillShadow">0 2 6 0 #10000000</BoxShadows>
@@ -39,6 +41,7 @@
           <SolidColorBrush x:Key="PetalSelectedStrokeBrush" Color="#70FFB08A" />
           <Color x:Key="WheelShadowColor">#59000000</Color>
           <SolidColorBrush x:Key="WheelLabelBrush" Color="#F2F2F2" />
+          <SolidColorBrush x:Key="WheelSubSliceBrush" Color="#3A3D40" />
           <SolidColorBrush x:Key="CenterPillBrush" Color="#D0303335" />
           <SolidColorBrush x:Key="CenterPillBorderBrush" Color="#33FFFFFF" />
           <BoxShadows x:Key="CenterPillShadow">0 2 6 0 #40000000</BoxShadows>
@@ -53,4 +56,21 @@
       <FontFamily x:Key="WheelFontFamily">fonts:Filee#Nunito, Segoe UI Variable Text, Segoe UI, sans-serif</FontFamily>
     </ResourceDictionary>
   </Styles.Resources>
+
+  <!-- The wheel. A group's ring and the editor's preview still use the slice keys: they get the same colours. -->
+  <Style Selector="c|DonutMenu">
+    <Setter Property="WheelTrackBrush" Value="{DynamicResource WheelTrackBrush}" />
+    <Setter Property="PetalFill" Value="{DynamicResource PetalFill}" />
+    <Setter Property="PetalStrokeBrush" Value="{DynamicResource PetalStrokeBrush}" />
+    <Setter Property="PetalSelectedStrokeBrush" Value="{DynamicResource PetalSelectedStrokeBrush}" />
+    <Setter Property="WheelShadowColor" Value="{DynamicResource WheelShadowColor}" />
+    <Setter Property="WheelLabelBrush" Value="{DynamicResource WheelLabelBrush}" />
+    <Setter Property="CenterPillBrush" Value="{DynamicResource CenterPillBrush}" />
+    <Setter Property="CenterPillBorderBrush" Value="{DynamicResource CenterPillBorderBrush}" />
+    <Setter Property="CenterPillShadow" Value="{DynamicResource CenterPillShadow}" />
+    <Setter Property="WheelFontFamily" Value="{DynamicResource WheelFontFamily}" />
+    <Setter Property="SliceBrush" Value="{DynamicResource WheelSubSliceBrush}" />
+    <Setter Property="SliceBorderBrush" Value="{DynamicResource PetalStrokeBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource WheelLabelBrush}" />
+  </Style>
 </Styles>
