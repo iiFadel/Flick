@@ -9,10 +9,9 @@ Size labels are relative effort, not dates: S (an evening), M (a few evenings), 
 | Area | Filee today | Target (Tangerine) |
 |---|---|---|
 | Trigger | Hold key, then drag | Start dragging, then tap a key. Key can be released, wheel stays open until drop or Escape |
-| Wheels | One donut | Three: Shift = convert, Ctrl/Cmd = tools, Alt/Ctrl(mac) = actions. Switch between them mid-drag |
+| Wheels | One donut | Two: Shift = convert, Ctrl/Cmd = tools (Tangerine's actions wheel is dropped). Switch between them mid-drag |
 | Keyboard use | No | Arrow keys choose, Enter applies, Escape cancels |
 | Tools | Some mixed into the donut (resize, PDF compress/merge/split) | Separate wheel: compress, strip metadata, mute, trim, crop, speed, snapshot, split, redact, annotate, add background, edit |
-| Actions | None | Share, Float, Copy, Move, Copy Path, Terminal. Works on folders and mixed selections |
 | Look | Filee style | Tangerine style |
 | macOS | Preview, platform project not written yet | Feels native |
 
@@ -57,13 +56,9 @@ Done when: side by side with the recording at normal speed, you can't immediatel
 - [ ] Small value popover (one shared control), then: Speed, Split (video, PDF), Channels, Snapshot, Visualize, Add BG
 - [ ] Tests per operation, inputs generated in the test (see `EngineFixture`)
 
-## Phase 4: Actions wheel (S to M)
+## Phase 4: Actions wheel (dropped)
 
-- [ ] Fill the Actions wheel (Phase 1 opens it empty with a "later version" note, `RadialViewModel.Wheel.cs`)
-- [ ] Copy (files to clipboard), Copy Path, Move (folder picker), Open Terminal here
-- [ ] Share: Windows share sheet (DataTransferManager) as the AirDrop equivalent
-- [ ] Float: always-on-top preview window for images and PDFs
-- [ ] Works on folders and mixed selections, not counted as conversions
+Decision 21 Oct 2026: Flick has two wheels only (Shift = Convert, Ctrl = Tools). Remove the Actions wheel, its key binding and its settings.
 
 ## Phase 5: Editor tools (L, the biggest phase)
 
@@ -81,7 +76,6 @@ Built from scratch in Swift (SwiftUI + AppKit), not on Avalonia, because the goa
 - [ ] Native engines first: ImageIO / Core Image (images), AVFoundation (video, audio), PDFKit (PDF render, merge, split), `textutil` (DOCX, RTF, HTML, TXT)
 - [ ] Bundled FFmpeg for what AVFoundation can't do (MKV, WebM, AVI, WMV, FLAC, OGG, Opus, GIF)
 - [ ] Fallback backend: the fork's `filee` CLI (self-contained .NET publish) for conversions with no native route (PDF → DOCX/PPTX/XLSX, EPUB, spreadsheets)
-- [ ] Actions: AirDrop / share sheet, Float (floating NSPanel), Copy, Move, Copy Path, Terminal
 
 ## Later, only if wanted
 

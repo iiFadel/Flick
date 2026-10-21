@@ -10,10 +10,14 @@ Tags: **(confirm)** = still a guess. **(our design)** = not shown anywhere, we d
 ## Interaction
 
 - Start dragging a file, then tap a key. The wheel opens at the cursor and stays open after the key is released, until drop or Escape.
-- Shift = Convert wheel. Command = Tools wheel. Control = Actions wheel (Windows defaults: Shift, Ctrl, Alt). Keys are configurable in Settings.
+- Shift = Convert wheel. Command (Ctrl on Windows) = Tools wheel. Keys are configurable in Settings.
+- **Flick decision (21 Oct 2026): no Actions wheel.** Tangerine's Control wheel is dropped. Flick has two wheels only.
+- **Wheel content rule:** the Convert wheel holds only format targets; the Tools wheel holds only the tools listed for that category below. No format conversions in Tools, no item twice, nothing from upstream Filee that is not in this spec (Filee extras like resize, grayscale, 720p stay in code but off the wheels).
+- Tools not built yet still appear in their spec position, greyed out with a "coming soon" reason, so the layout matches the spec now and fills in during Phase 3.
+- Sources with no Tools wheel (Documents, Slides, Spreadsheets, EPUB, Subtitles, and the other formats marked "none" below): tapping Ctrl does nothing and the Convert wheel stays open.
 - A wheel opens only when exactly one wheel key is down (*site*: `K()` returns nothing for two keys at once).
 - Tapping another key mid-drag switches wheels. The new wheel replaces the old one in place, same centre, no new opening animation (*site*: the menu element stays shown and only its children are replaced). Not in the recording **(confirm)**.
-- Keyboard path: Enter on a file opens the Convert wheel with its first slice selected; Command or Control switches wheels; arrow keys select (Right/Down = next clockwise, Left/Up = previous, Home/End = first/last, all wrapping); Enter or Space applies; Escape cancels; Tab cancels.
+- Keyboard path: Enter on a file opens the Convert wheel with its first slice selected; Command (Ctrl) switches wheels; arrow keys select (Right/Down = next clockwise, Left/Up = previous, Home/End = first/last, all wrapping); Enter or Space applies; Escape cancels; Tab cancels.
 - **Nothing is pre-selected when the wheel opens during a drag.** A slice lights up only while the pointer is over it (*site*: `selected:null` on open; *recording*: no orange until the pointer reaches AIFF). Only the keyboard path (Enter on a file) selects the first slice. This corrects the earlier "first item pre-selected" note.
 - Hit test: a slice is under the pointer only between the inner and outer radius and not inside a gap (*site*: `Ke()` + `isPointInFill`). The pointer in the hole or outside the ring selects nothing.
 - Drop on a slice runs it. Drop with nothing selected cancels (*site*: `pointerup` → `b()`).
@@ -23,7 +27,7 @@ Tags: **(confirm)** = still a guess. **(our design)** = not shown anywhere, we d
 
 ## Wheel contents
 
-Order is clockwise from the top slice. Lists are copied from the site's `z()` (Convert), `et()` (Tools) and `M` (Actions).
+Order is clockwise from the top slice. Lists are copied from the site's `z()` (Convert) and `et()` (Tools).
 
 ### Convert (Shift)
 
@@ -58,7 +62,7 @@ One file:
 | GIF | Metadata |
 | PDF | Compress, Metadata, Split, Organize |
 | ZIP, TAR, GZ, RAR | Extract |
-| everything else (SVG, AVIF, BMP, OGG, OPUS, AIFF, WMA, WEBM, AVI, WMV, documents, slides, spreadsheets, EPUB, subtitles) | none: empty-wheel card |
+| everything else (SVG, AVIF, BMP, OGG, OPUS, AIFF, WMA, WEBM, AVI, WMV, documents, slides, spreadsheets, EPUB, subtitles) | none: Ctrl does nothing |
 
 Several files of the same type (only tools that work on a batch, plus the multi-file tools):
 
@@ -104,25 +108,13 @@ Slice title, full name (used in the centre pill for tools and in the toast) and 
 
 SF Symbols may only be used on Apple platforms. On Windows we draw the closest Lucide icon (ISC licence), which is also what the site's own 24 px stroke icons look like **(our design)**.
 
-### Actions (Control, every file type, folders and mixed selections)
+### Actions
 
-Clockwise from the top: **AirDrop, Float, Copy, Move, Copy Path, Terminal** (6 slices, same look as the Tools wheel).
-
-| Slice | Name | SF Symbol | What it does (site text) |
-|---|---|---|---|
-| AIRDROP | AirDrop | airplayaudio | Share files and folders through the recipient picker. |
-| FLOAT | Float | pin.fill | Keep files in a floating shelf. Pin it to a screen edge and drag files into another app. |
-| COPY | Copy | doc.on.doc | Copy files to the clipboard, ready to paste. |
-| MOVE | Move | folder | Choose a destination folder and move the originals there. |
-| COPY PATH | Copy Path | doc.text | Copy full file paths as text, one path per line. |
-| TERMINAL | Terminal | terminal | Open a folder, or a file's containing folder, in Terminal or iTerm2. |
+Not in Flick (see Interaction). Tangerine's Control wheel had AirDrop, Float, Copy, Move, Copy Path and Terminal.
 
 ### Empty wheel
 
-When a wheel has no slices, a card shows instead of the ring (*site*):
-
-- Tools: "No editing tools for this format. Tap Shift to convert or Control for file actions."
-- Convert: "No conversions for this format. Tap Control for file actions."
+When the Convert wheel has no slices (a format Flick doesn't know), a card shows instead of the ring (*site*): "No conversions for this format." An empty Tools wheel never shows: Ctrl does nothing.
 
 ## Tool behaviour buckets
 
@@ -167,7 +159,7 @@ All in DIP, centre of the wheel = (0, 0), canvas 272 × 272.
 3. **Petals**: radial gradient per petal (centre of the petal's bounding box, radius 50 % of it): 0 % white at 80 %, 68 % `#F3F6F7` at 58 %, 100 % `#F4F6F6` at 75 %. Stroke 0.75 px `#5D6666` at 22 %. *Recording*: ≈ `#E3E3E3` with a lighter centre.
 4. **Selected petal**: fill `#FF5200`, stroke `#C26534` at 44 %. Fill changes in 120 ms. *Recording*: ≈ `#DE5414` at the outer edge to `#F85310` in the middle; slightly shaded, not quite flat.
 5. **Labels** (Convert): uppercase format, 14 px, weight 600, letter spacing 0.35 px, black; white on the selected petal. Centred on the label radius.
-6. **Labels** (Tools, Actions): icon 18 × 18 centred 7.5 px above the label point, black; label 8.5 px, weight 600, letter spacing 0.2 px, centred 10.5 px below the label point. Both turn white on the selected petal.
+6. **Labels** (Tools): icon 18 × 18 centred 7.5 px above the label point, black; label 8.5 px, weight 600, letter spacing 0.2 px, centred 10.5 px below the label point. Both turn white on the selected petal.
 7. **Centre**: *recording* shows a round light disc filling the hole with a pill inside. Pill (*site*): 70 wide, at least 32 high (36 for tools), fully rounded, white at 72 % with 12 px background blur (saturation ×1.3), 1 px border white at 70 %, top inner highlight 1 px white at 70 %, shadow (0, 2) blur 6 black at 6 %, padding 4 × 6. Text: selected slice's label (format) or full title (tool: 8.5 px weight 600, may wrap), 12 px weight 500, letter spacing 0.35 px, black. Hidden while nothing is selected.
 8. No caption under the live wheel. ("Convert to PNG" under the wheel is only on the site's static preview cards: 11 px, `#6C797D`.)
 
