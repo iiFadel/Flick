@@ -39,11 +39,11 @@ Risk: holding Shift or Ctrl during an Explorer drag changes the drop effect (mov
 
 ## Phase 2: Reskin (M)
 
-- [ ] Flick, not Filee, everywhere the user sees it: window titles, tray, toasts, settings, i18n strings, app icon (namespaces and `Filee.*` identifiers stay)
-- [ ] Real Flick icon (the rename shipped a placeholder: orange disc, white wheel)
+- [x] Flick, not Filee, everywhere the user sees it: window titles, tray, toasts, settings, i18n strings, app icon (namespaces and `Filee.*` identifiers stay)
+- [x] Real Flick icon: orange disc, white six-petal wheel drawn with the wheel's own geometry
 - [x] Redraw `DonutMenu` to the spec: shape, slice style, icons, labels, hover, centre content (`DonutMenu.Look.cs`, `PetalGeometry`)
 - [x] Opening, switching and closing animations matched to the site and recording (`WheelMotion`: a 200 ms bloom, a 120 ms hover fade, no switch or close animation)
-- [ ] Toast/progress window and settings window restyled to match
+- [x] Toast/progress window and settings window restyled to match (drop toast at the drop point, `Styles/Flick.axaml`)
 - [x] Theme tokens through `ThemeService` (no hard-coded colours in controls): `Styles/Flick.axaml`
 
 Done when: side by side with the recording at normal speed, you can't immediately tell them apart in motion.
