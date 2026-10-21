@@ -126,7 +126,8 @@ public partial class App : Application
 
         AppHost.Get<TrayService>().Create(this);
         AppHost.Get<WindowService>().EnsureToast();
-        AppHost.Get<ConversionService>().FeedbackDue += (_, _) => AppHost.Get<WindowService>().ShowFeedbackNotice();
+        if (Fork.UpstreamPrompts) // fork:
+            AppHost.Get<ConversionService>().FeedbackDue += (_, _) => AppHost.Get<WindowService>().ShowFeedbackNotice();
         AppHost.Get<WatchFolderService>().Start();
         // Originals of files from a browser that a crash kept from being deleted ("Save only the converted file").
         _ = Task.Run(() => Filee.Core.Web.WebDrop.DeleteStale(Filee.Core.Web.WebDrop.DefaultWorkRoot, TimeSpan.FromDays(1)));
@@ -198,7 +199,8 @@ public partial class App : Application
             AppHost.Get<WindowService>().ShowUpdateNotice(version);
         };
         updates.UpdateFailed += async (_, _) => await AppHost.Get<WindowService>().ShowUpdateFailedAsync();
-        updates.StartPeriodicChecks(() => store.Settings.CheckForUpdates, TimeSpan.FromSeconds(20));
+        if (Fork.UpstreamPrompts) // fork: upstream's releases are Filee, not Flick
+            updates.StartPeriodicChecks(() => store.Settings.CheckForUpdates, TimeSpan.FromSeconds(20));
         DispatcherTimer.RunOnce(() => NotifyEngineUpdates(store), TimeSpan.FromSeconds(25));
     }
 

@@ -104,6 +104,13 @@ public sealed class FormatRequestTests : IDisposable
             radial.Close(animate: false);
             Pump();
 
+            // fork: Flick shows no card (Fork.UpstreamPrompts); the rest is upstream's behaviour.
+            if (!Fork.UpstreamPrompts)
+            {
+                Assert.Null(windows.FormatRequestNotice);
+                return;
+            }
+
             var notice = windows.FormatRequestNotice;
             Assert.NotNull(notice);
             Assert.True(notice.IsVisible);

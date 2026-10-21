@@ -675,6 +675,7 @@
   "common.retry": "重试",
   "about.version": "版本 {0}",
   "about.license": "Filee 是基于 MIT 许可证的免费软件。",
+  "about.based_on": "Based on {0} by KnifeLemon, under the same license.",
   "about.notices": "第三方声明",
   "about.github": "GitHub 仓库",
   "about.support_title": "支持 Filee",

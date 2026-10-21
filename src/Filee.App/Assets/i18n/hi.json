@@ -657,6 +657,7 @@
   "common.retry": "फिर कोशिश करें",
   "about.version": "संस्करण {0}",
   "about.license": "Filee MIT लाइसेंस के तहत एक फ़्री सॉफ़्टवेयर है।",
+  "about.based_on": "Based on {0} by KnifeLemon, under the same license.",
   "about.notices": "तृतीय-पक्ष सूचनाएँ",
   "about.github": "GitHub रिपॉज़िटरी",
   "about.support_title": "Filee को आगे बढ़ाने में मदद करें",

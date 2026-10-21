@@ -209,7 +209,8 @@ public sealed partial class RadialController( // fork: partial (RadialController
         if (extensions.Count == 0)
             return;
         log.LogInformation("Donut closed on files Filee can't read: {Extensions}", FormatRequest.Label(extensions));
-        windows.ShowFormatRequestNotice(extensions);
+        if (Fork.UpstreamPrompts) // fork:
+            windows.ShowFormatRequestNotice(extensions);
     }
 
     private RadialWindow EnsureWindow()

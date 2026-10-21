@@ -11,9 +11,11 @@
       <StackPanel Orientation="Horizontal" Spacing="18">
         <Image Source="avares://Filee/Assets/Icons/filee.png" Width="72" Height="72" />
         <StackPanel VerticalAlignment="Center" Spacing="4">
-          <TextBlock Text="Filee" FontSize="24" FontWeight="Bold" />
+          <TextBlock Text="{DynamicResource app.name}" FontSize="24" FontWeight="Bold" />
           <TextBlock Classes="muted" Text="{Binding Version}" />
           <TextBlock Classes="muted" Text="{DynamicResource about.license}" />
+          <!-- fork: credit the upstream project -->
+          <TextBlock Classes="muted" Text="{Binding BasedOn}" />
           <Button Classes="ghost" Padding="0" Click="OnOpenRepository" Margin="0,4,0,0">
             <StackPanel Orientation="Horizontal" Spacing="6">
               <PathIcon Width="13" Height="13" Data="{StaticResource Icon.Link}" Foreground="{DynamicResource AccentBrush}" />
@@ -24,6 +26,8 @@
       </StackPanel>
     </Border>
     <!-- The sponsors right below Filee itself, while there are any -->
+    <!-- fork: upstream's sponsors, updates and support cards, hidden -->
+    <StackPanel Spacing="18" IsVisible="{Binding UpstreamPrompts}">
     <Border Classes="card" IsVisible="{Binding #Supporters.IsVisible}">
       <StackPanel Spacing="12">
         <TextBlock Classes="h2" Text="{DynamicResource sponsor.thanks}" />
@@ -62,6 +66,7 @@
         </WrapPanel>
       </StackPanel>
     </Border>
+    </StackPanel>
     <Border Classes="card">
       <StackPanel Spacing="8">
         <TextBlock Classes="h2" Text="{DynamicResource about.notices}" />
