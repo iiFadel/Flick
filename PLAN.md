@@ -19,7 +19,7 @@ Size labels are relative effort, not dates: S (an evening), M (a few evenings), 
 ## Phase 0: Setup and spec (S)
 
 - [ ] Fork on GitHub, clone, add `upstream` remote
-- [ ] `dotnet run` and `dotnet test` green on Windows
+- [x] `dotnet run` and `dotnet test` green on Windows
 - [ ] Install FFmpeg engine from Settings → Engines
 - [ ] Record Tangerine at high frame rate: each wheel opening, switching wheels, hovering slices, dropping, progress, completion, cancel
 - [ ] Inspect the Tangerine `.app` bundle: `Contents/Frameworks` and `otool -L` on the binary (which libraries it uses), `Contents/Resources` (reference only, keep out of the repo if it is ever public)
@@ -29,17 +29,18 @@ Done when: the app runs from source and the spec file exists. Every later phase 
 
 ## Phase 1: Gesture model (M, the most important phase)
 
-- [ ] Rewrite `GestureDetector` state machine: drag starts first, a modifier tap opens the matching wheel, releasing the key keeps it open
-- [ ] Three wheel kinds (Convert, Tools, Actions), tapping another modifier switches wheel without closing
-- [ ] Escape cancels, arrow keys move selection, Enter applies to the selected slice
-- [ ] Key bindings configurable in Settings (defaults: Shift, Ctrl, Alt on Windows)
+- [x] Rewrite `GestureDetector` state machine: drag starts first, a modifier tap opens the matching wheel, releasing the key keeps it open
+- [x] Three wheel kinds (Convert, Tools, Actions), tapping another modifier switches wheel without closing
+- [x] Escape cancels, arrow keys move selection, Enter applies to the selected slice
+- [x] Key bindings configurable in Settings (defaults: Shift, Ctrl, Alt on Windows)
 - [x] Unit tests for every transition, including: tap before drag threshold, double tap, key held through drop, drop outside wheel, Escape mid-switch
-- [ ] Manual check: the Explorer drag never breaks, source file is never moved or deleted
+- [x] Manual check: the Explorer drag never breaks, source file is never moved or deleted
 
 Risk: holding Shift or Ctrl during an Explorer drag changes the drop effect (move/copy/link). Filee already forces Copy on drop, but verify Explorer's cursor and behaviour while the key is held. If Shift-as-trigger fights Explorer, use tap-and-release only and test both.
 
 ## Phase 2: Reskin (M)
 
+- [ ] Flick, not Filee, everywhere the user sees it: window titles, tray, toasts, settings, i18n strings, app icon (namespaces and `Filee.*` identifiers stay)
 - [ ] Redraw `DonutMenu` to the spec: shape, slice style, icons, labels, hover, centre content
 - [ ] Opening, switching and closing animations as springs matched to the recordings
 - [ ] Toast/progress window and settings window restyled to match
