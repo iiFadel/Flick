@@ -24,11 +24,9 @@ public sealed partial class RadialController
         triggers.WheelSwitched += kind =>
         {
             _wheelKind = kind;
+            // The new wheel replaces the old one in place, without blooming again (Tangerine).
             if (WheelShowsFiles)
-            {
                 ShowWheel(_window!.DonutControl);
-                _window.DonutControl.PlayOpenAnimation();
-            }
         };
         triggers.WheelNavigated += step =>
         {

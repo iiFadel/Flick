@@ -82,7 +82,19 @@ public sealed partial class DonutMenu
             : hit;
 
     /// <summary>How far the wheel has opened (0 to 1).</summary>
-    private double WheelOpen => _open.Length == 0 ? 1 : Math.Clamp(_open.Average(), 0, 1);
+    internal double WheelOpen => _open.Length == 0 ? 1 : Math.Clamp(_open.Average(), 0, 1);
+
+    /// <summary>How visible the labels and the pill are: they fade in a little after the wheel starts to bloom.</summary>
+    internal double LabelOpacity => _openClock < double.MaxValue && !_closing ? WheelMotion.LabelAlpha(_openClock) : 1;
+
+    /// <summary>Moves a petal's highlight straight towards <paramref name="target"/> in <see cref="WheelMotion.HoverSeconds"/>.</summary>
+    private static bool Fade(ref Spring highlight, double target, double dt)
+    {
+        var step = dt / WheelMotion.HoverSeconds;
+        highlight.Value = highlight.Value < target ? Math.Min(target, highlight.Value + step) : Math.Max(target, highlight.Value - step);
+        highlight.Velocity = 0;
+        return highlight.Value != target;
+    }
 
     /// <summary>The shadow, the track, the petals and their labels.</summary>
     private void RenderWheel(DrawingContext context, Point center, int n)
@@ -141,6 +153,7 @@ public sealed partial class DonutMenu
                 }
 
                 var hot = (i == ActiveIndex || i == _dropTargetIndex) && item.IsEnabled;
+                using var labels = context.PushOpacity(LabelOpacity);
                 DrawPetalLabel(context, item, DonutGeometry.PointAt(center, layout.LabelRadius, mid), mid, span, layout, s, bold, hot);
             }
         }
@@ -235,7 +248,7 @@ public sealed partial class DonutMenu
         var height = Math.Max((tool ? ToolPillHeight : PillHeight) * s, label.Height + 8 * s);
         var box = new Rect(center.X - width / 2, center.Y - height / 2, width, height);
 
-        using (context.PushOpacity(open))
+        using (context.PushOpacity(open * LabelOpacity))
         {
             var border = CenterPillBorderBrush is null ? null : new Pen(CenterPillBorderBrush, 1);
             context.DrawRectangle(CenterPillBrush, border, new RoundedRect(box, height / 2), CenterPillShadow);

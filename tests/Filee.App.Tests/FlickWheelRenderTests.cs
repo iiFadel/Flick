@@ -102,7 +102,8 @@ public class FlickWheelRenderTests
     private static WriteableBitmap Capture(Window window, string name)
     {
         var frame = window.CaptureRenderedFrame()!;
-        frame.Save(Path.Combine(TestServices.ScreenshotDirectory, name));
+        using (var stream = File.Create(Path.Combine(TestServices.ScreenshotDirectory, name)))
+            frame.Save(stream, new PngBitmapEncoderOptions());
         return frame;
     }
 

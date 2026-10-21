@@ -746,7 +746,7 @@ public sealed partial class DonutMenu : Control
             // Popping out bounces; letting go settles without a bounce: one below zero would make the faded accent
             // flash once more on its way back.
             for (var i = 0; i < _hover.Length; i++)
-                active |= i == ActiveIndex ? _hover[i].Step(1, dt) : _hover[i].Step(0, dt, 320, CriticalDamping);
+                active |= Fade(ref _hover[i], i == ActiveIndex ? 1 : 0, dt); // fork: Tangerine's crossfade, no bounce
             active |= _centerPulse.Step(0, dt, 260, 12);
             // A soft bounce opening, like the slices popping out; folding away settles without one. The bounce grows the
             // ring by about a pixel, well inside the room kept for it (SubRingSpace).
@@ -763,8 +763,9 @@ public sealed partial class DonutMenu : Control
                 var done = true;
                 for (var i = 0; i < _open.Length; i++)
                 {
-                    var t = Math.Clamp((_openClock - i * (_closing ? 0.01 : OpenStagger)) / (_closing ? 0.16 : OpenDuration), 0, 1);
-                    _open[i] = _closing ? 1 - EaseInCubic(t) : EaseOutBack(t);
+                    // fork: one bloom for the whole wheel (WheelMotion) instead of staggered slices.
+                    var t = Math.Clamp(_openClock / (_closing ? 0.16 : WheelMotion.OpenSeconds), 0, 1);
+                    _open[i] = _closing ? 1 - EaseInCubic(t) : WheelMotion.Open(t);
                     done &= t >= 1;
                 }
                 if (done)
