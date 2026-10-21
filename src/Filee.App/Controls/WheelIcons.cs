@@ -1,4 +1,4 @@
-// fork: which line icon (Styles/WheelIcons.axaml) a wheel slice shows. Tangerine's tool and action ids
+// fork: which line icon (Styles/WheelIcons.axaml) a wheel slice shows. Tangerine's tool ids
 // (docs/TANGERINE-SPEC.md), mapped from the SF Symbol it uses to the closest Lucide icon, and the built-in presets that
 // do the same job. Any other slice shows its name only.
 
@@ -38,13 +38,6 @@ public static class WheelIcons
         ["createPDF"] = "file-plus",
         ["createCollage"] = "layout-dashboard",
         ["extractArchive"] = "archive",
-        // Actions
-        ["airDrop"] = "airplay",
-        ["float"] = "pin",
-        ["copy"] = "copy",
-        ["move"] = "folder",
-        ["copyPath"] = "file-text",
-        ["openTerminal"] = "terminal",
         // Built-in presets doing one of those jobs
         ["compress-pdf"] = "minimize-2",
         ["tool-crop"] = "crop",
@@ -55,7 +48,7 @@ public static class WheelIcons
         ["extract-frames-jpg"] = "camera",
     };
 
-    /// <summary>The Lucide icon name for a tool, action or preset id, or null.</summary>
+    /// <summary>The Lucide icon name for a tool or preset id, or null.</summary>
     public static string? GlyphFor(string id) => Glyphs.GetValueOrDefault(id);
 
     /// <summary>The icon's geometry (24 × 24, drawn as a stroke), or null when the id has none.</summary>

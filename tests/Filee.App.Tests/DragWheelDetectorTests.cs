@@ -27,7 +27,7 @@ public class DragWheelDetectorTests
     private static (DragWheelDetector Detector, Recorder Recorder) Create(DragWheelSettings? settings = null)
     {
         var detector = new DragWheelDetector { SystemDragThreshold = 4 };
-        detector.Configure(settings ?? new DragWheelSettings { ConvertKey = "Shift", ToolsKey = "Ctrl", ActionsKey = "Alt" });
+        detector.Configure(settings ?? new DragWheelSettings { ConvertKey = "Shift", ToolsKey = "Ctrl" });
         return (detector, new Recorder(detector));
     }
 
@@ -48,7 +48,6 @@ public class DragWheelDetectorTests
     [Theory]
     [InlineData("LeftShift", WheelKind.Convert)]
     [InlineData("LeftControl", WheelKind.Tools)]
-    [InlineData("LeftAlt", WheelKind.Actions)]
     public void Tap_after_the_drag_started_opens_the_keys_wheel_at_the_cursor(string key, WheelKind kind)
     {
         var (detector, recorder) = Create();
@@ -120,10 +119,10 @@ public class DragWheelDetectorTests
 
         detector.MouseDown(Left, 0, 0, ModifierKeys.None);
         Tap(detector, "LeftShift");
-        Tap(detector, "LeftAlt");
+        Tap(detector, "LeftControl");
         detector.MouseMove(50, 0, Left);
 
-        Assert.Equal(["open Actions 50,0"], recorder.Events);
+        Assert.Equal(["open Tools 50,0"], recorder.Events);
     }
 
     [Fact]
@@ -191,10 +190,23 @@ public class DragWheelDetectorTests
         StartDrag(detector);
         Tap(detector, "LeftShift");
         Tap(detector, "LeftControl");
-        Tap(detector, "LeftAlt");
         Tap(detector, "RightShift");
 
-        Assert.Equal(["open Convert 50,0", "switch Tools", "switch Actions", "switch Convert"], recorder.Events);
+        Assert.Equal(["open Convert 50,0", "switch Tools", "switch Convert"], recorder.Events);
+    }
+
+    [Fact]
+    public void Alt_is_no_wheel_key()
+    {
+        var (detector, recorder) = Create();
+
+        StartDrag(detector);
+        Tap(detector, "LeftAlt");
+        Assert.Empty(recorder.Events);
+
+        Tap(detector, "LeftShift");
+        Tap(detector, "LeftAlt");
+        Assert.Equal(["open Convert 50,0"], recorder.Events);
     }
 
     [Fact]
@@ -255,9 +267,9 @@ public class DragWheelDetectorTests
         Assert.Equal(["open Convert 50,0", "cancel"], recorder.Events);
 
         StartDrag(detector);
-        Tap(detector, "LeftAlt");
+        Tap(detector, "LeftControl");
 
-        Assert.Equal(["open Convert 50,0", "cancel", "open Actions 50,0"], recorder.Events);
+        Assert.Equal(["open Convert 50,0", "cancel", "open Tools 50,0"], recorder.Events);
     }
 
     [Fact]
@@ -424,7 +436,7 @@ public class DragWheelDetectorTests
 
         StartDrag(detector);
         Tap(detector, "LeftShift");
-        detector.Configure(new DragWheelSettings { ConvertKey = "Tab", ToolsKey = "Ctrl", ActionsKey = "Alt" });
+        detector.Configure(new DragWheelSettings { ConvertKey = "Tab", ToolsKey = "Ctrl" });
         Tap(detector, "Right");
         detector.MouseUp(Left, 50, 0);
         StartDrag(detector);
@@ -442,7 +454,7 @@ public class DragWheelDetectorTests
         StartDrag(detector);
         Tap(detector, "LeftShift");
         // A finished conversion saves the settings file, which applies the settings again.
-        detector.Configure(new DragWheelSettings { ConvertKey = "Shift", ToolsKey = "Ctrl", ActionsKey = "Alt" });
+        detector.Configure(new DragWheelSettings { ConvertKey = "Shift", ToolsKey = "Ctrl" });
         detector.Paused = false;
         Tap(detector, "Right");
 

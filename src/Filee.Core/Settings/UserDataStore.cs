@@ -416,6 +416,9 @@ internal static class SettingsMigrations
                 settings.Donut.OuterRadius = 120;
         }
 
+        // fork: v33: the Actions wheel is gone. Nothing to move: its key (dragWheel.actionsKey) is ignored when read and
+        // left out when saved.
+
         if (settings.Triggers.Count == 0)
             settings.Triggers = TriggerGesture.Defaults();
 

@@ -1,6 +1,5 @@
-// fork: which slices each drag wheel shows. Until the Tools and Actions wheels get their own contents (PLAN.md,
-// phases 3 and 4) the Tools wheel stands in with the profile's back face and the Actions wheel is empty. The wheels
-// replace flipping during a drag: no flip key, no hint.
+// fork: which slices each drag wheel shows. Until the Tools wheel gets its own contents the profile's back face stands
+// in for it. Flick has no Actions wheel. The wheels replace flipping during a drag: no flip key, no hint.
 
 using Filee.Core.Settings;
 
@@ -14,24 +13,11 @@ public sealed partial class RadialViewModel
         _loads++; // the back face is checked here when needed, not after the front is drawn
         FlipKey = null;
         FlipWithWheel = false;
-        switch (kind)
-        {
-            case WheelKind.Convert:
-                ShowFace(back: false, checkBack: false);
-                break;
-            case WheelKind.Tools:
-                ShowFace(back: true);
-                break;
-            default:
-                IsBackFace = false;
-                (Presets, _subPresets, Items) = (Face.Empty.Presets, Face.Empty.SubPresets, Face.Empty.Items);
-                break;
-        }
+        ShowFace(back: kind == WheelKind.Tools, checkBack: kind == WheelKind.Tools);
         CanFlip = false;
         FlipHint = null;
         FlipHintWheel = false;
-        CenterSubtitle = Items.Count > 0 ? null
-            : kind == WheelKind.Actions ? loc["donut.wheel_actions_later"]
-            : loc["donut.wheel_empty"];
+        // An empty Convert wheel shows a card instead of the ring (DonutMenu.Look.cs).
+        CenterSubtitle = Items.Count == 0 && kind == WheelKind.Convert ? loc["donut.wheel_empty_convert"] : null;
     }
 }

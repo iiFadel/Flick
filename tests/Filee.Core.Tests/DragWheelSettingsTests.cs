@@ -20,35 +20,33 @@ public class DragWheelSettingsTests
         Assert.Equal(expected, WheelKeys.Normalize(hookName));
 
     [Fact]
-    public void Default_keys_map_to_the_three_wheels()
+    public void Default_keys_map_to_the_two_wheels()
     {
         var keys = new DragWheelSettings().EffectiveKeys();
 
-        Assert.Equal(3, keys.Count);
+        Assert.Equal(2, keys.Count);
         Assert.Equal(WheelKind.Convert, keys["Shift"]);
         Assert.Equal(WheelKind.Tools, keys[OperatingSystem.IsMacOS() ? "Meta" : "Ctrl"]);
-        Assert.Equal(WheelKind.Actions, keys[OperatingSystem.IsMacOS() ? "Ctrl" : "Alt"]);
     }
 
     [Fact]
     public void Chosen_keys_are_used_normalised()
     {
-        var keys = new DragWheelSettings { ConvertKey = "RightShift", ToolsKey = "Tab", ActionsKey = "F2" }.EffectiveKeys();
+        var keys = new DragWheelSettings { ConvertKey = "RightShift", ToolsKey = "Tab" }.EffectiveKeys();
 
         Assert.Equal(WheelKind.Convert, keys["Shift"]);
         Assert.Equal(WheelKind.Tools, keys["tab"]);
-        Assert.Equal(WheelKind.Actions, keys["F2"]);
     }
 
     [Theory]
-    [InlineData("Shift", "LeftShift", "Alt")] // two wheels share a key
-    [InlineData("Enter", "Ctrl", "Alt")]      // Enter applies the selected slice
-    [InlineData("Shift", "Up", "Alt")]        // arrows move the selection
-    [InlineData("Shift", "Ctrl", "Escape")]   // Escape cancels
-    [InlineData("", "Ctrl", "Alt")]
-    public void Keys_that_cannot_work_fall_back_to_the_defaults(string convert, string tools, string actions)
+    [InlineData("Shift", "LeftShift")] // two wheels share a key
+    [InlineData("Enter", "Ctrl")]      // Enter applies the selected slice
+    [InlineData("Shift", "Up")]        // arrows move the selection
+    [InlineData("Shift", "Escape")]    // Escape cancels
+    [InlineData("", "Ctrl")]
+    public void Keys_that_cannot_work_fall_back_to_the_defaults(string convert, string tools)
     {
-        var keys = new DragWheelSettings { ConvertKey = convert, ToolsKey = tools, ActionsKey = actions }.EffectiveKeys();
+        var keys = new DragWheelSettings { ConvertKey = convert, ToolsKey = tools }.EffectiveKeys();
 
         Assert.Equal(new DragWheelSettings().EffectiveKeys(), keys);
     }

@@ -133,7 +133,7 @@ public sealed partial class DragWheelOptionsViewModel : ObservableObject
     {
         recorder.IsRecording = false;
         Error = null;
-        // The other wheels keep the keys they have now, even when those were defaults standing in for broken ones.
+        // The other wheel keeps the key it has now, even when that was a default standing in for a broken one.
         var keys = Keys.ToDictionary(k => k.Kind, k => EffectiveKey(k.Kind));
         keys[recorder.Kind] = name;
         if (keys.Values.Distinct(StringComparer.OrdinalIgnoreCase).Count() < keys.Count)
@@ -141,7 +141,7 @@ public sealed partial class DragWheelOptionsViewModel : ObservableObject
             Error = _loc.Format("triggers.wheel_key_taken", WheelKeyText.Display(name));
             return;
         }
-        (Settings.ConvertKey, Settings.ToolsKey, Settings.ActionsKey) = (keys[WheelKind.Convert], keys[WheelKind.Tools], keys[WheelKind.Actions]);
+        (Settings.ConvertKey, Settings.ToolsKey) = (keys[WheelKind.Convert], keys[WheelKind.Tools]);
         _save();
         foreach (var k in Keys)
             k.Refresh();

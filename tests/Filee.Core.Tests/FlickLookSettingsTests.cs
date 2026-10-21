@@ -38,6 +38,22 @@ public class FlickLookSettingsTests
         Assert.Equal("#378ADD", settings.Theme.Accent);
     }
 
+    [Fact]
+    public void Version_32_settings_with_the_actions_key_load_with_two_wheels()
+    {
+        using var dir = new TempDir();
+        File.WriteAllText(Path.Combine(dir.Path, "settings.json"),
+            """{ "schemaVersion": 32, "dragWheel": { "convertKey": "Shift", "toolsKey": "F2", "actionsKey": "Alt" } }""");
+
+        var store = new UserDataStore(dir.Path);
+        store.Load();
+
+        Assert.Equal(AppSettings.CurrentSchemaVersion, store.Settings.SchemaVersion);
+        Assert.Equal("F2", store.Settings.DragWheel.ToolsKey);
+        Assert.Equal(new[] { WheelKind.Convert, WheelKind.Tools }, store.Settings.DragWheel.EffectiveKeys().Values.Order());
+        Assert.False(store.Settings.DragWheel.EffectiveKeys().ContainsKey("Alt"));
+    }
+
     [Theory]
     [InlineData(150, 120)]
     [InlineData(180, 180)]

@@ -70,7 +70,6 @@ public class DragWheelTests
     [AvaloniaFact]
     public void Each_wheel_shows_its_slices_and_none_flips() => WithoutAnimations(() =>
     {
-        var loc = AppHost.Get<ILocalizer>();
         var (vm, window, _) = OpenDragMode();
 
         vm.ShowWheel(WheelKind.Convert);
@@ -85,13 +84,9 @@ public class DragWheelTests
         Assert.False(vm.CanFlip);
         Assert.Null(vm.FlipHint);
 
-        vm.ShowWheel(WheelKind.Actions);
-        Assert.Empty(vm.Items);
-        Assert.Equal(loc["donut.wheel_actions_later"], vm.CenterSubtitle);
-
         // The check of the back face posted by Load must not bring the front back.
         Dispatcher.UIThread.RunJobs();
-        Assert.Empty(vm.Items);
+        Assert.Equal(Existing(Images.BackPresetIds), vm.Items.Select(i => i.Id));
         window.Close();
     });
 
@@ -188,7 +183,7 @@ public class DragWheelTests
         var provider = new TriggerServiceLifecycleTests.DelayedProvider();
         provider.AllowExit.Set();
         using var triggers = TriggerServiceLifecycleTests.Create(provider, () => { });
-        triggers.Apply(new AppSettings { DragWheel = { ConvertKey = "Shift", ToolsKey = "Ctrl", ActionsKey = "Alt" } });
+        triggers.Apply(new AppSettings { DragWheel = { ConvertKey = "Shift", ToolsKey = "Ctrl" } });
         triggers.Start();
         Assert.True(SpinWait.SpinUntil(() => provider.Runs == 1, 2000));
         var vm = AppHost.Get<RadialViewModel>();
@@ -237,8 +232,10 @@ public class DragWheelTests
             provider.PostKey(EventType.KeyPressed, KeyCode.VcRight, EventMask.Button1);
             Assert.Equal(1, TriggerServiceLifecycleTests.Settle(() => window.DonutControl.ActiveIndex));
 
+            // fork: Alt opens no wheel (Flick has no Actions wheel): the Tools wheel stays.
             provider.PostKey(EventType.KeyPressed, KeyCode.VcLeftAlt, EventMask.Button1);
-            Assert.Empty(TriggerServiceLifecycleTests.Settle(() => vm.Items));
+            provider.PostKey(EventType.KeyReleased, KeyCode.VcLeftAlt, EventMask.Button1);
+            Assert.Equal(Existing(Images.BackPresetIds), TriggerServiceLifecycleTests.Settle(() => vm.Items.Select(i => i.Id).ToList()));
 
             provider.PostKey(EventType.KeyPressed, KeyCode.VcEscape, EventMask.Button1);
             Assert.False(TriggerServiceLifecycleTests.Settle(() => radial.IsVisible));

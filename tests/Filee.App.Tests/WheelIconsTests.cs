@@ -1,4 +1,4 @@
-// fork: every Tangerine tool and action has a line icon, and every icon exists.
+// fork: every Tangerine tool has a line icon, and every icon exists.
 
 using Avalonia.Headless.XUnit;
 using Filee.App.Controls;
@@ -7,19 +7,18 @@ namespace Filee.App.Tests;
 
 public class WheelIconsTests
 {
-    // docs/TANGERINE-SPEC.md: the 26 tools and the 6 actions.
+    // docs/TANGERINE-SPEC.md: the 26 tools.
     public static TheoryData<string> TangerineIds =>
     [
         "compress", "removeMetadata", "editImage", "annotateImage", "frameImage", "cropImage", "cropVideo", "redactImage",
         "redactVideo", "redactAudio", "normalizeAudio", "audioToVideo", "trimVideo", "trimAudio", "audioChannels",
         "muteVideo", "changeVideoSpeed", "videoSnapshots", "splitVideo", "joinVideos", "splitPDF", "mergePDF",
         "organizePDF", "createPDF", "createCollage", "extractArchive",
-        "airDrop", "float", "copy", "move", "copyPath", "openTerminal",
     ];
 
     [AvaloniaTheory]
     [MemberData(nameof(TangerineIds))]
-    public void Every_tool_and_action_has_an_icon(string id)
+    public void Every_tool_has_an_icon(string id)
     {
         TestServices.EnsureInitialized();
 

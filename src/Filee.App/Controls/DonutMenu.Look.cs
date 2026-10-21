@@ -4,6 +4,7 @@
 // the progress ring keep their own drawing, coloured through the same theme keys (Styles/Flick.axaml).
 
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
 
@@ -107,6 +108,12 @@ public sealed partial class DonutMenu
 
         using var _ = context.PushTransform(bloom);
         using var __ = context.PushOpacity(open);
+
+        if (n == 0 && !IsEditMode && !string.IsNullOrEmpty(CenterSubtitle))
+        {
+            DrawEmptyCard(context, center, CenterSubtitle, s);
+            return;
+        }
 
         DrawWheelShadow(context, center, layout, s);
         context.DrawGeometry(WheelTrackBrush, null, Annulus(center, layout.Hole, layout.Backdrop));
@@ -271,7 +278,7 @@ public sealed partial class DonutMenu
     /// </summary>
     private void DrawHoleHint(DrawingContext context, Point center, double s)
     {
-        var message = Count == 0 ? CenterSubtitle ?? CenterTitle : CenterHint;
+        var message = Count == 0 ? null : CenterHint; // an empty wheel says it on its card
         if (string.IsNullOrEmpty(message))
             return;
         var room = Layout.Hole * 1.6;
@@ -292,6 +299,29 @@ public sealed partial class DonutMenu
             _naturalWidths.Clear();
         using var line = new TextLayout(text, typeface, size, null, letterSpacing: letterSpacing);
         return _naturalWidths[key] = line.WidthIncludingTrailingWhitespace;
+    }
+
+    // The card an empty wheel shows (site: 245 wide, padding 24, radius 18, 13 px text at line height 1.7).
+    private const double CardWidth = 245, CardPadding = 24, CardRadius = 18, CardTextSize = 13, CardLineHeight = 1.7;
+
+    /// <summary>What an empty wheel shows instead of its ring: why it is empty, and the keys of the other wheels.</summary>
+    private void DrawEmptyCard(DrawingContext context, Point center, string message, double s)
+    {
+        IBrush? Find(string key) => this.TryFindResource(key, ActualThemeVariant, out var value) ? value as IBrush : null;
+        var shadow = this.TryFindResource("WheelCardShadow", ActualThemeVariant, out var found) && found is BoxShadows shadows
+            ? shadows : default;
+
+        var width = CardWidth * s;
+        var room = width - 2 * CardPadding * s;
+        var size = CardTextSize * s;
+        var text = new TextLayout(message, new Typeface(GetValue(Avalonia.Controls.Documents.TextElement.FontFamilyProperty)), size,
+            Find("WheelCardTextBrush") ?? SecondaryForeground, TextAlignment.Center, TextWrapping.Wrap, maxWidth: room,
+            lineHeight: size * CardLineHeight);
+        var height = text.Height + 2 * CardPadding * s;
+        var box = new Rect(center.X - width / 2, center.Y - height / 2, width, height);
+        var border = Find("WheelCardBorderBrush") is { } brush ? new Pen(brush, 1) : null;
+        context.DrawRectangle(Find("WheelCardBrush") ?? Brushes.White, border, new RoundedRect(box, CardRadius * s), shadow);
+        text.Draw(context, new Point(box.X + CardPadding * s, box.Y + CardPadding * s));
     }
 
     private static TextLayout WheelText(string text, Typeface typeface, double size, double letterSpacing, IBrush? brush,

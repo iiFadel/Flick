@@ -70,6 +70,23 @@ public class FlickWheelRenderTests
         window.Close();
     }
 
+    [AvaloniaFact]
+    public void An_empty_wheel_shows_a_card_instead_of_the_ring()
+    {
+        TestServices.EnsureInitialized("en");
+        var (window, donut) = Show([]);
+        donut.CenterSubtitle = "No editing tools for this format. Tap Shift to convert or Alt for file actions.";
+        Settle(donut);
+        using var frame = Capture(window, "flick-wheel-empty.png");
+
+        // Inside the card's left padding (245 wide, 24 padding), clear of the text.
+        var padding = PixelAt(frame, window, donut, Center(donut) + new Vector(-110, 0));
+        Assert.True(padding.R > 250 && padding.G > 250 && padding.B > 250, $"the card is {padding}");
+        // No track around it: the desktop shows where the ring would be.
+        Assert.Equal(Desktop, PixelAt(frame, window, donut, Center(donut) + new Vector(0, -donut.Layout.Outer)));
+        window.Close();
+    }
+
     private static DonutItem Format(string name) => new() { Id = name, Label = name };
 
     private static (Window, DonutMenu) Show(IReadOnlyList<DonutItem> items)

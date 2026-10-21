@@ -1,6 +1,6 @@
 // fork: Flick's drag-then-tap trigger. Start dragging files, then tap a key: the key picks the wheel that opens
-// (Convert, Tools or Actions), the wheel stays open after the key is released, and tapping another wheel's key
-// switches to it. Replaces upstream's "hold the modifier, then drag" (TriggerKind.Drag).
+// (Convert or Tools), the wheel stays open after the key is released, and tapping the other wheel's key switches to
+// it. Tangerine's third wheel (Actions) is not in Flick. Replaces upstream's "hold the modifier, then drag" (TriggerKind.Drag).
 
 namespace Filee.Core.Settings;
 
@@ -12,9 +12,6 @@ public enum WheelKind
 
     /// <summary>Same-format operations (compress, trim, crop, ...).</summary>
     Tools,
-
-    /// <summary>File actions (copy, move, share, ...), for any file type and folders.</summary>
-    Actions,
 }
 
 /// <summary>Key names as the global hook reports them (SharpHook <c>KeyCode</c> without "Vc").</summary>
@@ -50,22 +47,18 @@ public sealed class DragWheelSettings
 
     public string ToolsKey { get; set; } = DefaultKey(WheelKind.Tools);
 
-    public string ActionsKey { get; set; } = DefaultKey(WheelKind.Actions);
-
-    /// <summary>Windows and Linux: Shift, Ctrl, Alt. macOS: Shift, Command, Control (as in Tangerine).</summary>
+    /// <summary>Windows and Linux: Shift, Ctrl. macOS: Shift, Command (as in Tangerine).</summary>
     public static string DefaultKey(WheelKind kind) => kind switch
     {
         WheelKind.Convert => "Shift",
-        WheelKind.Tools => OperatingSystem.IsMacOS() ? "Meta" : "Ctrl",
-        _ => OperatingSystem.IsMacOS() ? "Ctrl" : "Alt",
+        _ => OperatingSystem.IsMacOS() ? "Meta" : "Ctrl",
     };
 
     /// <summary>The key set for <paramref name="kind"/>, as saved.</summary>
     public string KeyFor(WheelKind kind) => kind switch
     {
         WheelKind.Convert => ConvertKey,
-        WheelKind.Tools => ToolsKey,
-        _ => ActionsKey,
+        _ => ToolsKey,
     };
 
     /// <summary>
@@ -76,7 +69,7 @@ public sealed class DragWheelSettings
         !string.IsNullOrWhiteSpace(key) && !DonutSettings.ReservedFlipKeys.Contains(WheelKeys.Normalize(key));
 
     /// <summary>
-    /// Key → wheel, normalised. When a key isn't allowed or two wheels share one (a file edited by hand), all three
+    /// Key → wheel, normalised. When a key isn't allowed or two wheels share one (a file edited by hand), both
     /// fall back to the defaults, so every wheel keeps a key.
     /// </summary>
     public IReadOnlyDictionary<string, WheelKind> EffectiveKeys()

@@ -109,7 +109,7 @@ public sealed class DonutSettings
 public sealed class AppSettings
 {
     /// <summary>Current schema version. Increase when the format changes and add a migration.</summary>
-    public const int CurrentSchemaVersion = 32; // fork: 31 = DragWheel, 32 = Tangerine look defaults
+    public const int CurrentSchemaVersion = 33; // fork: 31 = DragWheel, 32 = Tangerine look defaults, 33 = no Actions wheel
 
     public int SchemaVersion { get; set; } = CurrentSchemaVersion;
 
