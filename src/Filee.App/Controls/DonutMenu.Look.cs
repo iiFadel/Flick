@@ -78,7 +78,7 @@ public sealed partial class DonutMenu
     /// </summary>
     private DonutHit WithGaps(DonutHit hit, Point p) =>
         hit.Kind == DonutHitKind.Segment && !IsEditMode && _expanded < 0 && _pendingGroup < 0 &&
-        PetalGeometry.IndexAt(Center, p, Layout, Count) != hit.Index
+        !PetalShape(Center, Layout, DonutGeometry.MidAngle(hit.Index, Count), DonutGeometry.Span(Count)).FillContains(p)
             ? new DonutHit(DonutHitKind.Gap, hit.Index)
             : hit;
 
@@ -237,6 +237,10 @@ public sealed partial class DonutMenu
     /// <summary>The pill in the hole naming the selected slice (hidden while none is).</summary>
     private void DrawWheelCenter(DrawingContext context, Point center)
     {
+        // The see-through hole still takes the drag: Windows passes fully transparent pixels to the window below, and a
+        // drop in the hole must cancel here, not land there (upstream's solid hub did this).
+        if (Count > 0)
+            context.DrawEllipse(HitBackdrop, null, center, Layout.Hole, Layout.Hole);
         var s = LookScale;
         var open = WheelOpen;
         var item = ActiveItem();

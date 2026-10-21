@@ -186,8 +186,15 @@ public sealed partial class RadialController( // fork: partial (RadialController
         var window = _window;
         // A group about to open (its dwell timer running) must not open on a closing donut.
         window.DonutControl.CollapseGroup();
-        // fork: Tangerine's wheel vanishes at once; `animate` no longer changes anything.
-        window.Hide();
+        // fork: Tangerine's drag wheels vanish at once; the click-mode donut keeps upstream's close animation.
+        if (animate && viewModel.IsClickMode)
+            window.DonutControl.PlayCloseAnimation(() =>
+            {
+                if (!_visible)
+                    window.Hide();
+            });
+        else
+            window.Hide();
         OfferFormatRequest();
     }
 

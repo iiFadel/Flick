@@ -51,7 +51,7 @@ public static class DonutGeometry
     public static double Span(int count) => count <= 0 ? 2 * Math.PI : 2 * Math.PI / count;
 
     /// <summary>Centre angle of slice <paramref name="index"/>.</summary>
-    public static double MidAngle(int index, int count) => (StartAngle(count) + index * Span(count)) % (2 * Math.PI);
+    public static double MidAngle(int index, int count) => (StartAngle(count) + index * Span(count)) % (2 * Math.PI); // fork: StartAngle
 
     /// <summary>fork: where slice 0 sits. Tangerine starts a wheel of three on the left (9 o'clock), any other at the top.</summary>
     public static double StartAngle(int count) => count == 3 ? 3 * Math.PI / 2 : 0;

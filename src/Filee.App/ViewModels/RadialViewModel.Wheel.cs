@@ -30,7 +30,8 @@ public sealed partial class RadialViewModel
     /// </summary>
     public bool ShowWheel(WheelKind kind)
     {
-        var sources = Files.Select(file => FormatRegistry.Detect(file)?.Id ?? "").ToList();
+        // Folders don't convert (RadialController.SourcesFor): the wheels are for the files beside them.
+        var sources = Files.Where(file => !Directory.Exists(file)).Select(file => FormatRegistry.Detect(file)?.Id ?? "").ToList();
         var face = kind == WheelKind.Tools ? ToolsFace(sources) : ConvertFace(sources);
         if (kind == WheelKind.Tools && face.Items.Count == 0)
             return false;

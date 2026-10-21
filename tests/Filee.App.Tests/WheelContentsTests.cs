@@ -81,6 +81,25 @@ public class WheelContentsTests
     }
 
     [AvaloniaFact]
+    public void A_folder_among_the_files_leaves_the_wheels_to_the_files()
+    {
+        TestServices.EnsureInitialized("en");
+        var folder = Directory.CreateTempSubdirectory("flick-folder-");
+        try
+        {
+            var vm = AppHost.Get<RadialViewModel>();
+            vm.ResetForDrag();
+            vm.Load([@"C:lick.png", folder.FullName], clickMode: false);
+            Assert.True(vm.ShowWheel(WheelKind.Convert));
+            Assert.Equal(["JPG", "WEBP", "HEIC", "TIFF", "AVIF", "BMP", "PDF"], vm.Items.Select(i => i.Label));
+        }
+        finally
+        {
+            folder.Delete();
+        }
+    }
+
+    [AvaloniaFact]
     public void Several_photos_get_the_batch_tools()
     {
         TestServices.EnsureInitialized("en");

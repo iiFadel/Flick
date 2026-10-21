@@ -100,7 +100,7 @@ public class DragWheelTests
         var center = Center(donut);
         donut.SetExternalHit(donut.HitTest(center), center);
 
-        donut.Preselect();
+        Assert.True(donut.HandleDragKey(Key.Right)); // the first arrow picks the top slice
         Assert.Equal(0, donut.ActiveIndex);
         donut.SetExternalHit(donut.HitTest(center), center); // the drag rests in the hole
         Assert.Equal(0, donut.ActiveIndex);

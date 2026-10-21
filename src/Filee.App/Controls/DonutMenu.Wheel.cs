@@ -13,15 +13,6 @@ public sealed partial class DonutMenu
     private bool _dragKeyHold;
     private Point? _dragKeyAnchor;
 
-    /// <summary>The wheel just opened or switched: its first slice (the top one) is selected.</summary>
-    public void Preselect()
-    {
-        if (IsEditMode || _progressMode || Count == 0)
-            return;
-        TakeSelectionFromDrag();
-        SetHover(0);
-    }
-
     /// <summary>An arrow or Enter from the global hook during a drag (see <see cref="HandleKey"/>).</summary>
     public bool HandleDragKey(Key key)
     {

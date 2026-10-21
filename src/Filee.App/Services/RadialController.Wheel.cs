@@ -55,7 +55,7 @@ public sealed partial class RadialController
 
     /// <summary>A drag wheel shows files and nothing was converted from it yet.</summary>
     private bool WheelShowsFiles =>
-        _wheelKind is not null && _window is not null && _visible && !_dropped && !viewModel.IsClickMode && viewModel.HasFiles;
+        _wheelKind is not null && _window is not null && _visible && !_dropped && !_converted && !viewModel.IsClickMode && viewModel.HasFiles;
 
     /// <summary>
     /// The files just entered (or the wheel switched): show the wheel's slices. As in Tangerine, none is selected until

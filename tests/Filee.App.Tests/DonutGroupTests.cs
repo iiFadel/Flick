@@ -627,7 +627,7 @@ public class DonutGroupTests
         var c = Center(donut);
         // fork: the see-through hole (the track around it is drawn), on the way from the hole to the group.
         var seam = OnGroup(donut, donut.Layout.Hole - 3);
-        Assert.Equal(0, AlphaAt(donut, seam)); // closed: clicks there go through, as without groups
+        Assert.True(AlphaAt(donut, seam) > 0); // fork: the hole takes the drag even closed, so a drop there cancels
 
         donut.HandleKey(Key.Right);
         donut.HandleKey(Key.Right);

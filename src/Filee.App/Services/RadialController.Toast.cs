@@ -50,6 +50,8 @@ public sealed partial class RadialController
             _window?.DonutControl.SetExternalHighlight(index);
         After(WheelHold, () =>
         {
+            if (_toastModel != model)
+                return; // a new gesture took the window meanwhile
             if (dropped)
                 HideWindow();
             else

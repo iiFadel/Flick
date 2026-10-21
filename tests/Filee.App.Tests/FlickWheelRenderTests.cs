@@ -25,8 +25,9 @@ public class FlickWheelRenderTests
 
         using (var idle = Capture(window, "flick-wheel-formats.png"))
         {
-            // Nothing is lit, and the hole shows the desktop.
-            Assert.Equal(Desktop, PixelAt(idle, window, donut, Center(donut)));
+            // Nothing is lit; the hole shows the desktop, yet still takes the drag (not fully transparent).
+            var hole = PixelAt(idle, window, donut, Center(donut));
+            Assert.True(Math.Abs(hole.R - Desktop.R) <= 1 && Math.Abs(hole.B - Desktop.B) <= 1, $"the hole is {hole}");
         }
 
         donut.SetExternalHighlight(0);

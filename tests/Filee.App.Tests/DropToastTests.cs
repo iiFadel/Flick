@@ -73,6 +73,11 @@ public class DropToastTests
         Assert.True(window.IsVisible);
         Assert.Equal(0, vm.DonutOpacity);
         Assert.Empty(vm.Items);
+        // The wheel keys do nothing more: no second conversion from this drag.
+        Tap(provider, KeyCode.VcLeftControl);
+        Tap(provider, KeyCode.VcLeftShift);
+        Assert.Equal(0, vm.DonutOpacity);
+        Assert.Empty(vm.Items);
 
         Drop(window, file, SliceCenter(window.DonutControl, 1, 2));
         Assert.False(window.IsVisible);
