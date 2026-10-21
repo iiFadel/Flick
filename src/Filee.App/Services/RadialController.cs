@@ -236,9 +236,11 @@ public sealed partial class RadialController( // fork: partial (RadialController
         window.Dropped += (hit, dropped) =>
         {
             // fork: the drop that ends a drag whose wheel already converted (Enter) converts nothing more.
-            if (donut.IsInProgressMode)
+            if (donut.IsInProgressMode || _converted)
             {
                 dropped.Web?.Dispose();
+                if (!donut.IsInProgressMode)
+                    Close(animate: false);
                 return;
             }
             _dropped = true;
@@ -339,6 +341,11 @@ public sealed partial class RadialController( // fork: partial (RadialController
             return;
         }
         _converted = true;
+        if (!viewModel.IsClickMode)
+        {
+            ShowDropToast(job, index); // fork: Tangerine's drop toast instead of the progress ring (RadialController.Toast.cs)
+            return;
+        }
         ShowProgress(job);
     }
 
@@ -411,6 +418,7 @@ public sealed partial class RadialController( // fork: partial (RadialController
     /// <summary>A new gesture needs the window right now: move the job to the toast without animation.</summary>
     private void ReleaseProgressToToast()
     {
+        ReleaseDropToast(); // fork: RadialController.Toast.cs
         if (_progressJob is not null)
             conversions.ShowInToast(_progressJob);
         DetachProgress();

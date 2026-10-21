@@ -59,6 +59,8 @@
   "donut.cancel": "여기에 놓으면 취소",
   "donut.wheel_empty_convert": "No conversions for this format.",
   "donut.tool_coming_soon": "Coming soon",
+  "droptoast.converting": "Converting to {0}",
+  "droptoast.saved": "{0} of {1} saved",
   "wheel.tool.compress": "Compress",
   "wheel.tool.removeMetadata": "Metadata",
   "wheel.tool.editImage": "Edit",

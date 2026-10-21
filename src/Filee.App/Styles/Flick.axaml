@@ -29,6 +29,14 @@
           <SolidColorBrush x:Key="WheelCardBorderBrush" Color="#D9DFDA" />
           <SolidColorBrush x:Key="WheelCardTextBrush" Color="#828782" />
           <BoxShadows x:Key="WheelCardShadow">0 8 28 0 #2024323D</BoxShadows>
+          <SolidColorBrush x:Key="ToastSurfaceBrush" Color="#F5F3F3F2" />
+          <SolidColorBrush x:Key="ToastBorderBrush" Color="#D9DCDA" />
+          <BoxShadows x:Key="ToastShadow">0 6 20 0 #2224323D</BoxShadows>
+          <SolidColorBrush x:Key="ToastTitleBrush" Color="#5C605D" />
+          <SolidColorBrush x:Key="ToastTextBrush" Color="#8A8F8B" />
+          <SolidColorBrush x:Key="ProgressTrackBrush" Color="#DCDFDC" />
+          <SolidColorBrush x:Key="ToastCloseBrush" Color="#E2E4E2" />
+          <SolidColorBrush x:Key="ToastCloseGlyphBrush" Color="#7A7F7B" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="WheelTrackBrush" Color="#F02A2D2F" />
@@ -49,6 +57,14 @@
           <SolidColorBrush x:Key="WheelCardBorderBrush" Color="#33FFFFFF" />
           <SolidColorBrush x:Key="WheelCardTextBrush" Color="#AEACA4" />
           <BoxShadows x:Key="WheelCardShadow">0 8 28 0 #59000000</BoxShadows>
+          <SolidColorBrush x:Key="ToastSurfaceBrush" Color="#F22A2C2B" />
+          <SolidColorBrush x:Key="ToastBorderBrush" Color="#33FFFFFF" />
+          <BoxShadows x:Key="ToastShadow">0 8 24 0 #59000000</BoxShadows>
+          <SolidColorBrush x:Key="ToastTitleBrush" Color="#EDEDEA" />
+          <SolidColorBrush x:Key="ToastTextBrush" Color="#A3A6A2" />
+          <SolidColorBrush x:Key="ProgressTrackBrush" Color="#3E413F" />
+          <SolidColorBrush x:Key="ToastCloseBrush" Color="#3A3D3B" />
+          <SolidColorBrush x:Key="ToastCloseGlyphBrush" Color="#B5B8B4" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
 
@@ -72,5 +88,54 @@
     <Setter Property="SliceBrush" Value="{DynamicResource WheelSubSliceBrush}" />
     <Setter Property="SliceBorderBrush" Value="{DynamicResource PetalStrokeBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource WheelLabelBrush}" />
+  </Style>
+
+  <!-- The drop toast (Views/DropToastWindow.axaml): sizes from the recording's proportions, our design in the details. -->
+  <Style Selector="Border.drop-toast">
+    <Setter Property="Width" Value="340" />
+    <Setter Property="Padding" Value="14,12,16,14" />
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Background" Value="{DynamicResource ToastSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ToastBorderBrush}" />
+    <Setter Property="BoxShadow" Value="{DynamicResource ToastShadow}" />
+    <Setter Property="RenderTransformOrigin" Value="50%,50%" />
+  </Style>
+  <Style Selector="TextBlock.drop-toast-title">
+    <Setter Property="Margin" Value="10,0,0,0" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="14" />
+    <Setter Property="FontWeight" Value="Medium" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    <Setter Property="Foreground" Value="{DynamicResource ToastTitleBrush}" />
+  </Style>
+  <Style Selector="TextBlock.drop-toast-status">
+    <Setter Property="FontSize" Value="12" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    <Setter Property="Foreground" Value="{DynamicResource ToastTextBrush}" />
+  </Style>
+  <Style Selector="ProgressBar.drop-toast-bar">
+    <Setter Property="Height" Value="4" />
+    <Setter Property="MinHeight" Value="4" />
+    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Background" Value="{DynamicResource ProgressTrackBrush}" />
+  </Style>
+  <Style Selector="Button.drop-toast-close">
+    <Setter Property="Width" Value="20" />
+    <Setter Property="Height" Value="20" />
+    <Setter Property="MinWidth" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="10" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Background" Value="{DynamicResource ToastCloseBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource ToastCloseGlyphBrush}" />
+  </Style>
+  <Style Selector="Button.drop-toast-close PathIcon">
+    <Setter Property="Width" Value="8" />
+    <Setter Property="Height" Value="8" />
   </Style>
 </Styles>

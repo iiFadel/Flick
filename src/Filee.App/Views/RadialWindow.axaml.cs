@@ -52,6 +52,9 @@ public partial class RadialWindow : Window
     private DonutHit _lastDragHit;
     private Point? _lastDragAt;
 
+    /// <summary>fork: where the drag last was, in screen pixels (the drop toast grows there).</summary>
+    internal PixelPoint? LastDragScreenPoint => _lastDragAt is { } at ? Donut.PointToScreen(at) : null;
+
     private void OnDragEnter(object? sender, DragEventArgs e)
     {
         DragEntered?.Invoke();

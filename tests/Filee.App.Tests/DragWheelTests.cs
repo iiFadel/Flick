@@ -1,6 +1,6 @@
-// fork: the drag wheels in the donut. Each wheel shows its slices (stand-ins until Phases 3 and 4), the first slice is
-// selected when one opens, keys from the global hook hold the selection until the drag moves on, a conversion's ring
-// takes no drop, and the whole path from the hook (drag, tap, switch, arrows, Escape) drives the controller.
+// fork: the drag wheels in the donut. Each wheel shows the spec's slices with none selected when it opens, keys from
+// the global hook hold the selection until the drag moves on, a conversion's ring takes no drop, the whole path from the
+// hook (drag, tap, switch, arrows, Escape) drives the controller, and Ctrl does nothing for files without tools.
 
 using Avalonia;
 using Avalonia.Headless;

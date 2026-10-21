@@ -4,6 +4,7 @@
 // drag.
 
 using Filee.App.Controls;
+using Filee.App.Services;
 using Filee.Core.Formats;
 using Filee.Core.Presets;
 using Filee.Core.Settings;
@@ -35,6 +36,7 @@ public sealed partial class RadialViewModel
             return false;
 
         _loads++; // the back-face check Load posted must not bring the toolbar profile back
+        Wheel = kind;
         IsBackFace = false;
         (Presets, _subPresets, Items) = (face.Presets, face.SubPresets, face.Items);
         FlipKey = null;
@@ -49,6 +51,16 @@ public sealed partial class RadialViewModel
         return true;
     }
 
+    /// <summary>The drag wheel showing (<see cref="ShowWheel"/>), or null.</summary>
+    public WheelKind? Wheel { get; private set; }
+
+    /// <summary>The drop toast for <paramref name="job"/>, started from slice <paramref name="index"/> of the wheel.</summary>
+    public DropToastViewModel DropToastFor(JobViewModel job, int index)
+    {
+        var label = index >= 0 && index < Items.Count ? Items[index].Label : job.Job.PresetDisplayName;
+        return new DropToastViewModel(job, DropToastLayout.Title(loc, label, conversion: Wheel != WheelKind.Tools), loc);
+    }
+
     /// <summary>
     /// A drag that opened the Tools wheel with files that have none: nothing shows (the window still takes the drag)
     /// until the Convert key is tapped.
@@ -56,6 +68,7 @@ public sealed partial class RadialViewModel
     public void HideWheel()
     {
         _loads++;
+        Wheel = null;
         (Presets, _subPresets, Items) = (Face.Empty.Presets, Face.Empty.SubPresets, Face.Empty.Items);
         CenterSubtitle = null;
         DonutOpacity = 0;
