@@ -218,15 +218,22 @@ public class DragWheelTests
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(new[] { file }, vm.Files);
             Assert.Equal(Existing(Images.PresetIds), vm.Items.Select(i => i.Id));
-            Assert.Equal(0, window.DonutControl.ActiveIndex);
+            Assert.Equal(-1, window.DonutControl.ActiveIndex); // fork: nothing is selected until the drag or a key picks a slice
             Assert.False(triggers.WatchFlipKey); // the wheels replace flipping
 
             provider.PostKey(EventType.KeyPressed, KeyCode.VcLeftControl, EventMask.Button1);
             Assert.True(TriggerServiceLifecycleTests.Settle(() => vm.IsBackFace));
             Assert.Equal(Existing(Images.BackPresetIds), vm.Items.Select(i => i.Id));
-            Assert.Equal(0, window.DonutControl.ActiveIndex);
+            Assert.Equal(-1, window.DonutControl.ActiveIndex);
             provider.PostKey(EventType.KeyReleased, KeyCode.VcLeftControl, EventMask.Button1);
 
+            // Enter with nothing selected does nothing; the first arrow selects the top slice, the next moves on.
+            provider.PostKey(EventType.KeyPressed, KeyCode.VcEnter, EventMask.Button1);
+            Assert.True(TriggerServiceLifecycleTests.Settle(() => radial.IsVisible));
+            Assert.Equal(-1, window.DonutControl.ActiveIndex);
+            provider.PostKey(EventType.KeyPressed, KeyCode.VcRight, EventMask.Button1);
+            Assert.Equal(0, TriggerServiceLifecycleTests.Settle(() => window.DonutControl.ActiveIndex));
+            provider.PostKey(EventType.KeyReleased, KeyCode.VcRight, EventMask.Button1);
             provider.PostKey(EventType.KeyPressed, KeyCode.VcRight, EventMask.Button1);
             Assert.Equal(1, TriggerServiceLifecycleTests.Settle(() => window.DonutControl.ActiveIndex));
 

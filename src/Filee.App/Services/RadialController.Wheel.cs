@@ -50,12 +50,15 @@ public sealed partial class RadialController
     private bool WheelShowsFiles =>
         _wheelKind is not null && _window is not null && _visible && !_dropped && !viewModel.IsClickMode && viewModel.HasFiles;
 
-    /// <summary>The files just entered (or the wheel switched): show the wheel's slices, the first one selected.</summary>
+    /// <summary>
+    /// The files just entered (or the wheel switched): show the wheel's slices. As in Tangerine, none is selected until
+    /// the drag reaches one or an arrow picks one (the first Right or Down picks the top slice).
+    /// </summary>
     private void ShowWheel(DonutMenu donut)
     {
         if (_wheelKind is not { } kind || viewModel.IsClickMode)
             return;
         viewModel.ShowWheel(kind);
-        donut.Preselect();
+        donut.SetExternalHighlight(-1);
     }
 }
