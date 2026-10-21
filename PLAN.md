@@ -41,10 +41,10 @@ Risk: holding Shift or Ctrl during an Explorer drag changes the drop effect (mov
 
 - [ ] Flick, not Filee, everywhere the user sees it: window titles, tray, toasts, settings, i18n strings, app icon (namespaces and `Filee.*` identifiers stay)
 - [ ] Real Flick icon (the rename shipped a placeholder: orange disc, white wheel)
-- [ ] Redraw `DonutMenu` to the spec: shape, slice style, icons, labels, hover, centre content
-- [ ] Opening, switching and closing animations as springs matched to the recordings
+- [x] Redraw `DonutMenu` to the spec: shape, slice style, icons, labels, hover, centre content (`DonutMenu.Look.cs`, `PetalGeometry`)
+- [x] Opening, switching and closing animations matched to the site and recording (`WheelMotion`: a 200 ms bloom, a 120 ms hover fade, no switch or close animation)
 - [ ] Toast/progress window and settings window restyled to match
-- [ ] Theme tokens through `ThemeService` (no hard-coded colours in controls)
+- [x] Theme tokens through `ThemeService` (no hard-coded colours in controls): `Styles/Flick.axaml`
 
 Done when: side by side with the recording at normal speed, you can't immediately tell them apart in motion.
 
@@ -80,6 +80,9 @@ Built from scratch in Swift (SwiftUI + AppKit), not on Avalonia, because the goa
 ## Later, only if wanted
 
 - Explorer selection + keyboard shortcut to open the wheel without dragging
+- Real backdrop blur behind the wheel's track and pill (Tangerine's glass). Avalonia can't blur behind part of a transparent window, so Flick uses the colours the glass shows over a light desktop; over a dark or busy desktop it looks flatter than Tangerine
+- The click-mode donut (hold gesture, Explorer menu) and the Donut toolbar editor still use upstream's toolbar profiles and progress ring; the drag wheels use the spec lists (`WheelCatalog`) and the drop toast. Decide whether click mode should follow
+- `EbookTests.Calibre_ranked_first_makes_a4_pdfs_of_e_books` fails in full runs of the whole solution and passes alone (load or timing); look into it
 - Engine error texts (password-protected archives, DRM ebooks, CAD), log lines and the `filee` CLI still say Filee
 - Watch folders and CLI already exist upstream, keep them working
 - Pull upstream regularly: `git fetch upstream && git merge upstream/main`

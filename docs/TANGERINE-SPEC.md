@@ -169,7 +169,7 @@ All in DIP, centre of the wheel = (0, 0), canvas 272 × 272.
 
 ### Fonts
 
-- Wheel: `ui-rounded` = **SF Pro Rounded** (*site*). Licensed for Apple platforms only, so not usable on Windows. Windows choice: open question, see the Phase 2 plan.
+- Wheel: `ui-rounded` = **SF Pro Rounded** (*site*). Licensed for Apple platforms only, so not usable on Windows. Flick on Windows: **Nunito** (OFL, fetched by `build/fetch-fonts.ps1`), Bold for slice labels (it matches SF Pro Rounded SemiBold next to the recording), SemiBold for the pill.
 - Website text: DM Sans (OFL). Toast in the *recording*: the Mac system font (SF Pro).
 
 ### Colours
@@ -203,6 +203,15 @@ All in DIP, centre of the wheel = (0, 0), canvas 272 × 272.
 ### Not on the site or in the recording (our design)
 
 Dark mode, value popovers, editor windows, Settings window, tray menu, errors in the toast, toasts for several files. Keep them in the same language: orange accent, light frosted greys, soft shadows, round shapes, small uppercase labels. Mark each in this file as **(our design)** when it is decided.
+
+Decided so far (values in `src/Filee.App/Styles/Flick.axaml`):
+
+- **Wheel on Windows:** no backdrop blur behind part of a window, so the track and petals use the colours the recording shows over a light desktop: track `#D6DADB` at 94 %, petal gradient `#F5F6F6` → `#E4E6E7` (68 %) → `#E8EAEA`. The selected petal has a faint white radial glow over the orange, as in the recording. **(our design)**
+- **Greyed slices:** a tool not built yet, or a format Flick can't make, is drawn at 55 % and doesn't light up; while it is hovered the pill shows the reason ("Coming soon"), since tooltips don't show during a drag. **(our design)**
+- **Drop toast:** 340 wide (the recording's proportion to the wheel), padding 14 × 12, radius 14, fill `#F3F3F2` at 96 %, border `#D9DCDA`, shadow (0, 6) blur 20 `#24323D` at 13 %. Title 14 Medium `#5C605D`; status 12 `#8A8F8B`; × in a 20 px circle `#E2E4E2`; bar 4 px, radius 2, orange on `#DCDFDC`. Fades out in 150 ms. **(our design)**
+- **Bottom-right toast:** the same card, × and bar; its buttons, errors and notes as upstream. **(our design)**
+- **Windows (Settings and the rest):** page `#F4F4F4`, cards white, hairlines `#E9ECE8`, text `#282B29`, muted text `#636D64` (the site's `#828782` is too faint for small captions: 3.7:1 on white), font Segoe UI (static: Avalonia draws the variable Segoe UI Variable at one weight). **(our design)**
+- **Dark mode:** page `#1C1D1C`, cards `#262827`, text `#EDEEEB` / `#A3A6A2`; wheel track `#2A2D2F`, petals `#43474A` → `#36393C`, toast `#2A2C2B`. **(our design)**
 
 ## Not usable in the repo
 
