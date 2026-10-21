@@ -101,6 +101,14 @@
     <Setter Property="BoxShadow" Value="{DynamicResource ToastShadow}" />
     <Setter Property="RenderTransformOrigin" Value="50%,50%" />
   </Style>
+  <!-- The bottom-right toast's cards (Views/ToastWindow.axaml) look like the drop toast. -->
+  <Style Selector="Border.toast-card">
+    <Setter Property="CornerRadius" Value="14" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Background" Value="{DynamicResource ToastSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource ToastBorderBrush}" />
+    <Setter Property="BoxShadow" Value="{DynamicResource ToastShadow}" />
+  </Style>
   <Style Selector="TextBlock.drop-toast-title">
     <Setter Property="Margin" Value="10,0,0,0" />
     <Setter Property="VerticalAlignment" Value="Center" />
