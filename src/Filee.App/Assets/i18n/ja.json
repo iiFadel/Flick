@@ -657,6 +657,7 @@
   "common.retry": "再試行",
   "about.version": "バージョン{0}",
   "about.license": "FileeはMITライセンスのフリーソフトウェアです。",
+  "about.based_on": "Based on {0} by KnifeLemon, under the same license.",
   "about.notices": "サードパーティのライセンス情報",
   "about.github": "GitHubリポジトリ",
   "about.support_title": "Fileeの成長を応援",

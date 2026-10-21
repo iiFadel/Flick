@@ -675,6 +675,7 @@
   "common.retry": "다시 시도",
   "about.version": "버전 {0}",
   "about.license": "Filee는 MIT 라이선스의 무료 소프트웨어예요.",
+  "about.based_on": "Based on {0} by KnifeLemon, under the same license.",
   "about.notices": "서드파티 고지",
   "about.github": "GitHub 저장소",
   "about.support_title": "Filee 응원하기",

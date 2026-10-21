@@ -41,6 +41,7 @@ Risk: holding Shift or Ctrl during an Explorer drag changes the drop effect (mov
 ## Phase 2: Reskin (M)
 
 - [ ] Flick, not Filee, everywhere the user sees it: window titles, tray, toasts, settings, i18n strings, app icon (namespaces and `Filee.*` identifiers stay)
+- [ ] Real Flick icon (the rename shipped a placeholder: orange disc, white wheel)
 - [ ] Redraw `DonutMenu` to the spec: shape, slice style, icons, labels, hover, centre content
 - [ ] Opening, switching and closing animations as springs matched to the recordings
 - [ ] Toast/progress window and settings window restyled to match
@@ -85,5 +86,6 @@ Built from scratch in Swift (SwiftUI + AppKit), not on Avalonia, because the goa
 ## Later, only if wanted
 
 - Explorer selection + keyboard shortcut to open the wheel without dragging
+- Engine error texts (password-protected archives, DRM ebooks, CAD), log lines and the `filee` CLI still say Filee
 - Watch folders and CLI already exist upstream, keep them working
 - Pull upstream regularly: `git fetch upstream && git merge upstream/main`

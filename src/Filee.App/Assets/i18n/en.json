@@ -675,6 +675,7 @@
   "common.retry": "Retry",
   "about.version": "Version {0}",
   "about.license": "Filee is free software under the MIT license.",
+  "about.based_on": "Based on {0} by KnifeLemon, under the same license.",
   "about.notices": "Third-party notices",
   "about.github": "GitHub repository",
   "about.support_title": "Help Filee grow",

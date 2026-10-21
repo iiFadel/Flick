@@ -675,6 +675,7 @@
   "common.retry": "Повторить",
   "about.version": "Версия {0}",
   "about.license": "Filee — свободная программа под лицензией MIT.",
+  "about.based_on": "Based on {0} by KnifeLemon, under the same license.",
   "about.notices": "Сторонние компоненты",
   "about.github": "Репозиторий на GitHub",
   "about.support_title": "Помогите Filee расти",

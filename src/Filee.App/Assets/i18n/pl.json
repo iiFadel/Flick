@@ -675,6 +675,7 @@
   "common.retry": "Ponów",
   "about.version": "Wersja {0}",
   "about.license": "Filee to wolne oprogramowanie na licencji MIT.",
+  "about.based_on": "Based on {0} by KnifeLemon, under the same license.",
   "about.notices": "Informacje o komponentach zewnętrznych",
   "about.github": "Repozytorium GitHub",
   "about.support_title": "Pomóż Filee się rozwijać",

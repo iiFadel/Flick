@@ -154,6 +154,11 @@ Bump `AppSettings.CurrentSchemaVersion` and add a step to `SettingsMigrations` w
   application resources. Light/dark surface colours are theme dictionaries in `Styles/Soft.axaml`; a user's
   `theme.json` (`CustomTheme`, see [CUSTOM-THEMES.md](CUSTOM-THEMES.md)) overrides them with theme dictionaries in
   application resources, which are searched first.
+- Flick branding: `LocalizationService.LoadStrings` runs every string through `Brand.Apply`, which turns the word
+  "Filee" into "Flick" (not `Filee.exe`-style names or `/Filee` URL paths). The i18n files stay as upstream ships them,
+  and window titles use `{DynamicResource app.name}`. `Fork.UpstreamPrompts` (false) hides upstream's update checks,
+  star/sponsor prompts and the "Request this format" card. `Filee.exe`, `avares://Filee/...`, namespaces and the
+  `%AppData%\Filee` settings folder keep the upstream name so merges and existing settings keep working.
 
 ## Command line and watch folders
 

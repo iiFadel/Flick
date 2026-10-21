@@ -8,6 +8,9 @@
     <RootNamespace>Filee.App</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\Icons\filee.ico</ApplicationIcon>
+    <!-- fork: Task Manager and file properties show Flick; the exe stays Filee.exe for avares:// paths and upstream merges. -->
+    <Product>Flick</Product>
+    <AssemblyTitle>Flick</AssemblyTitle>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
   </PropertyGroup>

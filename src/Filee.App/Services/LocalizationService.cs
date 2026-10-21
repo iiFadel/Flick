@@ -125,7 +125,8 @@ public sealed class LocalizationService : ILocalizer
         if (!(loader?.Exists(uri) ?? AssetLoader.Exists(uri)))
             return [];
         using var stream = loader?.Open(uri) ?? AssetLoader.Open(uri);
-        return JsonSerializer.Deserialize(stream, AppJsonContext.Default.DictionaryStringString) ?? [];
+        var strings = JsonSerializer.Deserialize(stream, AppJsonContext.Default.DictionaryStringString) ?? [];
+        return strings.ToDictionary(s => s.Key, s => Brand.Apply(s.Value)); // fork: Flick, not Filee
     }
 
     /// <summary>
