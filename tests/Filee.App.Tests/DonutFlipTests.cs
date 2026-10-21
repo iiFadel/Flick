@@ -194,6 +194,9 @@ public class DonutFlipTests
     [AvaloniaFact]
     public void The_back_face_greys_out_what_cannot_convert_the_files_and_one_with_nothing_left_does_not_flip()
     {
+        // fork: with FFmpeg, pictures reach WAV through a still video, so the back face isn't empty for them.
+        Assert.SkipWhen(Filee.Engines.Infrastructure.EngineEnvironment.BundledProgram("ffmpeg", "ffmpeg") is not null,
+            "FFmpeg is installed: pictures can become sounds.");
         var group = new Preset
         {
             Id = "flip-test-sounds",

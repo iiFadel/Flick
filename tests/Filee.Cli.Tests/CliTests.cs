@@ -222,6 +222,9 @@ public sealed class CliTests : IDisposable
     [Fact]
     public async Task Jpeg_xr_converts_on_windows_and_is_no_download_away_elsewhere()
     {
+        // fork: with FFmpeg installed nothing is a download away, so the "optional engines" line is gone.
+        Assert.SkipWhen(Filee.Engines.Infrastructure.EngineEnvironment.BundledProgram("ffmpeg", "ffmpeg") is not null,
+            "FFmpeg is installed.");
         var (code, output, _) = await Run("formats", "jxr");
 
         Assert.Equal(Cli.Success, code);
