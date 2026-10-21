@@ -1,0 +1,56 @@
+<!--
+  fork: Flick's Tangerine look (docs/TANGERINE-SPEC.md). Loaded after Soft.axaml, so its keys and setters win.
+  Light values follow the recording of the real app; Windows has no backdrop blur behind part of a window, so the
+  translucent glass of the site is replaced by the colours it ends up as over a light desktop. Dark values are our design.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <Styles.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Light">
+          <SolidColorBrush x:Key="WheelTrackBrush" Color="#F0D6DADB" />
+          <RadialGradientBrush x:Key="PetalFill">
+            <GradientStop Offset="0" Color="#F5F6F6" />
+            <GradientStop Offset="0.68" Color="#E4E6E7" />
+            <GradientStop Offset="1" Color="#E8EAEA" />
+          </RadialGradientBrush>
+          <SolidColorBrush x:Key="PetalStrokeBrush" Color="#385D6666" />
+          <SolidColorBrush x:Key="PetalSelectedStrokeBrush" Color="#70C26534" />
+          <Color x:Key="WheelShadowColor">#25263438</Color>
+          <SolidColorBrush x:Key="WheelLabelBrush" Color="#000000" />
+          <SolidColorBrush x:Key="CenterPillBrush" Color="#B8FFFFFF" />
+          <SolidColorBrush x:Key="CenterPillBorderBrush" Color="#B3FFFFFF" />
+          <BoxShadows x:Key="CenterPillShadow">0 2 6 0 #10000000</BoxShadows>
+          <SolidColorBrush x:Key="WheelCardBrush" Color="#F2FFFFFF" />
+          <SolidColorBrush x:Key="WheelCardBorderBrush" Color="#D9DFDA" />
+          <SolidColorBrush x:Key="WheelCardTextBrush" Color="#828782" />
+          <BoxShadows x:Key="WheelCardShadow">0 8 28 0 #2024323D</BoxShadows>
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Dark">
+          <SolidColorBrush x:Key="WheelTrackBrush" Color="#F02A2D2F" />
+          <RadialGradientBrush x:Key="PetalFill">
+            <GradientStop Offset="0" Color="#43474A" />
+            <GradientStop Offset="0.68" Color="#36393C" />
+            <GradientStop Offset="1" Color="#3A3D40" />
+          </RadialGradientBrush>
+          <SolidColorBrush x:Key="PetalStrokeBrush" Color="#26FFFFFF" />
+          <SolidColorBrush x:Key="PetalSelectedStrokeBrush" Color="#70FFB08A" />
+          <Color x:Key="WheelShadowColor">#59000000</Color>
+          <SolidColorBrush x:Key="WheelLabelBrush" Color="#F2F2F2" />
+          <SolidColorBrush x:Key="CenterPillBrush" Color="#D0303335" />
+          <SolidColorBrush x:Key="CenterPillBorderBrush" Color="#33FFFFFF" />
+          <BoxShadows x:Key="CenterPillShadow">0 2 6 0 #40000000</BoxShadows>
+          <SolidColorBrush x:Key="WheelCardBrush" Color="#F2262624" />
+          <SolidColorBrush x:Key="WheelCardBorderBrush" Color="#33FFFFFF" />
+          <SolidColorBrush x:Key="WheelCardTextBrush" Color="#AEACA4" />
+          <BoxShadows x:Key="WheelCardShadow">0 8 28 0 #59000000</BoxShadows>
+        </ResourceDictionary>
+      </ResourceDictionary.ThemeDictionaries>
+
+      <!-- Tangerine draws the wheel in SF Pro Rounded (Apple only); Nunito is the closest open rounded font. -->
+      <FontFamily x:Key="WheelFontFamily">fonts:Filee#Nunito, Segoe UI Variable Text, Segoe UI, sans-serif</FontFamily>
+    </ResourceDictionary>
+  </Styles.Resources>
+</Styles>

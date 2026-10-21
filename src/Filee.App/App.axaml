@@ -23,5 +23,6 @@
     <FluentTheme />
     <StyleInclude Source="avares://Filee/Styles/Soft.axaml" />
     <StyleInclude Source="avares://Filee/Styles/TagEditor.axaml" />
+    <StyleInclude Source="avares://Filee/Styles/Flick.axaml" /> <!-- fork: Tangerine look -->
   </Application.Styles>
 </Application>

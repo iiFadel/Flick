@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-  Downloads the Noto Sans fonts (SIL Open Font License 1.1) used by the Filee UI.
+  Downloads the Noto Sans and Nunito fonts (SIL Open Font License 1.1) used by the UI.
 
 .DESCRIPTION
   Fonts are not committed to git (≈36 MB). Run this once after cloning, and CI runs it before publishing.
@@ -22,6 +22,7 @@ $noto = 'https://raw.githubusercontent.com/notofonts/notofonts.github.io/28b15b4
 $latin = "$noto/NotoSans/hinted/ttf"
 $devanagari = "$noto/NotoSansDevanagari/hinted/ttf"
 $cjk = 'https://raw.githubusercontent.com/notofonts/noto-cjk/Sans2.004/Sans/SubsetOTF'
+$nunito = 'https://fonts.gstatic.com/s/nunito/v32'
 
 # File name => (URL, SHA-256). Update both together when bumping a version.
 $fonts = [ordered]@{
@@ -37,6 +38,9 @@ $fonts = [ordered]@{
     'NotoSansKR-Bold.otf'            = @("$cjk/KR/NotoSansKR-Bold.otf", '5A6CEB287ED2FC6CFC6213144EBEA68CBD94B20FC9EB873D8486493BF02D9BDA')
     'NotoSansSC-Regular.otf'         = @("$cjk/SC/NotoSansSC-Regular.otf", 'FAA6C9DF652116DDE789D351359F3D7E5D2285A2B2A1F04A2D7244DF706D5EA9')
     'NotoSansSC-Bold.otf'            = @("$cjk/SC/NotoSansSC-Bold.otf", 'C6CB5A93ABAA9EDC8EE7463B7EBB7F42D618D40E6ED2F7A5371C97B0B64767C0')
+    # fork: the wheel's rounded font. Google Fonts' static instances of Nunito v32 (the repo only has variable fonts).
+    'Nunito-Medium.ttf'              = @("$nunito/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhRTM.ttf", 'CEB6EEC0A584CAE83E8F3AB868E2F03977B38FF6E78632BC8A7EC69DCF9F7C18')
+    'Nunito-SemiBold.ttf'            = @("$nunito/XRXI3I6Li01BKofiOc5wtlZ2di8HDGUmRTM.ttf", '1506FC96971E84D1A4CA89F0D1157A881B9CE217BBFA05D2B3C9E3C8F6723091')
 }
 
 New-Item -ItemType Directory -Force -Path $Destination | Out-Null
