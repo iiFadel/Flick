@@ -1,0 +1,31 @@
+<!-- fork: the small toast that grows at the drop point while a drag wheel's conversion runs (Tangerine's look;
+     styles in Styles/Flick.axaml). Long or failed jobs move to the bottom-right ToastWindow. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Filee.App.ViewModels"
+        x:Class="Filee.App.Views.DropToastWindow"
+        x:DataType="vm:DropToastViewModel"
+        Title="{DynamicResource app.name}"
+        SizeToContent="WidthAndHeight"
+        WindowDecorations="None"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent"
+        Topmost="True"
+        ShowInTaskbar="False"
+        ShowActivated="False"
+        CanResize="False">
+  <!-- Room around the card for its shadow. -->
+  <Border x:Name="Card" Classes="drop-toast" Margin="20">
+    <StackPanel Spacing="7">
+      <DockPanel>
+        <Button Classes="drop-toast-close" DockPanel.Dock="Left" Command="{Binding CloseCommand}"
+                ToolTip.Tip="{DynamicResource toast.cancel}">
+          <PathIcon Data="{StaticResource Icon.Close}" />
+        </Button>
+        <TextBlock Classes="drop-toast-title" Text="{Binding Title}" />
+      </DockPanel>
+      <TextBlock Classes="drop-toast-status" Text="{Binding Status}" />
+      <ProgressBar Classes="drop-toast-bar" Minimum="0" Maximum="1" Value="{Binding Fraction}" />
+    </StackPanel>
+  </Border>
+</Window>

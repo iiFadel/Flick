@@ -1,0 +1,30 @@
+<!--
+  fork: line icons for the Tools wheel (see WheelIcons.cs). Lucide 0.460.0 (ISC, https://lucide.dev),
+  24x24, drawn as strokes. Tangerine uses SF Symbols, which may only be used on Apple platforms.
+-->
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <StreamGeometry x:Key="WheelIcon.archive">M3 3H21A1 1 0 0 1 22 4V7A1 1 0 0 1 21 8H3A1 1 0 0 1 2 7V4A1 1 0 0 1 3 3Z M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8 M10 12h4</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.audio-lines">M2 10v3 M6 6v11 M10 3v18 M14 8v7 M18 5v13 M22 10v3</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.audio-waveform">M2 13a2 2 0 0 0 2-2V7a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0V4a2 2 0 0 1 4 0v13a2 2 0 0 0 4 0v-4a2 2 0 0 1 2-2</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.camera">M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z M9 13A3 3 0 1 0 15 13A3 3 0 1 0 9 13Z</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.columns-2">M5 3H19A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3Z M12 3v18</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.crop">M6 2v14a2 2 0 0 0 2 2h14 M18 22V8a2 2 0 0 0-2-2H2</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.eye-off">M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49 M14.084 14.158a3 3 0 0 1-4.242-4.242 M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143 M2 2 l20 20</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.file-plus">M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z M14 2v4a2 2 0 0 0 2 2h4 M9 15h6 M12 18v-6</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.files">M20 7h-3a2 2 0 0 1-2-2V2 M9 18a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h7l4 4v10a2 2 0 0 1-2 2Z M3 7.6v12.8A1.6 1.6 0 0 0 4.6 22h9.8</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.film">M5 3H19A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3Z M7 3v18 M3 7.5h4 M3 12h18 M3 16.5h4 M17 3v18 M17 7.5h4 M17 16.5h4</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.gauge">M12 14 l4-4 M3.34 19a10 10 0 1 1 17.32 0</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.image">M5 3H19A2 2 0 0 1 21 5V19A2 2 0 0 1 19 21H5A2 2 0 0 1 3 19V5A2 2 0 0 1 5 3Z M7 9A2 2 0 1 0 11 9A2 2 0 1 0 7 9Z M21 15 l-3.086-3.086a2 2 0 0 0-2.828 0L6 21</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.layers">M12.83 2.18 a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z M22 17.65 l-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65 M22 12.65 l-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.layout-dashboard">M4 3H9A1 1 0 0 1 10 4V11A1 1 0 0 1 9 12H4A1 1 0 0 1 3 11V4A1 1 0 0 1 4 3Z M15 3H20A1 1 0 0 1 21 4V7A1 1 0 0 1 20 8H15A1 1 0 0 1 14 7V4A1 1 0 0 1 15 3Z M15 12H20A1 1 0 0 1 21 13V20A1 1 0 0 1 20 21H15A1 1 0 0 1 14 20V13A1 1 0 0 1 15 12Z M4 16H9A1 1 0 0 1 10 17V20A1 1 0 0 1 9 21H4A1 1 0 0 1 3 20V17A1 1 0 0 1 4 16Z</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.layout-grid">M4 3H9A1 1 0 0 1 10 4V9A1 1 0 0 1 9 10H4A1 1 0 0 1 3 9V4A1 1 0 0 1 4 3Z M15 3H20A1 1 0 0 1 21 4V9A1 1 0 0 1 20 10H15A1 1 0 0 1 14 9V4A1 1 0 0 1 15 3Z M15 14H20A1 1 0 0 1 21 15V20A1 1 0 0 1 20 21H15A1 1 0 0 1 14 20V15A1 1 0 0 1 15 14Z M4 14H9A1 1 0 0 1 10 15V20A1 1 0 0 1 9 21H4A1 1 0 0 1 3 20V15A1 1 0 0 1 4 14Z</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.mic-off">M2 2L22 22 M18.89 13.23A7.12 7.12 0 0 0 19 12v-2 M5 10v2a7 7 0 0 0 12 5 M15 9.34V5a3 3 0 0 0-5.68-1.33 M9 9v3a3 3 0 0 0 5.12 2.12 M12 19L12 22</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.minimize-2">M4 14L10 14L10 20 M20 10L14 10L14 4 M14 10L21 3 M3 21L10 14</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.pencil-line">M12 20h9 M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z M15 5 l3 3</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.scissors">M3 6A3 3 0 1 0 9 6A3 3 0 1 0 3 6Z M8.12 8.12 12 12 M20 4 8.12 15.88 M3 18A3 3 0 1 0 9 18A3 3 0 1 0 3 18Z M14.8 14.8 20 20</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.sliders-horizontal">M21 4L14 4 M10 4L3 4 M21 12L12 12 M8 12L3 12 M21 20L16 20 M12 20L3 20 M14 2L14 6 M8 10L8 14 M16 18L16 22</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.speaker">M6 2H18A2 2 0 0 1 20 4V20A2 2 0 0 1 18 22H6A2 2 0 0 1 4 20V4A2 2 0 0 1 6 2Z M12 6h.01 M8 14A4 4 0 1 0 16 14A4 4 0 1 0 8 14Z M12 14h.01</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.tag">M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z M7 7.5A0.5 0.5 0 1 0 8 7.5A0.5 0.5 0 1 0 7 7.5Z</StreamGeometry>
+  <StreamGeometry x:Key="WheelIcon.volume-x">M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z M22 9L16 15 M16 9L22 15</StreamGeometry>
+</ResourceDictionary>

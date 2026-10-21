@@ -27,6 +27,9 @@ public enum DonutHitKind
 
     /// <summary>A slice of the small ring a group slice fans out; <see cref="DonutHit.Index"/> is the group, <see cref="DonutHit.Sub"/> the slice.</summary>
     SubSegment,
+
+    /// <summary>fork: between two petals or in a rounded-off corner: selects nothing. <see cref="DonutHit.Index"/> is the nearest slice.</summary>
+    Gap,
 }
 
 /// <param name="Sub">With <see cref="DonutHitKind.SubSegment"/>: which of the group's presets.</param>
@@ -48,7 +51,10 @@ public static class DonutGeometry
     public static double Span(int count) => count <= 0 ? 2 * Math.PI : 2 * Math.PI / count;
 
     /// <summary>Centre angle of slice <paramref name="index"/>.</summary>
-    public static double MidAngle(int index, int count) => index * Span(count);
+    public static double MidAngle(int index, int count) => (StartAngle(count) + index * Span(count)) % (2 * Math.PI); // fork: StartAngle
+
+    /// <summary>fork: where slice 0 sits. Tangerine starts a wheel of three on the left (9 o'clock), any other at the top.</summary>
+    public static double StartAngle(int count) => count == 3 ? 3 * Math.PI / 2 : 0;
 
     /// <summary>Converts a clockwise-from-top angle and radius into a point relative to <paramref name="center"/>.</summary>
     public static Point PointAt(Point center, double radius, double angle) =>
@@ -67,7 +73,8 @@ public static class DonutGeometry
         if (count <= 0)
             return -1;
         var span = Span(count);
-        return (int)Math.Floor((angle + span / 2) / span) % count;
+        var turns = (int)Math.Floor((angle - StartAngle(count) + span / 2) / span); // fork: StartAngle
+        return (turns % count + count) % count;
     }
 
     /// <summary>How far a group's fan reaches into each neighbouring slice, as a share of a slice.</summary>

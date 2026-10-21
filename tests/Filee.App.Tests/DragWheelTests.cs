@@ -1,6 +1,6 @@
-// fork: the drag wheels in the donut. Each wheel shows its slices (stand-ins until Phases 3 and 4), the first slice is
-// selected when one opens, keys from the global hook hold the selection until the drag moves on, a conversion's ring
-// takes no drop, and the whole path from the hook (drag, tap, switch, arrows, Escape) drives the controller.
+// fork: the drag wheels in the donut. Each wheel shows the spec's slices with none selected when it opens, keys from
+// the global hook hold the selection until the drag moves on, a conversion's ring takes no drop, the whole path from the
+// hook (drag, tap, switch, arrows, Escape) drives the controller, and Ctrl does nothing for files without tools.
 
 using Avalonia;
 using Avalonia.Headless;
@@ -30,9 +30,11 @@ public class DragWheelTests
 
     private static UserDataStore Store => AppHost.Get<UserDataStore>();
 
-    private static ToolbarProfile Images => Store.Profiles.Single(p => p.Id == "images");
-
-    private static List<string> Existing(IEnumerable<string>? ids) => (ids ?? []).Where(id => Store.FindPreset(id) is not null).ToList();
+    // fork: the wheels show the spec's lists (WheelContentsTests covers every category).
+    private static readonly string[] PhotoTargets = ["PNG", "WEBP", "HEIC", "TIFF", "AVIF", "BMP", "PDF"];
+    private static readonly string[] PhotoTools = ["Compress", "Metadata", "Edit", "Annotate", "Add BG", "Crop", "Redact"];
+    private static readonly string[] PhotosTools = ["Compress", "Metadata", "Crop", "Create PDF", "Collage"];
+    private static readonly string[] LetterTargets = ["PAGES", "PDF", "TXT", "MD", "HTML", "EPUB", "PNG", "JPG"];
 
     private static void WithoutAnimations(Action test)
     {
@@ -70,28 +72,23 @@ public class DragWheelTests
     [AvaloniaFact]
     public void Each_wheel_shows_its_slices_and_none_flips() => WithoutAnimations(() =>
     {
-        var loc = AppHost.Get<ILocalizer>();
         var (vm, window, _) = OpenDragMode();
 
         vm.ShowWheel(WheelKind.Convert);
-        Assert.Equal(Existing(Images.PresetIds), vm.Items.Select(i => i.Id));
+        Assert.Equal(PhotoTargets, vm.Items.Select(i => i.Label));
         Assert.False(vm.IsBackFace);
         Assert.False(vm.CanFlip);
         Assert.Null(vm.FlipHint);
         Assert.Null(vm.FlipKey);
 
         vm.ShowWheel(WheelKind.Tools);
-        Assert.Equal(Existing(Images.BackPresetIds), vm.Items.Select(i => i.Id));
+        Assert.Equal(PhotosTools, vm.Items.Select(i => i.Label));
         Assert.False(vm.CanFlip);
         Assert.Null(vm.FlipHint);
 
-        vm.ShowWheel(WheelKind.Actions);
-        Assert.Empty(vm.Items);
-        Assert.Equal(loc["donut.wheel_actions_later"], vm.CenterSubtitle);
-
         // The check of the back face posted by Load must not bring the front back.
         Dispatcher.UIThread.RunJobs();
-        Assert.Empty(vm.Items);
+        Assert.Equal(PhotosTools, vm.Items.Select(i => i.Label));
         window.Close();
     });
 
@@ -103,7 +100,7 @@ public class DragWheelTests
         var center = Center(donut);
         donut.SetExternalHit(donut.HitTest(center), center);
 
-        donut.Preselect();
+        Assert.True(donut.HandleDragKey(Key.Right)); // the first arrow picks the top slice
         Assert.Equal(0, donut.ActiveIndex);
         donut.SetExternalHit(donut.HitTest(center), center); // the drag rests in the hole
         Assert.Equal(0, donut.ActiveIndex);
@@ -188,7 +185,7 @@ public class DragWheelTests
         var provider = new TriggerServiceLifecycleTests.DelayedProvider();
         provider.AllowExit.Set();
         using var triggers = TriggerServiceLifecycleTests.Create(provider, () => { });
-        triggers.Apply(new AppSettings { DragWheel = { ConvertKey = "Shift", ToolsKey = "Ctrl", ActionsKey = "Alt" } });
+        triggers.Apply(new AppSettings { DragWheel = { ConvertKey = "Shift", ToolsKey = "Ctrl" } });
         triggers.Start();
         Assert.True(SpinWait.SpinUntil(() => provider.Runs == 1, 2000));
         var vm = AppHost.Get<RadialViewModel>();
@@ -217,21 +214,29 @@ public class DragWheelTests
             window.DragDrop(at, RawDragEventType.DragEnter, data, DragDropEffects.Copy, RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
             Assert.Equal(new[] { file }, vm.Files);
-            Assert.Equal(Existing(Images.PresetIds), vm.Items.Select(i => i.Id));
-            Assert.Equal(0, window.DonutControl.ActiveIndex);
+            Assert.Equal(PhotoTargets, vm.Items.Select(i => i.Label));
+            Assert.Equal(-1, window.DonutControl.ActiveIndex); // fork: nothing is selected until the drag or a key picks a slice
             Assert.False(triggers.WatchFlipKey); // the wheels replace flipping
 
             provider.PostKey(EventType.KeyPressed, KeyCode.VcLeftControl, EventMask.Button1);
-            Assert.True(TriggerServiceLifecycleTests.Settle(() => vm.IsBackFace));
-            Assert.Equal(Existing(Images.BackPresetIds), vm.Items.Select(i => i.Id));
-            Assert.Equal(0, window.DonutControl.ActiveIndex);
+            Assert.Equal(PhotoTools, TriggerServiceLifecycleTests.Settle(() => vm.Items.Select(i => i.Label).ToList()));
+            Assert.Equal(-1, window.DonutControl.ActiveIndex);
             provider.PostKey(EventType.KeyReleased, KeyCode.VcLeftControl, EventMask.Button1);
 
+            // Enter with nothing selected does nothing; the first arrow selects the top slice, the next moves on.
+            provider.PostKey(EventType.KeyPressed, KeyCode.VcEnter, EventMask.Button1);
+            Assert.True(TriggerServiceLifecycleTests.Settle(() => radial.IsVisible));
+            Assert.Equal(-1, window.DonutControl.ActiveIndex);
+            provider.PostKey(EventType.KeyPressed, KeyCode.VcRight, EventMask.Button1);
+            Assert.Equal(0, TriggerServiceLifecycleTests.Settle(() => window.DonutControl.ActiveIndex));
+            provider.PostKey(EventType.KeyReleased, KeyCode.VcRight, EventMask.Button1);
             provider.PostKey(EventType.KeyPressed, KeyCode.VcRight, EventMask.Button1);
             Assert.Equal(1, TriggerServiceLifecycleTests.Settle(() => window.DonutControl.ActiveIndex));
 
+            // fork: Alt opens no wheel (Flick has no Actions wheel): the Tools wheel stays.
             provider.PostKey(EventType.KeyPressed, KeyCode.VcLeftAlt, EventMask.Button1);
-            Assert.Empty(TriggerServiceLifecycleTests.Settle(() => vm.Items));
+            provider.PostKey(EventType.KeyReleased, KeyCode.VcLeftAlt, EventMask.Button1);
+            Assert.Equal(PhotoTools, TriggerServiceLifecycleTests.Settle(() => vm.Items.Select(i => i.Label).ToList()));
 
             provider.PostKey(EventType.KeyPressed, KeyCode.VcEscape, EventMask.Button1);
             Assert.False(TriggerServiceLifecycleTests.Settle(() => radial.IsVisible));
@@ -243,4 +248,82 @@ public class DragWheelTests
             folder.Delete(recursive: true);
         }
     });
+
+    /// <summary>
+    /// fork: files without tools (a Word document). Ctrl does nothing over the Convert wheel; a drag opened with Ctrl
+    /// shows nothing until Shift opens the Convert wheel.
+    /// </summary>
+    [AvaloniaFact]
+    public void Ctrl_does_nothing_for_files_without_tools() => WithoutAnimations(() =>
+    {
+        var provider = new TriggerServiceLifecycleTests.DelayedProvider();
+        provider.AllowExit.Set();
+        using var triggers = TriggerServiceLifecycleTests.Create(provider, () => { });
+        triggers.Apply(new AppSettings { DragWheel = { ConvertKey = "Shift", ToolsKey = "Ctrl" } });
+        triggers.Start();
+        Assert.True(SpinWait.SpinUntil(() => provider.Runs == 1, 2000));
+        var vm = AppHost.Get<RadialViewModel>();
+        var radial = new RadialController(vm, AppHost.Get<ConversionService>(), AppHost.Get<WindowService>(), Store,
+            AppHost.Get<IPlatformServices>(), triggers, NullLogger<RadialController>.Instance);
+        radial.ListenToWheels();
+        var folder = Directory.CreateTempSubdirectory("flick-wheel-");
+        try
+        {
+            var file = Path.Combine(folder.FullName, "letter.docx");
+            File.WriteAllBytes(file, [0x50, 0x4B, 0x03, 0x04]);
+            List<string> Labels() => vm.Items.Select(i => i.Label).ToList();
+            void Tap(KeyCode key)
+            {
+                provider.PostKey(EventType.KeyPressed, key, EventMask.Button1);
+                provider.PostKey(EventType.KeyReleased, key, EventMask.Button1);
+            }
+
+            // Shift first: the Convert wheel. Ctrl leaves it as it is.
+            provider.PostMouse(EventType.MousePressed, 400, 400, EventMask.Button1);
+            provider.PostMouse(EventType.MouseDragged, 460, 400, EventMask.Button1);
+            Tap(KeyCode.VcLeftShift);
+            Assert.True(TriggerServiceLifecycleTests.Settle(() => radial.IsVisible));
+            Enter(radial.Window!, file);
+            Assert.Equal(LetterTargets, Labels());
+            Tap(KeyCode.VcLeftControl);
+            Assert.Equal(LetterTargets, TriggerServiceLifecycleTests.Settle(Labels));
+            Assert.True(radial.IsVisible);
+            Assert.Equal(1, vm.DonutOpacity);
+            Tap(KeyCode.VcEscape);
+            Assert.False(TriggerServiceLifecycleTests.Settle(() => radial.IsVisible));
+            provider.PostMouse(EventType.MouseReleased, 460, 400, EventMask.None);
+
+            // Ctrl first: nothing shows; Shift opens the Convert wheel.
+            provider.PostMouse(EventType.MousePressed, 400, 400, EventMask.Button1);
+            provider.PostMouse(EventType.MouseDragged, 460, 400, EventMask.Button1);
+            Tap(KeyCode.VcLeftControl);
+            Assert.True(TriggerServiceLifecycleTests.Settle(() => radial.IsVisible));
+            Enter(radial.Window!, file);
+            Assert.Empty(vm.Items);
+            Assert.Equal(0, vm.DonutOpacity);
+            Tap(KeyCode.VcLeftShift);
+            Assert.Equal(LetterTargets, TriggerServiceLifecycleTests.Settle(Labels));
+            Assert.Equal(1, vm.DonutOpacity);
+
+            Tap(KeyCode.VcEscape);
+            provider.PostMouse(EventType.MouseReleased, 460, 400, EventMask.None);
+            radial.Window!.Close();
+        }
+        finally
+        {
+            folder.Delete(recursive: true);
+        }
+    });
+
+    /// <summary>The OS drag carrying <paramref name="file"/> reaches the wheel's window.</summary>
+    private static void Enter(RadialWindow window, string file)
+    {
+        var data = new DataTransfer();
+        var item = window.StorageProvider.TryGetFileFromPathAsync(file).GetAwaiter().GetResult();
+        Assert.NotNull(item);
+        data.Add(DataTransferItem.CreateFile(item));
+        var at = new Point(window.Bounds.Width / 2, window.Bounds.Height / 2);
+        window.DragDrop(at, RawDragEventType.DragEnter, data, DragDropEffects.Copy, RawInputModifiers.None);
+        Dispatcher.UIThread.RunJobs();
+    }
 }

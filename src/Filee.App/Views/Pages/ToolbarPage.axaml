@@ -313,7 +313,8 @@
               <TextBlock Classes="label" VerticalAlignment="Center" Text="{DynamicResource toolbar.size}" />
               <Slider Grid.Column="1" Minimum="110" Maximum="220" Value="{Binding OuterRadius}" />
             </Grid>
-            <Grid ColumnDefinitions="90,*">
+            <!-- fork: the wheel keeps Tangerine's proportions, so its hole no longer has a size of its own. -->
+            <Grid ColumnDefinitions="90,*" IsVisible="False">
               <TextBlock Classes="label" VerticalAlignment="Center" Text="{DynamicResource toolbar.hole}" />
               <Slider Grid.Column="1" Minimum="25" Maximum="65" Value="{Binding HoleRatio}" />
             </Grid>

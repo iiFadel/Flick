@@ -65,10 +65,13 @@
         </Animation>
       </Style.Animations>
     </Style>
+    <!-- fork: the drop toast's thin bar (Styles/Flick.axaml). -->
     <Style Selector="ProgressBar">
-      <Setter Property="CornerRadius" Value="999" />
-      <Setter Property="MinHeight" Value="6" />
-      <Setter Property="Height" Value="6" />
+      <Setter Property="CornerRadius" Value="2" />
+      <Setter Property="MinHeight" Value="4" />
+      <Setter Property="Height" Value="4" />
+      <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Background" Value="{DynamicResource ProgressTrackBrush}" />
     </Style>
   </Window.Styles>
 
@@ -80,13 +83,14 @@
     </ItemsControl.ItemsPanel>
     <ItemsControl.ItemTemplate>
       <DataTemplate x:DataType="vm:JobViewModel">
-        <Border Classes="card" Padding="14,12">
+        <Border Classes="card toast-card" Padding="14,12"> <!-- fork: toast-card -->
           <StackPanel Spacing="8">
             <DockPanel>
-              <Button DockPanel.Dock="Right" Classes="icon" Command="{Binding DismissCommand}" Padding="4" VerticalAlignment="Top">
-                <PathIcon Width="12" Height="12" Data="{StaticResource Icon.Close}" />
+              <!-- fork: × on the left and the title of the drop toast (Styles/Flick.axaml). -->
+              <Button DockPanel.Dock="Left" Classes="drop-toast-close" Command="{Binding DismissCommand}">
+                <PathIcon Data="{StaticResource Icon.Close}" />
               </Button>
-              <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+              <TextBlock Classes="drop-toast-title" Text="{Binding Title}" />
             </DockPanel>
             <Border Classes="download-badge" IsVisible="{Binding IsDownloading}" HorizontalAlignment="Left"
                     Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1"

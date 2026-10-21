@@ -32,7 +32,7 @@ public sealed class ThemeSettings
     public ThemeMode Mode { get; set; } = ThemeMode.System;
 
     /// <summary>Accent colour as <c>#RRGGBB</c>.</summary>
-    public string Accent { get; set; } = "#7F77DD";
+    public string Accent { get; set; } = "#FF5200"; // fork: Tangerine's orange (was #7F77DD)
 
     /// <summary>Base corner radius in pixels. Larger = "softer" UI.</summary>
     public double CornerRadius { get; set; } = 16;
@@ -50,7 +50,7 @@ public sealed class ThemeSettings
 public sealed class DonutSettings
 {
     /// <summary>Outer radius in logical pixels.</summary>
-    public double OuterRadius { get; set; } = 150;
+    public double OuterRadius { get; set; } = 120; // fork: Tangerine's wheel (was 150)
 
     /// <summary>Inner (hole) radius as a fraction of the outer radius (0.2 - 0.7).</summary>
     public double HoleRatio { get; set; } = 0.42;
@@ -109,7 +109,7 @@ public sealed class DonutSettings
 public sealed class AppSettings
 {
     /// <summary>Current schema version. Increase when the format changes and add a migration.</summary>
-    public const int CurrentSchemaVersion = 31; // fork: 31 = DragWheel
+    public const int CurrentSchemaVersion = 33; // fork: 31 = DragWheel, 32 = Tangerine look defaults, 33 = no Actions wheel
 
     public int SchemaVersion { get; set; } = CurrentSchemaVersion;
 

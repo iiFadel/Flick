@@ -9,10 +9,9 @@ Size labels are relative effort, not dates: S (an evening), M (a few evenings), 
 | Area | Filee today | Target (Tangerine) |
 |---|---|---|
 | Trigger | Hold key, then drag | Start dragging, then tap a key. Key can be released, wheel stays open until drop or Escape |
-| Wheels | One donut | Three: Shift = convert, Ctrl/Cmd = tools, Alt/Ctrl(mac) = actions. Switch between them mid-drag |
+| Wheels | One donut | Two: Shift = convert, Ctrl/Cmd = tools (Tangerine's actions wheel is dropped). Switch between them mid-drag |
 | Keyboard use | No | Arrow keys choose, Enter applies, Escape cancels |
 | Tools | Some mixed into the donut (resize, PDF compress/merge/split) | Separate wheel: compress, strip metadata, mute, trim, crop, speed, snapshot, split, redact, annotate, add background, edit |
-| Actions | None | Share, Float, Copy, Move, Copy Path, Terminal. Works on folders and mixed selections |
 | Look | Filee style | Tangerine style |
 | macOS | Preview, platform project not written yet | Feels native |
 
@@ -40,30 +39,26 @@ Risk: holding Shift or Ctrl during an Explorer drag changes the drop effect (mov
 
 ## Phase 2: Reskin (M)
 
-- [ ] Flick, not Filee, everywhere the user sees it: window titles, tray, toasts, settings, i18n strings, app icon (namespaces and `Filee.*` identifiers stay)
-- [ ] Real Flick icon (the rename shipped a placeholder: orange disc, white wheel)
-- [ ] Redraw `DonutMenu` to the spec: shape, slice style, icons, labels, hover, centre content
-- [ ] Opening, switching and closing animations as springs matched to the recordings
-- [ ] Toast/progress window and settings window restyled to match
-- [ ] Theme tokens through `ThemeService` (no hard-coded colours in controls)
+- [x] Flick, not Filee, everywhere the user sees it: window titles, tray, toasts, settings, i18n strings, app icon (namespaces and `Filee.*` identifiers stay)
+- [x] Real Flick icon: orange disc, white six-petal wheel drawn with the wheel's own geometry
+- [x] Redraw `DonutMenu` to the spec: shape, slice style, icons, labels, hover, centre content (`DonutMenu.Look.cs`, `PetalGeometry`)
+- [x] Opening, switching and closing animations matched to the site and recording (`WheelMotion`: a 200 ms bloom, a 120 ms hover fade, no switch or close animation)
+- [x] Toast/progress window and settings window restyled to match (drop toast at the drop point, `Styles/Flick.axaml`)
+- [x] Theme tokens through `ThemeService` (no hard-coded colours in controls): `Styles/Flick.axaml`
 
 Done when: side by side with the recording at normal speed, you can't immediately tell them apart in motion.
 
 ## Phase 3: Tools wheel, no-UI tools (M)
 
-- [ ] Replace the Tools wheel stand-in (Phase 1 shows the profile's back face there, `RadialViewModel.Wheel.cs`)
+- [x] Replace the Tools wheel stand-in: both drag wheels now show the spec's lists (`WheelCatalog`); tools not built yet are greyed out as "coming soon"
 - [ ] Add an "operation" concept next to target-format presets (a same-format transform with parameters). Design it in plan mode first: it must fit `Preset`, `ToolbarProfile`, `JobQueue` and `OutputPathResolver` without breaking conversions
 - [ ] Instant tools: Compress and Metadata (images, video, audio, PDF), Mute, Normalize, Extract (archives)
 - [ ] Small value popover (one shared control), then: Speed, Split (video, PDF), Channels, Snapshot, Visualize, Add BG
 - [ ] Tests per operation, inputs generated in the test (see `EngineFixture`)
 
-## Phase 4: Actions wheel (S to M)
+## Phase 4: Actions wheel (dropped)
 
-- [ ] Fill the Actions wheel (Phase 1 opens it empty with a "later version" note, `RadialViewModel.Wheel.cs`)
-- [ ] Copy (files to clipboard), Copy Path, Move (folder picker), Open Terminal here
-- [ ] Share: Windows share sheet (DataTransferManager) as the AirDrop equivalent
-- [ ] Float: always-on-top preview window for images and PDFs
-- [ ] Works on folders and mixed selections, not counted as conversions
+Decision 21 Oct 2026: Flick has two wheels only (Shift = Convert, Ctrl = Tools). Remove the Actions wheel, its key binding and its settings.
 
 ## Phase 5: Editor tools (L, the biggest phase)
 
@@ -81,11 +76,13 @@ Built from scratch in Swift (SwiftUI + AppKit), not on Avalonia, because the goa
 - [ ] Native engines first: ImageIO / Core Image (images), AVFoundation (video, audio), PDFKit (PDF render, merge, split), `textutil` (DOCX, RTF, HTML, TXT)
 - [ ] Bundled FFmpeg for what AVFoundation can't do (MKV, WebM, AVI, WMV, FLAC, OGG, Opus, GIF)
 - [ ] Fallback backend: the fork's `filee` CLI (self-contained .NET publish) for conversions with no native route (PDF → DOCX/PPTX/XLSX, EPUB, spreadsheets)
-- [ ] Actions: AirDrop / share sheet, Float (floating NSPanel), Copy, Move, Copy Path, Terminal
 
 ## Later, only if wanted
 
 - Explorer selection + keyboard shortcut to open the wheel without dragging
+- Real backdrop blur behind the wheel's track and pill (Tangerine's glass). Avalonia can't blur behind part of a transparent window, so Flick uses the colours the glass shows over a light desktop; over a dark or busy desktop it looks flatter than Tangerine
+- The click-mode donut (hold gesture, Explorer menu) and the Donut toolbar editor still use upstream's toolbar profiles and progress ring; the drag wheels use the spec lists (`WheelCatalog`) and the drop toast. Decide whether click mode should follow
+- `EbookTests.Calibre_ranked_first_makes_a4_pdfs_of_e_books` fails in full runs of the whole solution and passes alone (load or timing); look into it
 - Engine error texts (password-protected archives, DRM ebooks, CAD), log lines and the `filee` CLI still say Filee
 - Watch folders and CLI already exist upstream, keep them working
 - Pull upstream regularly: `git fetch upstream && git merge upstream/main`

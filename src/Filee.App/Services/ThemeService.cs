@@ -16,7 +16,7 @@ public sealed class ThemeService(IPlatformServices platform)
 {
     /// <summary>Accent swatches offered in the Theme page.</summary>
     public static readonly IReadOnlyList<string> Swatches =
-        ["#7F77DD", "#1D9E75", "#D85A30", "#378ADD", "#D4537E", "#BA7517", "#639922", "#5F5E5A"];
+        ["#FF5200", "#7F77DD", "#1D9E75", "#D85A30", "#378ADD", "#D4537E", "#BA7517", "#639922", "#5F5E5A"]; // fork: orange first
 
     /// <summary>Embedded Noto fonts (see build/fetch-fonts.ps1). Missing files fall back to system fonts.</summary>
     private const string Latin = "fonts:Filee#Noto Sans";
@@ -47,6 +47,13 @@ public sealed class ThemeService(IPlatformServices platform)
         ["warning"] = "WarningBrush",
     };
 
+    /// <summary>fork: wheel keys that take a custom theme's colour of another key.</summary>
+    private static readonly (string Key, string[] WheelKeys)[] WheelKeys =
+    [
+        ("SurfaceBrush", ["PetalFill", "WheelSubSliceBrush"]),
+        ("TextPrimaryBrush", ["WheelLabelBrush"]),
+    ];
+
     public void Apply(ThemeSettings theme, string language, CustomTheme? custom = null)
     {
         var app = Application.Current ?? throw new InvalidOperationException("No application.");
@@ -60,7 +67,7 @@ public sealed class ThemeService(IPlatformServices platform)
         };
 
         // Accent colour + derived shades. Fluent controls read the System* keys.
-        var accent = Color.TryParse(theme.Accent, out var parsed) ? parsed : Color.Parse("#7F77DD");
+        var accent = Color.TryParse(theme.Accent, out var parsed) ? parsed : Color.Parse("#FF5200"); // fork: Tangerine's orange
         res["AccentColor"] = accent;
         res["AccentBrush"] = new SolidColorBrush(accent);
         res["AccentSoftBrush"] = new SolidColorBrush(accent, 0.18);
@@ -103,7 +110,10 @@ public sealed class ThemeService(IPlatformServices platform)
             language.StartsWith("ja", StringComparison.OrdinalIgnoreCase) ? [Japanese, Korean, Chinese]
             : language.StartsWith("zh", StringComparison.OrdinalIgnoreCase) ? [Chinese, Korean, Japanese]
             : [Korean, Chinese, Japanese];
-        return $"{Latin}, {Devanagari}, {string.Join(", ", cjk.Select(f => f.Embedded))}, Segoe UI, Nirmala UI, "
+        // fork: on Windows the system font leads (as SF Pro does on the Mac); Noto covers the rest. Segoe UI, not Segoe UI
+        // Variable: Avalonia draws a variable font at one weight only.
+        var system = OperatingSystem.IsWindows() ? "Segoe UI, " : "";
+        return $"{system}{Latin}, {Devanagari}, {string.Join(", ", cjk.Select(f => f.Embedded))}, {(system.Length == 0 ? "Segoe UI, " : "")}Nirmala UI, "
             + $"{string.Join(", ", cjk.Select(f => f.System))}, Kohinoor Devanagari, sans-serif";
     }
 
@@ -113,6 +123,11 @@ public sealed class ThemeService(IPlatformServices platform)
         foreach (var (name, value) in colors ?? new Dictionary<string, string>())
             if (CustomBrushKeys.TryGetValue(name, out var key) && Color.TryParse(value, out var color))
                 dictionary[key] = new SolidColorBrush(color);
+        // fork: the wheel's petals and labels (Styles/Flick.axaml) follow the user's surface and text colours.
+        foreach (var (key, wheelKeys) in WheelKeys)
+            if (dictionary.TryGetValue(key, out var brush))
+                foreach (var wheelKey in wheelKeys)
+                    dictionary[wheelKey] = brush;
 
         if (dictionary.Count == 0)
             res.ThemeDictionaries.Remove(variant);

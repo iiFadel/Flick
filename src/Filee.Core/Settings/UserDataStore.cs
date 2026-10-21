@@ -407,6 +407,18 @@ internal static class SettingsMigrations
         if (settings.SchemaVersion < 31)
             MoveDragGestureToWheel(settings);
 
+        // fork: v32: the accent and wheel size still on upstream's defaults move to Tangerine's.
+        if (settings.SchemaVersion < 32)
+        {
+            if (string.Equals(settings.Theme.Accent, "#7F77DD", StringComparison.OrdinalIgnoreCase))
+                settings.Theme.Accent = "#FF5200";
+            if (settings.Donut.OuterRadius == 150)
+                settings.Donut.OuterRadius = 120;
+        }
+
+        // fork: v33: the Actions wheel is gone. Nothing to move: its key (dragWheel.actionsKey) is ignored when read and
+        // left out when saved.
+
         if (settings.Triggers.Count == 0)
             settings.Triggers = TriggerGesture.Defaults();
 

@@ -186,7 +186,8 @@ public sealed partial class RadialController( // fork: partial (RadialController
         var window = _window;
         // A group about to open (its dwell timer running) must not open on a closing donut.
         window.DonutControl.CollapseGroup();
-        if (animate)
+        // fork: Tangerine's drag wheels vanish at once; the click-mode donut keeps upstream's close animation.
+        if (animate && viewModel.IsClickMode)
             window.DonutControl.PlayCloseAnimation(() =>
             {
                 if (!_visible)
@@ -234,16 +235,19 @@ public sealed partial class RadialController( // fork: partial (RadialController
             if (viewModel.IsClickMode || SameFiles(files, viewModel.Files) || SameWebFiles(files, viewModel.Files))
                 return;
             viewModel.Load(files, clickMode: false);
-            ShowWheel(donut); // fork:
+            if (!ShowWheel(donut) && _wheelKind is not null) // fork: a Tools wheel for files without tools shows nothing until Shift
+                viewModel.HideWheel();
             donut.PlayOpenAnimation();
             WatchFlipKey();
         };
         window.Dropped += (hit, dropped) =>
         {
             // fork: the drop that ends a drag whose wheel already converted (Enter) converts nothing more.
-            if (donut.IsInProgressMode)
+            if (donut.IsInProgressMode || _converted)
             {
                 dropped.Web?.Dispose();
+                if (!donut.IsInProgressMode)
+                    Close(animate: false);
                 return;
             }
             _dropped = true;
@@ -344,6 +348,11 @@ public sealed partial class RadialController( // fork: partial (RadialController
             return;
         }
         _converted = true;
+        if (!viewModel.IsClickMode)
+        {
+            ShowDropToast(job, index); // fork: Tangerine's drop toast instead of the progress ring (RadialController.Toast.cs)
+            return;
+        }
         ShowProgress(job);
     }
 
@@ -416,6 +425,7 @@ public sealed partial class RadialController( // fork: partial (RadialController
     /// <summary>A new gesture needs the window right now: move the job to the toast without animation.</summary>
     private void ReleaseProgressToToast()
     {
+        ReleaseDropToast(); // fork: RadialController.Toast.cs
         if (_progressJob is not null)
             conversions.ShowInToast(_progressJob);
         DetachProgress();

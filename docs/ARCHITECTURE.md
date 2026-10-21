@@ -97,9 +97,9 @@ second with the Engines page's `TransferRate` and units, rewritten four times a 
 ## Drag wheels (Flick)
 
 Flick replaces upstream's "hold the modifier, then drag" with Tangerine's "start dragging, then tap a key". Each key
-opens one wheel: Convert, Tools or Actions (`WheelKind`; keys in `AppSettings.DragWheel`, defaults Shift / Ctrl / Alt,
-macOS Shift / Command / Control, Settings → Triggers). Schema 31 moved the old drag gesture's button, threshold and
-scope there.
+opens one wheel: Convert or Tools (`WheelKind`; keys in `AppSettings.DragWheel`, defaults Shift / Ctrl, macOS Shift /
+Command, Settings → Triggers). Schema 31 moved the old drag gesture's button, threshold and scope there; schema 33
+dropped Tangerine's third wheel (Actions), whose old key is ignored when settings are read.
 
 `DragWheelDetector` (pure, unit tested) is the state machine: `Idle → Pressed → Dragging → Open(kind)`, with
 `Pending(kind)` for a key tapped before the threshold and `Cancelled` after Escape, until the button is released.
@@ -109,13 +109,30 @@ then drag) never open a wheel; the modifiers of each press catch up on key relea
 
 `TriggerService.Wheel.cs` feeds it from the hook and posts its events to the UI thread; `RadialController.Wheel.cs`
 opens the drag window for `WheelOpened`, shows the wheel's slices once the files enter (`RadialViewModel.ShowWheel`)
-with the first slice selected (`DonutMenu.Preselect`), and passes arrows and Enter to `DonutMenu.HandleDragKey`. A key
+with none selected (a slice lights up when the drag reaches it, or the first arrow picks one), and passes arrows and
+Enter to `DonutMenu.HandleDragKey`. A key
 holds the selection until the drag moves away from where it rested (`DonutMenu.Wheel.cs`), since the drag's own
-position keeps arriving through `SetExternalHit`. A drop on a slice converts with it; a drop in the hole or elsewhere
-cancels. After Enter started a conversion, the drop that ends the drag converts nothing more (`Converts` is false on
-the progress ring). The wheels replace flipping during a drag (Tab and the mouse wheel still flip in click mode).
+position keeps arriving through `SetExternalHit`. A drop on a slice converts with it; a drop in the hole, a gap or
+elsewhere cancels. The wheels replace flipping during a drag (Tab and the mouse wheel still flip in click mode).
 
-Until Phases 3 and 4 the Tools wheel shows the profile's back face and the Actions wheel is empty.
+**Contents.** The drag wheels don't use the toolbar profiles (those still serve the click-mode donut and its editor).
+`Filee.Core/Wheels/WheelCatalog` (pure, unit tested) holds `docs/TANGERINE-SPEC.md`'s lists, ported from Tangerine's
+website: the Convert wheel's format targets for the files (several files: what all of them can become, none of their
+own formats) and the Tools wheel's tools (several files: the batch and multi-file tools only).
+`RadialViewModel.Wheel.cs` turns each target into the plain built-in `to-<format>` preset (or a plain one made for
+the wheel), labelled as the spec writes it (MD, VTT, GZIP), and each tool into the built-in preset that already does it
+(`BuiltTools`: Crop, Split PDF, Merge / Create PDF, Extract, and Compress for PDFs); the rest are greyed out in their
+place as "coming soon", and the pill names that reason during a drag. Files with no tools have no Tools wheel:
+`ShowWheel` refuses it and the controller keeps the wheel showing; a drag opened with that key shows nothing
+(`HideWheel`) until the Convert key.
+
+**After the drop** (`RadialController.Toast.cs`, Tangerine's "After the drop"). A drag wheel's conversion gets no
+progress ring: the slice stays lit 50 ms, the wheel goes, and 70 ms later `DropToastWindow` grows at the drop point
+(`RadialWindow.LastDragScreenPoint`, placed by `DropToastLayout`) with "Converting to MP3", the file and percentage,
+and a thin bar. It closes 80 ms after "1 of 1 saved"; a failure, or a job still running after `HandOffAfter` (5 s),
+moves to the bottom-right `ToastWindow`, and × cancels. After Enter started a job mid-drag, the wheel's window stays
+up, invisible (`HideWheel`), so the drop that ends the drag lands on it and converts nothing (`_converted`) instead of
+on Explorer below. Click mode keeps the ring (`DonutMenu.Progress.cs`).
 
 ## Donut control
 
@@ -123,6 +140,17 @@ Until Phases 3 and 4 the Tools wheel shows the profile's back face and the Actio
 (slice angles, hit testing) and is unit tested. The same control is the live toolbar and, with `IsEditMode`, the
 editor on the *Donut toolbar* settings page (drag to reorder, ✎ / right-click to edit).
 Animations are small springs advanced per frame; `Motion.Enabled == false` (*Reduce animations*) snaps them.
+
+**Flick's look** (`DonutMenu.Look.cs`, numbers in `docs/TANGERINE-SPEC.md`): `Render` draws `RenderWheel` and
+`DrawWheelCenter` instead of upstream's `RenderRing` and `DrawCenter` (kept, unused, so merges stay clean). Petals come
+from `PetalGeometry` (pure, unit tested against paths copied from Tangerine's site): a 4 px gap, rounded corners drawn
+with quadratic curves, Tangerine's proportions at any size (`PetalLayout.ForOuter`; the hole size setting is hidden),
+and three slices starting on the left (`DonutGeometry.StartAngle`). A gap, a cut-away corner or the band past the
+petals is `DonutHitKind.Gap` (selects nothing) unless a group is opening, so its ring never folds on the way out.
+Formats are names in Nunito (`WheelFontFamily`); tools a Lucide line icon over a small label (`DonutItem.Icon`,
+`WheelIcons`). The hole is see-through, with a pill naming the selected slice; a wheel with nothing to show draws a
+card (`DrawEmptyCard`). Motion (`WheelMotion`, pure): one 200 ms bloom on the site's cubic-bezier with the labels
+fading in from 40 ms, a 120 ms crossfade on hover, nothing on switching wheels or closing.
 
 Every `ToolbarProfile` has two faces: `PresetIds` (the front) and `BackPresetIds` (the back; the built-in donuts get
 the less common formats and tools of their file type, see `BuiltInData.CreateProfiles`). The flip key
@@ -154,6 +182,12 @@ Bump `AppSettings.CurrentSchemaVersion` and add a step to `SettingsMigrations` w
   application resources. Light/dark surface colours are theme dictionaries in `Styles/Soft.axaml`; a user's
   `theme.json` (`CustomTheme`, see [CUSTOM-THEMES.md](CUSTOM-THEMES.md)) overrides them with theme dictionaries in
   application resources, which are searched first.
+- Flick's look: `Styles/Flick.axaml`, loaded after `Soft.axaml`, overrides the light and dark surfaces and text with
+  Tangerine's site colours and adds the wheel's and the toasts' keys (light from the recording; Windows can't blur
+  behind part of a window, so the glass is the colour it ends up as over a light desktop; dark is our design). A custom
+  theme's surface and text colours also reach the wheel (`ThemeService.WheelKeys`). The accent defaults to `#FF5200`
+  (schema 32 moves an untouched old default), and on Windows Segoe UI leads the font chain (static: Avalonia draws
+  variable fonts like Segoe UI Variable at one weight).
 - Flick branding: `LocalizationService.LoadStrings` runs every string through `Brand.Apply`, which turns the word
   "Filee" into "Flick" (not `Filee.exe`-style names or `/Filee` URL paths). The i18n files stay as upstream ships them,
   and window titles use `{DynamicResource app.name}`. `Fork.UpstreamPrompts` (false) hides upstream's update checks,
