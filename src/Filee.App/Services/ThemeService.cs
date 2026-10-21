@@ -110,7 +110,10 @@ public sealed class ThemeService(IPlatformServices platform)
             language.StartsWith("ja", StringComparison.OrdinalIgnoreCase) ? [Japanese, Korean, Chinese]
             : language.StartsWith("zh", StringComparison.OrdinalIgnoreCase) ? [Chinese, Korean, Japanese]
             : [Korean, Chinese, Japanese];
-        return $"{Latin}, {Devanagari}, {string.Join(", ", cjk.Select(f => f.Embedded))}, Segoe UI, Nirmala UI, "
+        // fork: on Windows the system font leads (as SF Pro does on the Mac); Noto covers the rest. Segoe UI, not Segoe UI
+        // Variable: Avalonia draws a variable font at one weight only.
+        var system = OperatingSystem.IsWindows() ? "Segoe UI, " : "";
+        return $"{system}{Latin}, {Devanagari}, {string.Join(", ", cjk.Select(f => f.Embedded))}, Segoe UI, Nirmala UI, "
             + $"{string.Join(", ", cjk.Select(f => f.System))}, Kohinoor Devanagari, sans-serif";
     }
 

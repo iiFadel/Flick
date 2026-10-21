@@ -11,6 +11,14 @@
     <ResourceDictionary>
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
+          <!-- Windows (Settings and the rest): the site's page, cards, hairlines and text. Muted text is the site's
+               #636D64, not #828782, which is too faint for small captions on white. -->
+          <SolidColorBrush x:Key="PageBrush" Color="#F4F4F4" />
+          <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFF" />
+          <SolidColorBrush x:Key="SurfaceAltBrush" Color="#EFEFEE" />
+          <SolidColorBrush x:Key="SubtleBorderBrush" Color="#E9ECE8" />
+          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#282B29" />
+          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#636D64" />
           <SolidColorBrush x:Key="WheelTrackBrush" Color="#F0D6DADB" />
           <RadialGradientBrush x:Key="PetalFill">
             <GradientStop Offset="0" Color="#F5F6F6" />
@@ -39,6 +47,13 @@
           <SolidColorBrush x:Key="ToastCloseGlyphBrush" Color="#7A7F7B" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
+          <!-- Our design: neutral near-black surfaces to go with the orange. -->
+          <SolidColorBrush x:Key="PageBrush" Color="#1C1D1C" />
+          <SolidColorBrush x:Key="SurfaceBrush" Color="#262827" />
+          <SolidColorBrush x:Key="SurfaceAltBrush" Color="#2F3130" />
+          <SolidColorBrush x:Key="SubtleBorderBrush" Color="#1CFFFFFF" />
+          <SolidColorBrush x:Key="TextPrimaryBrush" Color="#EDEEEB" />
+          <SolidColorBrush x:Key="TextSecondaryBrush" Color="#A3A6A2" />
           <SolidColorBrush x:Key="WheelTrackBrush" Color="#F02A2D2F" />
           <RadialGradientBrush x:Key="PetalFill">
             <GradientStop Offset="0" Color="#43474A" />
@@ -69,7 +84,7 @@
       </ResourceDictionary.ThemeDictionaries>
 
       <!-- Tangerine draws the wheel in SF Pro Rounded (Apple only); Nunito is the closest open rounded font. -->
-      <FontFamily x:Key="WheelFontFamily">fonts:Filee#Nunito, Segoe UI Variable Text, Segoe UI, sans-serif</FontFamily>
+      <FontFamily x:Key="WheelFontFamily">fonts:Filee#Nunito, Segoe UI, sans-serif</FontFamily>
     </ResourceDictionary>
   </Styles.Resources>
 
