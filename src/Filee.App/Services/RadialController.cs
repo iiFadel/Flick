@@ -228,7 +228,8 @@ public sealed partial class RadialController( // fork: partial (RadialController
             if (viewModel.IsClickMode || SameFiles(files, viewModel.Files) || SameWebFiles(files, viewModel.Files))
                 return;
             viewModel.Load(files, clickMode: false);
-            ShowWheel(donut); // fork:
+            if (!ShowWheel(donut) && _wheelKind is not null) // fork: a Tools wheel for files without tools shows nothing until Shift
+                viewModel.HideWheel();
             donut.PlayOpenAnimation();
             WatchFlipKey();
         };

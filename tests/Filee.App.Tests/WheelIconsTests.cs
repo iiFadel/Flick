@@ -35,6 +35,6 @@ public class WheelIconsTests
         TestServices.EnsureInitialized();
 
         Assert.Null(WheelIcons.Find("to-png"));
-        Assert.NotNull(WheelIcons.Find("compress-pdf"));
+        Assert.Null(WheelIcons.Find("compress-pdf")); // a preset id: wheels look icons up by Tangerine's tool ids
     }
 }

@@ -50,7 +50,7 @@ Done when: side by side with the recording at normal speed, you can't immediatel
 
 ## Phase 3: Tools wheel, no-UI tools (M)
 
-- [ ] Replace the Tools wheel stand-in (Phase 1 shows the profile's back face there, `RadialViewModel.Wheel.cs`)
+- [x] Replace the Tools wheel stand-in: both drag wheels now show the spec's lists (`WheelCatalog`); tools not built yet are greyed out as "coming soon"
 - [ ] Add an "operation" concept next to target-format presets (a same-format transform with parameters). Design it in plan mode first: it must fit `Preset`, `ToolbarProfile`, `JobQueue` and `OutputPathResolver` without breaking conversions
 - [ ] Instant tools: Compress and Metadata (images, video, audio, PDF), Mute, Normalize, Extract (archives)
 - [ ] Small value popover (one shared control), then: Speed, Split (video, PDF), Channels, Snapshot, Visualize, Add BG

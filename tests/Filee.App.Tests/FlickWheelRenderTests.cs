@@ -9,6 +9,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Threading;
 using Filee.App.Controls;
+using Filee.App.Services;
 
 namespace Filee.App.Tests;
 
@@ -84,6 +85,25 @@ public class FlickWheelRenderTests
         Assert.True(padding.R > 250 && padding.G > 250 && padding.B > 250, $"the card is {padding}");
         // No track around it: the desktop shows where the ring would be.
         Assert.Equal(Desktop, PixelAt(frame, window, donut, Center(donut) + new Vector(0, -donut.Layout.Outer)));
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Tools_not_built_yet_are_greyed_and_say_so()
+    {
+        TestServices.EnsureInitialized("en");
+        var vm = AppHost.Get<Filee.App.ViewModels.RadialViewModel>();
+        vm.ResetForDrag();
+        vm.Load([@"C:\flick\notes.pdf"], clickMode: false);
+        Assert.True(vm.ShowWheel(Filee.Core.Settings.WheelKind.Tools));
+        var (window, donut) = Show(vm.Items);
+        donut.SetExternalHighlight(3); // Organize: coming soon
+        Settle(donut);
+        using var frame = Capture(window, "flick-wheel-pdf-tools.png");
+
+        // Hovering a greyed-out slice doesn't light it.
+        var organize = PixelAt(frame, window, donut, OnPetal(donut, 3, donut.Layout.Outer - 6));
+        Assert.True(Math.Abs(organize.R - organize.B) < 16, $"a coming-soon petal is {organize}");
         window.Close();
     }
 

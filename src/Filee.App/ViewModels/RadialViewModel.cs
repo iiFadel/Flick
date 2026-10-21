@@ -245,7 +245,6 @@ public sealed partial class RadialViewModel(UserDataStore store, ILocalizer loc,
                         : FormatLabels.NameOf(loc, p.TargetFormat),
                 IsEnabled = reason is null,
                 DisabledReason = reason,
-                Icon = WheelIcons.Find(p.Id), // fork: tools show a line icon
             };
         }
 

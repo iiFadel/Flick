@@ -246,8 +246,10 @@ public sealed partial class DonutMenu
             return;
         }
 
-        var tool = item.Icon is not null;
-        var text = tool ? item.Label.ToUpper(System.Globalization.CultureInfo.CurrentUICulture) : item.Label;
+        // A greyed-out slice says why ("Coming soon"): tooltips don't show during a drag (our design).
+        var reason = item.IsEnabled ? null : item.DisabledReason;
+        var tool = item.Icon is not null && reason is null;
+        var text = reason ?? (tool ? item.Label.ToUpper(System.Globalization.CultureInfo.CurrentUICulture) : item.Label);
         var width = PillWidth * s;
         var typeface = new Typeface(WheelFontFamily, FontStyle.Normal, tool ? FontWeight.Bold : FontWeight.SemiBold);
         var label = WheelText(text, typeface, (tool ? ToolLabelSize : PillTextSize) * s, (tool ? ToolLetterSpacing : FormatLetterSpacing) * s,
