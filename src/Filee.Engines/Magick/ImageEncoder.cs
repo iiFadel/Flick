@@ -302,6 +302,11 @@ internal static class ImageEncoder
                 if (options.WebpLossless)
                     image.Settings.SetDefine(MagickFormat.WebP, "lossless", true);
                 break;
+            // fork: the Tools wheel's Compress (ImageOptions.ReduceColors).
+            case "png" when options.ReduceColors:
+                image.Quantize(new QuantizeSettings { Colors = 256, DitherMethod = DitherMethod.FloydSteinberg });
+                image.Settings.SetDefine(MagickFormat.Png, "compression-level", "9");
+                break;
             case "tiff":
                 image.Settings.Compression = options.TiffCompression switch
                 {

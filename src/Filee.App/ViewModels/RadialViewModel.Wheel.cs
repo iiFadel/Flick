@@ -15,8 +15,8 @@ namespace Filee.App.ViewModels;
 public sealed partial class RadialViewModel
 {
     /// <summary>
-    /// Tangerine's tools that a built-in preset already does (tool id → preset id). Compress: PDFs only. The others
-    /// Flick runs are <see cref="ToolOperations"/>.
+    /// Tangerine's tools that a built-in preset already does (tool id → preset id). The others Flick runs are
+    /// <see cref="ToolOperations"/>.
     /// </summary>
     private static readonly Dictionary<string, string> BuiltTools = new(StringComparer.Ordinal)
     {
@@ -24,7 +24,6 @@ public sealed partial class RadialViewModel
         ["splitPDF"] = "pdf-split",
         ["mergePDF"] = "merge-pdf",
         ["createPDF"] = "merge-pdf",
-        ["extractArchive"] = "extract",
     };
 
     /// <summary>
@@ -103,7 +102,7 @@ public sealed partial class RadialViewModel
         foreach (var tool in WheelCatalog.Tools(sources))
         {
             var label = loc["wheel.tool." + tool];
-            var builtId = tool == "compress" ? sources.All(s => s == "pdf") ? "compress-pdf" : null : BuiltTools.GetValueOrDefault(tool);
+            var builtId = BuiltTools.GetValueOrDefault(tool);
             var built = ToolOperations.For(tool, sources, id => loc["tool.suffix." + id]) is { } operation
                 ? Named(operation, label)
                 : builtId is null ? null : store.FindPreset(builtId);

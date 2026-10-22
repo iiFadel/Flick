@@ -300,6 +300,12 @@ public sealed class ImageOptions
     /// </summary>
     public bool MultiPageTiff { get; set; }
 
+    /// <summary>
+    /// fork: PNG target: reduce the picture to a palette of at most 256 colours (dithered, transparency kept), like
+    /// pngquant: far smaller files, a slight colour change (the Tools wheel's Compress).
+    /// </summary>
+    public bool ReduceColors { get; set; }
+
     /// <summary>Use lossless WEBP encoding.</summary>
     public bool WebpLossless { get; set; }
 
@@ -521,6 +527,12 @@ public sealed class MediaOptions
     /// wheel's Metadata).
     /// </summary>
     public bool StripMetadata { get; set; }
+
+    /// <summary>
+    /// fork: Bring the audio to -16 LUFS integrated loudness, true peak at most -1.5 dBTP (EBU R128 measurement, one
+    /// pass), keeping the format (the Tools wheel's Normalize).
+    /// </summary>
+    public bool NormalizeLoudness { get; set; }
 
     public MediaOptions Clone() => (MediaOptions)MemberwiseClone();
 }

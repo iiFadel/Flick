@@ -547,6 +547,9 @@ public sealed class JobQueue : IAsyncDisposable
             if (zipResult && inputs.Count > 0)
                 inputs = PackZip(job, file, index, inputs, ct);
 
+            if (finalOutput && job.Preset.Output.NeverLarger) // fork
+                NeverLarger.Apply(file, inputs);
+
             if (finalOutput)
             {
                 file.Outputs.AddRange(inputs);
