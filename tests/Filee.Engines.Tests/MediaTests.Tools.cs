@@ -84,4 +84,62 @@ public partial class MediaTests
         Assert.Equal("h264", probed.Video?.Codec);
         Assert.NotNull(probed.Audio);
     }
+
+    [Fact]
+    public async Task Compress_makes_a_wav_a_flac_and_an_mp3_128k()
+    {
+        SkipUnlessInstalled();
+        var folder = fx.NewFolder();
+        var wav = await MakeToneAsync(folder, "voice.wav", seconds: 4);
+
+        var flac = await RunToolAsync("compress", wav);
+        Assert.Equal(Path.Combine(folder, "voice Compressed.flac"), flac);
+        Assert.Equal("flac", (await ProbeAsync(flac)).Audio?.Codec);
+
+        var mp3 = Path.Combine(folder, "song.mp3");
+        await RunAsync(Tools!.Value.Ffmpeg, ["-hide_banner", "-nostdin", "-v", "error", "-y", "-i", wav, "-b:a", "320k", mp3]);
+        var smaller = await RunToolAsync("compress", mp3);
+        Assert.Equal(Path.Combine(folder, "song Compressed.mp3"), smaller);
+        Assert.InRange((await ProbeAsync(smaller)).Audio!.BitRate, 100_000, 140_000);
+    }
+
+    [Fact]
+    public async Task Compress_makes_a_video_smaller_in_its_own_format()
+    {
+        SkipUnlessInstalled();
+        var folder = fx.NewFolder();
+        var source = await MakeClipAsync(folder, "clip.mp4", seconds: 3, size: "640x480",
+            extra: ["-c:v", "libx264", "-crf", "12", "-pix_fmt", "yuv420p", "-c:a", "aac"]);
+
+        var output = await RunToolAsync("compress", source);
+
+        Assert.Equal(Path.Combine(folder, "clip Compressed.mp4"), output);
+        Assert.True(new FileInfo(output).Length < new FileInfo(source).Length);
+        Assert.Equal("h264", (await ProbeAsync(output)).Video?.Codec);
+    }
+
+    [Fact]
+    public async Task Normalize_brings_a_quiet_song_to_minus_16_lufs()
+    {
+        SkipUnlessInstalled();
+        var folder = fx.NewFolder();
+        var tone = await MakeToneAsync(folder, "tone.wav", seconds: 6);
+        var quiet = Path.Combine(folder, "quiet.flac");
+        await RunAsync(Tools!.Value.Ffmpeg, ["-hide_banner", "-nostdin", "-v", "error", "-y", "-i", tone, "-af", "volume=-20dB", quiet]);
+
+        var output = await RunToolAsync("normalizeAudio", quiet);
+
+        Assert.Equal(Path.Combine(folder, "quiet Normalized.flac"), output);
+        Assert.InRange(await LoudnessAsync(output), -17.5, -14.5);
+        Assert.Equal(44100, (await ProbeAsync(output)).Audio?.SampleRate);
+    }
+
+    /// <summary>Integrated loudness (LUFS) as FFmpeg's EBU R128 meter measures it.</summary>
+    private static async Task<double> LoudnessAsync(string path)
+    {
+        var result = await ProcessRunner.RunAsync(Tools!.Value.Ffmpeg,
+            ["-hide_banner", "-nostdin", "-i", path, "-af", "ebur128", "-f", "null", "-"], TimeSpan.FromMinutes(1), CancellationToken.None);
+        var line = result.StandardError.Split('\n').Last(l => l.TrimStart().StartsWith("I:", StringComparison.Ordinal));
+        return double.Parse(line.Split(':')[1].Replace("LUFS", "").Trim(), System.Globalization.CultureInfo.InvariantCulture);
+    }
 }

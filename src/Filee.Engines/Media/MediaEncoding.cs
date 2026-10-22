@@ -513,6 +513,23 @@ internal static class MediaEncoding
         ["wav"] = ["pcm_u8", "pcm_s16le", "pcm_s24le", "pcm_s32le", "pcm_f32le"],
     };
 
+    /// <summary>
+    /// fork: <see cref="MediaOptions.NormalizeLoudness"/>: FFmpeg's loudnorm filter to -16 LUFS, true peak -1.5 dBTP.
+    /// It works at 192 kHz inside, so the source's rate is asked for again (a WAV and FLAC keep theirs).
+    /// </summary>
+    internal static IEnumerable<string> LoudnessArguments(MediaOptions options, AudioStreamInfo audio)
+    {
+        if (!options.NormalizeLoudness)
+            yield break;
+        yield return "-af";
+        yield return "loudnorm=I=-16:TP=-1.5:LRA=11";
+        if (audio.SampleRate is > 0 and <= 192000)
+        {
+            yield return "-ar";
+            yield return audio.SampleRate.ToString(CultureInfo.InvariantCulture);
+        }
+    }
+
     /// <summary>fork: True when an audio file only loses its tags: its audio is copied, not encoded again.</summary>
     internal static bool CopiesAudioFile(string target, AudioStreamInfo audio, MediaOptions options) =>
         options.StripMetadata && options.AudioBitrateKbps <= 0 && options.AudioChannels is not (1 or 2) && options.AudioSampleRate <= 0
@@ -565,6 +582,7 @@ internal static class MediaEncoding
         var codec = AudioEncoder(target, spec.AudioCodec, options);
         args.AddRange(AudioCodecArguments(target, codec, options, audio, inVideo: false));
         args.AddRange(ChannelAndRateArguments(target, codec, options, audio.SampleRate));
+        args.AddRange(LoudnessArguments(options, audio)); // fork: NormalizeLoudness
         args.AddRange(MetadataArguments(extras?.MetadataFile is null ? 0 : 1));
         args.AddRange(ContainerArguments(target));
         args.AddRange(["-f", spec.Muxer, "-progress", "pipe:1", output]);
@@ -690,6 +708,10 @@ internal static class MediaEncoding
             case "libopencore_amrnb":
                 // AMR-NB is defined for 8 kHz mono only; 12.2 kbit/s is its best mode.
                 args.AddRange(["-ar", "8000", "-ac", "1", "-b:a", "12.2k"]);
+                break;
+            // fork: the Tools wheel's Compress: FLAC's strongest (slowest) setting, still lossless.
+            case "flac" when quality == MediaQuality.Small:
+                args.AddRange(["-compression_level", "12"]);
                 break;
             case "pcm_s16le" when target is "dv":
                 args.AddRange(["-ar", "48000", "-ac", "2"]);

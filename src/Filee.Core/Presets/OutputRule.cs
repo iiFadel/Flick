@@ -84,6 +84,12 @@ public sealed class OutputRule
     /// </summary>
     public bool PlainCopyNumbers { get; set; }
 
+    /// <summary>
+    /// fork: A result of the source's own format that is not smaller than the source is replaced by a copy of the
+    /// source, with the notice <c>notice.not_smaller</c> (the Tools wheel's Compress).
+    /// </summary>
+    public bool NeverLarger { get; set; }
+
     public OutputRule Clone()
     {
         var clone = (OutputRule)MemberwiseClone();

@@ -136,7 +136,11 @@ operation runs through `ConversionService` and `JobQueue` like any conversion; `
 `Filee.Engines/Metadata/LosslessMetadata`, which rewrites JPEG, PNG, WebP, GIF, TIFF and HEIF containers without their
 metadata blocks and never decodes the picture (Orientation and the ICC profile stay); a file it can't follow is
 converted as usual with `KeepMetadata` off. Audio and video use `MediaOptions.StripMetadata` (streams copied where the
-format allows), PDFs `PdfOptions.RemoveMetadata`, Mute `MediaOptions.RemoveAudio`.
+format allows), PDFs `PdfOptions.RemoveMetadata`, Mute `MediaOptions.RemoveAudio`. Compress uses fixed defaults
+(photos at 70, PNGs to a palette with `ImageOptions.ReduceColors`, `MediaQuality.Small`, 128 kbit/s audio, WAV → FLAC,
+Compress PDF's settings) and `OutputRule.NeverLarger`: `JobQueue` replaces a result that didn't get smaller by a copy
+of the source (`NeverLarger`, notice `notice.not_smaller`). Normalize is `MediaOptions.NormalizeLoudness` (loudnorm to
+-16 LUFS). Extract is a folder target named `name Extracted`.
 
 **After the drop** (`RadialController.Toast.cs`, Tangerine's "After the drop"). A drag wheel's conversion gets no
 progress ring: the slice stays lit 50 ms, the wheel goes, and 70 ms later `DropToastWindow` grows at the drop point

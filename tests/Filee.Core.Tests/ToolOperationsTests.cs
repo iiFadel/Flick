@@ -8,7 +8,15 @@ namespace Filee.Core.Tests;
 public class ToolOperationsTests
 {
     private static Preset? For(string tool, params string[] formats) =>
-        ToolOperations.For(tool, formats, id => id == "removeMetadata" ? "No Metadata" : id == "muteVideo" ? "Muted" : "?");
+        ToolOperations.For(tool, formats, id => id switch
+        {
+            "removeMetadata" => "No Metadata",
+            "muteVideo" => "Muted",
+            "compress" => "Compressed",
+            "normalizeAudio" => "Normalized",
+            "extractArchive" => "Extracted",
+            _ => "?",
+        });
 
     [Theory]
     [InlineData("jpg")]
@@ -78,6 +86,56 @@ public class ToolOperationsTests
     }
 
     [Theory]
+    [InlineData("jpg", 70, false)]
+    [InlineData("webp", 70, false)]
+    [InlineData("heic", 70, false)]
+    [InlineData("png", 90, true)]
+    public void Compress_shrinks_pictures_in_their_own_format(string format, int quality, bool palette)
+    {
+        var preset = For("compress", format)!;
+        Assert.Equal(BuiltInData.SameAsSource, preset.TargetFormat);
+        Assert.Equal(quality, preset.Image.Quality);
+        Assert.Equal(palette, preset.Image.ReduceColors);
+        Assert.True(preset.Image.KeepMetadata);
+        Assert.True(preset.Output.NeverLarger);
+        Assert.Equal("{name} Compressed", preset.Output.FileNamePattern);
+    }
+
+    [Fact]
+    public void Compress_makes_videos_and_songs_small_and_a_wav_flac()
+    {
+        Assert.Equal(MediaQuality.Small, For("compress", "mov")!.Media.Quality);
+        var song = For("compress", "mp3")!;
+        Assert.Equal((BuiltInData.SameAsSource, 128), (song.TargetFormat, song.Media.AudioBitrateKbps));
+        Assert.Equal("flac", For("compress", "wav", "wav")!.TargetFormat);
+        Assert.Equal(BuiltInData.SameAsSource, For("compress", "wav", "mp3")!.TargetFormat);
+        Assert.Equal(TiffCompression.Zip, For("compress", "tiff")!.Image.TiffCompression);
+    }
+
+    [Fact]
+    public void Compress_on_a_pdf_is_compress_pdf_keeping_the_smaller_file_itself()
+    {
+        var preset = For("compress", "pdf")!;
+        Assert.Equal(PdfCompression.Ebook, preset.Pdf.Compression);
+        Assert.True(preset.Pdf.CompressWithGhostscript);
+        Assert.False(preset.Output.NeverLarger);
+    }
+
+    [Fact]
+    public void Normalize_and_extract()
+    {
+        Assert.True(For("normalizeAudio", "flac")!.Media.NormalizeLoudness);
+        var extract = For("extractArchive", "zip")!;
+        Assert.Equal(Filee.Core.Formats.FormatRegistry.Folder, extract.TargetFormat);
+        Assert.Equal("{name} Extracted", extract.Output.FileNamePattern);
+        Assert.NotNull(For("extractArchive", "tgz"));
+    }
+
+    [Theory]
+    [InlineData("compress", "gif")]
+    [InlineData("compress", "docx")]
+    [InlineData("normalizeAudio", "mp4")]
+    [InlineData("extractArchive", "pdf")]
     [InlineData("muteVideo", "mp3")]
     [InlineData("removeMetadata", "docx")]
     [InlineData("removeMetadata", "jpg", "mp4")]
