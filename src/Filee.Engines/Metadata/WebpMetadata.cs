@@ -1,6 +1,6 @@
-// fork: a WebP without its metadata, the picture chunks copied as they are. Only the extended format (VP8X) holds
-// metadata: its EXIF and "XMP " chunks go, and so do their flags; the ICC profile (ICCP) stays. A turned photo gets an
-// EXIF chunk with only its Orientation back.
+// fork: a WebP without its metadata. Only the extended format (VP8X) holds metadata; of its chunks only the picture,
+// alpha, animation and the ICC profile (ICCP) are copied, as they are. EXIF, "XMP " and any unknown chunk go, and so
+// do the EXIF and XMP flags. A turned photo gets an EXIF chunk with only its Orientation back.
 
 using System.Buffers.Binary;
 
@@ -10,6 +10,8 @@ internal static class WebpMetadata
 {
     private const byte ExifFlag = 0x08;
     private const byte XmpFlag = 0x04;
+
+    private static readonly HashSet<string> Kept = ["VP8 ", "VP8L", "ALPH", "ANIM", "ANMF", "ICCP"];
 
     /// <returns>The file without metadata, or null when it is not a WebP this can follow.</returns>
     public static byte[]? Strip(byte[] webp)
@@ -50,7 +52,7 @@ internal static class WebpMetadata
             }
             else if (type == "EXIF" && turned)
                 WriteChunk(output, "EXIF", ExifOrientation.Tiff(orientation));
-            else if (type is not ("EXIF" or "XMP "))
+            else if (Kept.Contains(type))
                 output.Write(webp, start, size);
         }
         var result = output.ToArray();

@@ -1,6 +1,6 @@
-// fork: a GIF without its metadata, the frames copied as they are. Removed: comment extensions and application
-// extensions (XMP, ICC and maker data live there), except the looping ones (NETSCAPE2.0, ANIMEXTS1.0), which an
-// animation needs.
+// fork: a GIF without its metadata, the frames copied as they are. Kept extensions: frame timing (graphic control),
+// plain text (drawn on the picture) and the looping ones (NETSCAPE2.0, ANIMEXTS1.0), which an animation needs.
+// Comments, the other application extensions (XMP, ICC and maker data live there) and unknown ones go.
 
 namespace Filee.Engines.Metadata;
 
@@ -31,8 +31,7 @@ internal static class GifMetadata
                     var first = at;
                     if (SkipSubBlocks(gif, ref at) is false)
                         return null;
-                    var drop = label == 0xFE || label == 0xFF && !Loops(gif, first);
-                    if (!drop)
+                    if (label is 0xF9 or 0x01 || label == 0xFF && Loops(gif, first))
                         output.Write(gif, start, at - start);
                     break;
                 }

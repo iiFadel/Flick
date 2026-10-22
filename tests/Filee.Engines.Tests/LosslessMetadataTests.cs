@@ -180,4 +180,24 @@ public class LosslessMetadataTests(EngineFixture fx) : IClassFixture<EngineFixtu
         Assert.Equal(ColorProfiles.AdobeRGB1998.ToByteArray(), result.GetColorProfile()?.ToByteArray());
         SamePixels(source, output);
     }
+
+    [Fact]
+    public async Task A_png_keeps_only_the_chunks_its_picture_needs()
+    {
+        var folder = fx.NewFolder();
+        var plain = EngineFixture.MakeImage(folder, "plain.png", MagickFormat.Png);
+        // A chunk a program made up, after the header: only an allowlist of chunks may pass.
+        var png = File.ReadAllBytes(plain);
+        var chunk = new List<byte> { 0, 0, 0, 13 };
+        chunk.AddRange("prVtSecret data!!"u8.ToArray()); // type + 13 bytes
+        var crc = Filee.Engines.Archives.Crc32.Compute(chunk.Skip(4).ToArray());
+        chunk.AddRange([(byte)(crc >> 24), (byte)(crc >> 16), (byte)(crc >> 8), (byte)crc]);
+        var source = Path.Combine(folder, "logo.png");
+        File.WriteAllBytes(source, [.. png[..33], .. chunk, .. png[33..]]);
+
+        var output = await StripAsync(source);
+
+        Assert.DoesNotContain("Secret", System.Text.Encoding.Latin1.GetString(File.ReadAllBytes(output)));
+        SamePixels(source, output);
+    }
 }

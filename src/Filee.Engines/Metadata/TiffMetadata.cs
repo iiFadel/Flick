@@ -1,21 +1,21 @@
 // fork: a TIFF without its metadata, changed in place so the strips and tiles stay exactly where and what they are.
-// In every page's IFD the metadata entries are taken out (the rest move up, in order) and the bytes they pointed to
-// are overwritten with zeros: Exif and GPS (with everything in them, maker notes too), XMP, IPTC, Photoshop data,
-// and the camera, software, author, date and description texts. Orientation, the ICC profile and everything the
-// pixels need stay. BigTIFF is not handled.
+// In every page's IFD only the entries the picture needs stay (they move up, in order): its layout, colour,
+// resolution, Orientation and ICC profile. Every other entry is taken out and the bytes it pointed to are overwritten
+// with zeros: Exif and GPS (with everything in them, maker notes too), XMP, IPTC, Photoshop data, the camera,
+// software, author, date and description texts, thumbnails' pointers and any private tag. BigTIFF is not handled.
 
 namespace Filee.Engines.Metadata;
 
 internal static class TiffMetadata
 {
-    private const ushort ExifIfd = 34665, GpsIfd = 34853, InteropIfd = 40965;
+    private const ushort ExifIfd = 34665, GpsIfd = 34853, SubIfds = 330, InteropIfd = 40965;
 
-    /// <summary>Entries removed from a page: texts, dates, metadata blocks and the Exif / GPS pointers.</summary>
-    private static readonly HashSet<ushort> Removed =
+    /// <summary>Entries a page keeps: what decoding and showing its picture needs (TIFF 6.0 baseline and extensions).</summary>
+    private static readonly HashSet<ushort> Kept =
     [
-        270, 271, 272, 305, 306, 315, 316, 33432, // description, make, model, software, date, artist, host, copyright
-        700, 33723, 34377, 50341, // XMP, IPTC, Photoshop, PrintIM
-        ExifIfd, GpsIfd,
+        254, 255, 256, 257, 258, 259, 262, 263, 266, 273, 274, 277, 278, 279, 280, 281, 282, 283, 284, 290, 291, 292, 293,
+        296, 297, 301, 317, 318, 319, 320, 321, 322, 323, 324, 325, 332, 334, 338, 339, 340, 341, 347, 529, 530, 531, 532,
+        34675, // ICC profile
     ];
 
     /// <returns>The file without metadata, or null when it is not a TIFF this can follow.</returns>
@@ -35,12 +35,12 @@ internal static class TiffMetadata
             {
                 var entry = (int)ifd + 2 + i * 12;
                 var tag = ExifOrientation.U16(tiff, entry, little);
-                if (!Removed.Contains(tag))
+                if (Kept.Contains(tag))
                 {
                     entries.Add(tiff.AsSpan(entry, 12).ToArray());
                     continue;
                 }
-                if (tag is ExifIfd or GpsIfd && !ClearIfd(tiff, ExifOrientation.U32(tiff, entry + 8, little), little, visited))
+                if (tag is ExifIfd or GpsIfd or SubIfds && !ClearIfds(tiff, entry, little, visited))
                     return null;
                 if (!ClearValue(tiff, entry, little))
                     return null;
@@ -58,7 +58,24 @@ internal static class TiffMetadata
         return tiff;
     }
 
-    /// <summary>Zeros an Exif, GPS or interoperability IFD: its values, then its entries.</summary>
+    /// <summary>Zeros the IFDs an Exif, GPS or SubIFDs entry points to (SubIFDs may list several).</summary>
+    private static bool ClearIfds(byte[] tiff, int entry, bool little, HashSet<uint> visited)
+    {
+        var count = ExifOrientation.U32(tiff, entry + 4, little);
+        if (count <= 1)
+            return ClearIfd(tiff, ExifOrientation.U32(tiff, entry + 8, little), little, visited);
+        var offsets = ExifOrientation.U32(tiff, entry + 8, little);
+        if (offsets + count * 4L > tiff.Length)
+            return false;
+        for (var i = 0; i < count; i++)
+        {
+            if (!ClearIfd(tiff, ExifOrientation.U32(tiff, (int)offsets + i * 4, little), little, visited))
+                return false;
+        }
+        return true;
+    }
+
+    /// <summary>Zeros an Exif, GPS, interoperability or sub-IFD: its values, then its entries.</summary>
     private static bool ClearIfd(byte[] tiff, uint ifd, bool little, HashSet<uint> visited)
     {
         if (ifd == 0)
