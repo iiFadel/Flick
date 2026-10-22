@@ -243,13 +243,13 @@ internal static class MediaEncoding
         {
             // VA-API's device is a global option, so it goes before the input.
             args.InsertRange(Common.Length, HardwareVideo.InputArguments(hardware));
-            args.AddRange(["-vf", ScaleFilter(options.MaxHeight) + HardwareVideo.FilterSuffix(hardware, HardwareVideo.TenBit(hardware.Codec, video))]);
+            args.AddRange(["-vf", ToolEncoding.SpeedFilter(options) + ScaleFilter(options.MaxHeight) + HardwareVideo.FilterSuffix(hardware, HardwareVideo.TenBit(hardware.Codec, video))]);
             args.AddRange(HardwareVideo.CodecArguments(hardware, target, options.Quality, video, options.MaxHeight));
         }
         else
         {
             var pal = IsPal(video.FrameRate);
-            args.AddRange(["-vf", target is "vob" or "dv" ? DvdOrDvFilter(video, pal) : ScaleFilter(options.MaxHeight)]);
+            args.AddRange(["-vf", ToolEncoding.SpeedFilter(options) + (target is "vob" or "dv" ? DvdOrDvFilter(video, pal) : ScaleFilter(options.MaxHeight))]);
             args.AddRange(VideoCodecArguments(target, VideoEncoder(target, spec.VideoCodec!, options.VideoCodec, encoders), options.Quality, video, pal));
         }
 
@@ -259,6 +259,8 @@ internal static class MediaEncoding
             args.AddRange(["-c:a", "copy"]);
         else
             args.AddRange(AudioCodecArguments(target, spec.AudioCodec, options, audio, inVideo: true));
+        if (audio is not null)
+            args.AddRange(ToolEncoding.TempoArguments(options)); // fork: Speed
 
         args.AddRange(options.StripMetadata ? NoMetadataArguments : MetadataArguments()); // fork: StripMetadata
         args.AddRange(ContainerArguments(target));
@@ -295,7 +297,7 @@ internal static class MediaEncoding
     /// </summary>
     internal static bool CanCopyVideo(string target, VideoStreamInfo video, MediaOptions options)
     {
-        if (options.Quality == MediaQuality.Small || options.MaxHeight > 0 && video.DisplayHeight > Math.Max(16, options.MaxHeight)
+        if (options.Quality == MediaQuality.Small || options.Speed != 1 /* fork */ || options.MaxHeight > 0 && video.DisplayHeight > Math.Max(16, options.MaxHeight)
             || video.Codec is not { } codec || !Remuxable.TryGetValue(target, out var codecs))
             return false;
         var takes = MediaCodecs.Effective(target, options.VideoCodec) switch
@@ -337,7 +339,7 @@ internal static class MediaEncoding
     /// as they are.
     /// </summary>
     internal static bool CanCopyAudio(string target, AudioStreamInfo audio, MediaOptions options) =>
-        options.Quality != MediaQuality.Small && options.AudioBitrateKbps <= 0
+        options.Quality != MediaQuality.Small && options.Speed == 1 /* fork */ && options.AudioBitrateKbps <= 0
         && (options.AudioChannels is not (1 or 2) || options.AudioChannels == audio.Channels)
         && Remuxable.TryGetValue(target, out var codecs) && audio.Codec is { } codec && codecs.Audio.Contains(codec);
 

@@ -125,6 +125,9 @@ public sealed partial class FfmpegConverter(ILogger? logger = null) : IConverter
 
         if (step.FrameSequence)
             return await FrameSequenceWriter.ConvertAsync(ffmpeg, step, input, info, progress, cancellationToken);
+        // fork: the Tools wheel's Split, Snapshot and Visualize.
+        if (await ToolEncoding.TryRunAsync(ffmpeg, step, input, info, progress, cancellationToken) is { } tool)
+            return tool;
 
         var output = step.Output.Allocate(FormatRegistry.Get(step.To).PrimaryExtension);
         if (output is null)
@@ -158,7 +161,7 @@ public sealed partial class FfmpegConverter(ILogger? logger = null) : IConverter
         // Throws for a missing stream before anything is written (an existing file of that name stays untouched).
         var passes = Plan(hardware);
         // FFmpeg reports the position in the output, which a speed change makes longer or shorter.
-        var duration = still ? MediaEncoding.StillDuration : info.Duration / speed;
+        var duration = still ? MediaEncoding.StillDuration : info.Duration / speed / ToolEncoding.Speed(media); // fork: Speed
         try
         {
             await RunWithFallbackAsync(passes, hardware, Plan,

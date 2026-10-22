@@ -56,7 +56,7 @@ Done when: side by side with the recording at normal speed, you can't immediatel
 - [x] Instant tools: Compress (images, video, audio, PDF; never larger than the source), Normalize (-16 LUFS), Extract (archives, `name Extracted`)
 - [x] Small value popover (one shared control, `ToolParameter`) and Channels (Mono / Stereo)
 - [ ] Popover tools (choices decided 22 Oct 2026): Speed 0.25× / 0.5× / 1.5× / 2× / 4×; Split video into 2 / 3 / 4 equal parts at keyframes, no re-encode, `name Clips` folder; Snapshot 1 (middle) / 5 / 10 PNG frames, several in a folder; Visualize landscape / portrait / square; Add BG white / black / orange gradient, ~8% padding, rounded corners
-- [ ] Tests per operation, inputs generated in the test (see `EngineFixture`)
+- [x] Tests per operation, inputs generated in the test (see `EngineFixture`)
 
 ## Phase 4: Actions wheel (dropped)
 
@@ -89,5 +89,6 @@ Built from scratch in Swift (SwiftUI + AppKit), not on Avalonia, because the goa
 - Compress on a mixed WAV + MP3 selection keeps the WAVs as WAV (one target per job); WAV alone becomes FLAC
 - Normalize is one loudnorm pass (dynamic); a two-pass linear normalize would match -16 LUFS more exactly on music with wide dynamics
 - Metadata on a HEIC runs without FFmpeg, but its slice still needs FFmpeg installed: the HEIC self-edge belongs to FFmpeg
+- Split video cuts at the next keyframe after each equal point: a video with very few keyframes gives uneven or fewer clips (Phase 5's split points could re-encode around the cut)
 - Watch folders and CLI already exist upstream, keep them working
 - Pull upstream regularly: `git fetch upstream && git merge upstream/main`
