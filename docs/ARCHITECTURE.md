@@ -146,6 +146,13 @@ of the source (`NeverLarger`, notice `notice.not_smaller`). Normalize is `MediaO
 (`ToolOperations.ParameterFor`: choices, each a label, a name suffix and a change to the preset). A drop on its slice,
 or Enter during the drag, hides the wheel and grows `ValuePopoverWindow` at the drop point; a pick applies the choice to
 a copy of the preset (`Channels Stereo`, `song Stereo.mp3`), starts the job and shows the drop toast in the same spot.
+The popover tools: Channels; Speed (`MediaOptions.Speed`, 0.25× to 4×: `setpts` and `atempo` on MediaEncoding's video
+encode, pitch kept); Split (`SplitParts`, FFmpeg's segment muxer at keyframes, streams copied, folder `name Clips`);
+Snapshot (`Snapshots`, video → PNG: the middle frame, or 5 / 10 spread evenly into `name Snapshots`); Visualize
+(`Visualizer`, an orange `showwaves` MP4 with the sound, written from the audio self-edge as `name Visualizer.mp4`);
+Add BG (`ImageOptions.Backdrop`, `Magick/ImageBackdrops`: 8 % padding, rounded corners, white, black or an orange
+gradient). Split, Snapshot and Visualize are runs of their own in `Filee.Engines/Media/ToolEncoding`, which
+`FfmpegConverter` asks first.
 While the drag goes on, the hook's arrows, Enter and Escape reach it through `WheelNavigated` / `WheelApplied` /
 `WheelCancelled`; after the drag the window takes the keyboard, and losing focus or Escape runs nothing.
 

@@ -3,6 +3,7 @@
 // source's own format) plus the options that do the work, so the job, route and output pipeline stay the conversions'.
 // Pure, unit tested (ToolOperationsTests).
 
+using System.Globalization;
 using Filee.Core.Formats;
 using Filee.Core.Presets;
 
@@ -32,6 +33,11 @@ public static class ToolOperations
             "normalizeAudio" => formats.All(Audio.Contains) ? Normalize() : null,
             "audioChannels" => formats.All(Audio.Contains) ? SameFormat() : null,
             "extractArchive" => formats.All(Archives.Contains) ? Extract() : null,
+            "changeVideoSpeed" => formats.All(Video.Contains) ? SameFormat(p => p.Media.Speed = 2) : null,
+            "splitVideo" => formats.All(Video.Contains) ? SameFormat(p => p.Media.SplitParts = 2) : null,
+            "videoSnapshots" => formats.All(Video.Contains) ? Snapshot() : null,
+            "audioToVideo" => formats.All(Audio.Contains) ? SameFormat(p => p.Media.Visualizer = VisualizerShape.Landscape) : null,
+            "frameImage" => formats.All(f => Images.Contains(f) && f != "gif") ? SameFormat(p => p.Image.Backdrop = ImageBackdrop.White) : null,
             _ => null,
         };
         if (preset is null)
@@ -46,7 +52,10 @@ public static class ToolOperations
     /// The value <paramref name="tool"/> asks for in the popover after the drop, or null for a tool that runs at once.
     /// Only meaningful where <see cref="For"/> gives an operation.
     /// </summary>
-    /// <param name="text">Flick's text for a key (<c>tool.choice.mono</c>).</param>
+    /// <param name="text">
+    /// Flick's text for a key (<c>tool.choice.mono</c>); <c>tool.choice.parts</c> and <c>tool.choice.frames</c> hold
+    /// a <c>{0}</c> for the number.
+    /// </param>
     public static ToolParameter? ParameterFor(string tool, Func<string, string> text) => tool switch
     {
         "audioChannels" => new ToolParameter(
@@ -54,8 +63,37 @@ public static class ToolOperations
             new ToolChoice(text("tool.choice.mono"), text("tool.choice.mono"), p => p.Media.AudioChannels = 1),
             new ToolChoice(text("tool.choice.stereo"), text("tool.choice.stereo"), p => p.Media.AudioChannels = 2),
         ]),
+        // Default 2×, the speed Tangerine's window shows first after 1×.
+        "changeVideoSpeed" => new ToolParameter(
+            [.. new[] { 0.25, 0.5, 1.5, 2, 4 }.Select(speed => new ToolChoice(
+                Number(speed) + "×", $"{text("tool.suffix.changeVideoSpeed")} {Number(speed)}x", p => p.Media.Speed = speed))],
+            Default: 3),
+        "splitVideo" => new ToolParameter(
+            [.. new[] { 2, 3, 4 }.Select(parts => new ToolChoice(
+                Format(text("tool.choice.parts"), parts), text("tool.suffix.splitVideo"), p => p.Media.SplitParts = parts))]),
+        "videoSnapshots" => new ToolParameter(
+        [
+            new ToolChoice(text("tool.choice.middle_frame"), text("tool.suffix.videoSnapshots"), p => p.Media.Snapshots = 1),
+            .. new[] { 5, 10 }.Select(frames => new ToolChoice(
+                Format(text("tool.choice.frames"), frames), text("tool.suffix.videoSnapshots_several"), p => p.Media.Snapshots = frames)),
+        ]),
+        "audioToVideo" => new ToolParameter(
+        [
+            .. new[] { VisualizerShape.Landscape, VisualizerShape.Portrait, VisualizerShape.Square }.Select(shape => new ToolChoice(
+                text("tool.choice." + shape.ToString().ToLowerInvariant()), text("tool.suffix.audioToVideo"), p => p.Media.Visualizer = shape)),
+        ]),
+        "frameImage" => new ToolParameter(
+        [
+            new ToolChoice(text("tool.choice.white"), text("tool.suffix.frameImage"), p => p.Image.Backdrop = ImageBackdrop.White),
+            new ToolChoice(text("tool.choice.black"), text("tool.suffix.frameImage"), p => p.Image.Backdrop = ImageBackdrop.Black),
+            new ToolChoice(text("tool.choice.orange"), text("tool.suffix.frameImage"), p => p.Image.Backdrop = ImageBackdrop.OrangeGradient),
+        ]),
         _ => null,
     };
+
+    private static string Number(double value) => value.ToString("0.##", CultureInfo.InvariantCulture);
+
+    private static string Format(string text, int number) => string.Format(CultureInfo.InvariantCulture, text, number);
 
     /// <summary>
     /// Fixed defaults until Tangerine's Compress window (Phase 5): photos at quality 70, PNGs to a 256-colour palette,
@@ -133,6 +171,21 @@ public static class ToolOperations
     {
         var preset = SameFormat();
         preset.Media.RemoveAudio = true;
+        return preset;
+    }
+
+    /// <summary>One middle frame as a PNG until the popover picks how many (<see cref="MediaOptions.Snapshots"/>).</summary>
+    private static Preset Snapshot()
+    {
+        var preset = SameFormat(p => p.Media.Snapshots = 1);
+        preset.TargetFormat = "png";
+        return preset;
+    }
+
+    private static Preset SameFormat(Action<Preset> apply)
+    {
+        var preset = SameFormat();
+        apply(preset);
         return preset;
     }
 

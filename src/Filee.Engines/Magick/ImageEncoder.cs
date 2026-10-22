@@ -254,6 +254,7 @@ internal static class ImageEncoder
                 image.Resize((uint)options.Width, (uint)Math.Max(1, Math.Round(image.Height * (double)options.Width / image.Width)));
                 break;
         }
+        ImageBackdrops.Apply(image, options.Backdrop); // fork: the Tools wheel's Add BG, before the size limits
         FitFormat(image, targetFormat);
 
         // Before grayscale (a blue signature stays blue until then) and before alpha is flattened for JPG and co.

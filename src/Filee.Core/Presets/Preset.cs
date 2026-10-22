@@ -306,6 +306,12 @@ public sealed class ImageOptions
     /// </summary>
     public bool ReduceColors { get; set; }
 
+    /// <summary>
+    /// fork: Put the picture on a background: about 8 % padding around it, its corners rounded (the Tools wheel's Add BG).
+    /// </summary>
+    [JsonConverter(typeof(LenientEnumJsonConverter<ImageBackdrop>))]
+    public ImageBackdrop Backdrop { get; set; }
+
     /// <summary>Use lossless WEBP encoding.</summary>
     public bool WebpLossless { get; set; }
 
@@ -447,6 +453,28 @@ public enum MediaQuality
     Small,
 }
 
+/// <summary>fork: The background <see cref="ImageOptions.Backdrop"/> puts a picture on.</summary>
+public enum ImageBackdrop
+{
+    None,
+    White,
+    Black,
+    /// <summary>Flick's orange, lighter at the top.</summary>
+    OrangeGradient,
+}
+
+/// <summary>fork: The frame of <see cref="MediaOptions.Visualizer"/>'s video.</summary>
+public enum VisualizerShape
+{
+    None,
+    /// <summary>1920 × 1080.</summary>
+    Landscape,
+    /// <summary>1080 × 1920.</summary>
+    Portrait,
+    /// <summary>1080 × 1080.</summary>
+    Square,
+}
+
 /// <summary>Video and audio options.</summary>
 public sealed class MediaOptions
 {
@@ -533,6 +561,30 @@ public sealed class MediaOptions
     /// pass), keeping the format (the Tools wheel's Normalize).
     /// </summary>
     public bool NormalizeLoudness { get; set; }
+
+    /// <summary>
+    /// fork: Play a video this many times faster (0.25 … 4), the sound's pitch kept; 1 keeps the speed (the Tools
+    /// wheel's Speed).
+    /// </summary>
+    public double Speed { get; set; } = 1;
+
+    /// <summary>
+    /// fork: Cut a video into this many parts of about equal length, at keyframes, without encoding it again, into a
+    /// folder; 0 keeps it whole (the Tools wheel's Split).
+    /// </summary>
+    public int SplitParts { get; set; }
+
+    /// <summary>
+    /// fork: Video → PNG: this many full-size frames spread evenly over the video (1 is the middle one), several in a
+    /// folder; 0 is the usual still frame (the Tools wheel's Snapshot).
+    /// </summary>
+    public int Snapshots { get; set; }
+
+    /// <summary>
+    /// fork: Audio → an MP4 of an orange waveform on black with the sound, in this shape (the Tools wheel's Visualize).
+    /// </summary>
+    [JsonConverter(typeof(LenientEnumJsonConverter<VisualizerShape>))]
+    public VisualizerShape Visualizer { get; set; }
 
     public MediaOptions Clone() => (MediaOptions)MemberwiseClone();
 }
