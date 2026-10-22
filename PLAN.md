@@ -55,7 +55,7 @@ Done when: side by side with the recording at normal speed, you can't immediatel
 - [x] Metadata (lossless for JPEG, PNG, WebP, GIF, TIFF, HEIC; streams copied for audio and video; PDF), Mute
 - [x] Instant tools: Compress (images, video, audio, PDF; never larger than the source), Normalize (-16 LUFS), Extract (archives, `name Extracted`)
 - [x] Small value popover (one shared control, `ToolParameter`) and Channels (Mono / Stereo)
-- [ ] Popover tools (choices decided 22 Oct 2026): Speed 0.25× / 0.5× / 1.5× / 2× / 4×; Split video into 2 / 3 / 4 equal parts at keyframes, no re-encode, `name Clips` folder; Snapshot 1 (middle) / 5 / 10 PNG frames, several in a folder; Visualize landscape / portrait / square; Add BG white / black / orange gradient, ~8% padding, rounded corners
+- [x] Popover tools (choices decided 22 Oct 2026): Speed 0.25× / 0.5× / 1.5× / 2× / 4×; Split video into 2 / 3 / 4 equal parts at keyframes, no re-encode, `name Clips` folder; Snapshot 1 (middle) / 5 / 10 PNG frames, several in a folder; Visualize landscape / portrait / square; Add BG white / black / orange gradient, ~8% padding, rounded corners
 - [x] Tests per operation, inputs generated in the test (see `EngineFixture`)
 
 ## Phase 4: Actions wheel (dropped)
