@@ -14,6 +14,7 @@ using Filee.Core.Presets;
 using Filee.Engines.Heic;
 using Filee.Engines.Infrastructure;
 using Filee.Engines.Magick;
+using Filee.Engines.Metadata;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -110,6 +111,9 @@ public sealed partial class FfmpegConverter(ILogger? logger = null) : IConverter
 
     public async Task<IReadOnlyList<string>> ConvertAsync(ConversionStep step, IProgress<double>? progress, CancellationToken cancellationToken)
     {
+        // fork: the Tools wheel's Metadata on a HEIC rewrites the file without decoding it when it can.
+        if (await LosslessMetadata.TryRunAsync(step, cancellationToken) is { } stripped)
+            return stripped;
         var (ffmpeg, ffprobe) = _tools ?? Locate() ?? throw new InvalidOperationException("FFmpeg was not found.");
         if (step.MotionPhoto)
             return await ExtractMotionAsync(step, progress, cancellationToken);

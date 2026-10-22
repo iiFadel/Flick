@@ -14,13 +14,13 @@ public class WheelContentsTests
     public static TheoryData<string, string[], string[], string[]> Categories => new()
     {
         { "photo.jpg", ["PNG", "WEBP", "HEIC", "TIFF", "AVIF", "BMP", "PDF"],
-            ["Compress", "Metadata", "Edit", "Annotate", "Add BG", "Crop", "Redact"], ["Crop"] },
+            ["Compress", "Metadata", "Edit", "Annotate", "Add BG", "Crop", "Redact"], ["Metadata", "Crop"] },
         { "clip.mov", ["MP4", "MKV", "WEBM", "AVI", "WMV", "GIF", "MP3"],
-            ["Compress", "Metadata", "Mute", "Trim", "Crop", "Speed", "Snapshot", "Split", "Redact"], [] },
+            ["Compress", "Metadata", "Mute", "Trim", "Crop", "Speed", "Snapshot", "Split", "Redact"], ["Metadata", "Mute"] },
         { "song.mp3", ["M4A", "WAV", "FLAC", "OGG", "OPUS", "AIFF", "WMA"],
-            ["Compress", "Metadata", "Normalize", "Visualize", "Trim", "Channels", "Bleep"], [] },
+            ["Compress", "Metadata", "Normalize", "Visualize", "Trim", "Channels", "Bleep"], ["Metadata"] },
         { "notes.pdf", ["DOCX", "PAGES", "PPTX", "XLSX", "JPG", "PNG", "EPUB", "TXT", "MD"],
-            ["Compress", "Metadata", "Split", "Organize"], ["Compress", "Split"] },
+            ["Compress", "Metadata", "Split", "Organize"], ["Compress", "Metadata", "Split"] },
         { "letter.docx", ["PAGES", "PDF", "TXT", "MD", "HTML", "EPUB", "PNG", "JPG"], [], [] },
         { "slides.pptx", ["PDF", "JPG", "PNG"], [], [] },
         { "budget.xlsx", ["ODS", "CSV", "TSV", "PDF"], [], [] },
@@ -76,8 +76,30 @@ public class WheelContentsTests
         vm.Load([@"C:\flick\clip.mov"], clickMode: false);
 
         Assert.True(vm.ShowWheel(WheelKind.Tools));
+        var loc = AppHost.Get<ILocalizer>();
         for (var i = 0; i < vm.Items.Count; i++)
-            Assert.Null(vm.PresetAt(i, -1));
+        {
+            if (vm.Items[i].DisabledReason == loc["donut.tool_coming_soon"])
+                Assert.Null(vm.PresetAt(i, -1));
+        }
+    }
+
+    [AvaloniaFact]
+    public void A_tool_operation_runs_on_the_file_as_a_same_format_preset()
+    {
+        TestServices.EnsureInitialized("en");
+        var vm = AppHost.Get<RadialViewModel>();
+        vm.ResetForDrag();
+        vm.Load([@"C:\flick\photo.jpg"], clickMode: false);
+
+        Assert.True(vm.ShowWheel(WheelKind.Tools));
+        var metadata = vm.Items.Select(i => i.Label).ToList().IndexOf("Metadata");
+        var preset = vm.PresetAt(metadata, -1);
+        Assert.NotNull(preset);
+        Assert.Equal("op-removeMetadata", preset.Id);
+        Assert.Equal("Metadata", preset.Name);
+        Assert.Equal("{name} No Metadata", preset.Output.FileNamePattern);
+        Assert.False(preset.Image.KeepMetadata);
     }
 
     [AvaloniaFact]
@@ -89,7 +111,7 @@ public class WheelContentsTests
         {
             var vm = AppHost.Get<RadialViewModel>();
             vm.ResetForDrag();
-            vm.Load([@"C:lick.png", folder.FullName], clickMode: false);
+            vm.Load([@"C:\flick\a.png", folder.FullName], clickMode: false);
             Assert.True(vm.ShowWheel(WheelKind.Convert));
             Assert.Equal(["JPG", "WEBP", "HEIC", "TIFF", "AVIF", "BMP", "PDF"], vm.Items.Select(i => i.Label));
         }

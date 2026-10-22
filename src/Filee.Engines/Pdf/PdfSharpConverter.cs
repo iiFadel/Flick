@@ -36,6 +36,7 @@ public sealed class PdfSharpConverter : IConverter, IPdfMerger, IImageTransforme
 
     public Task<IReadOnlyList<string>> ConvertAsync(ConversionStep step, IProgress<double>? progress, CancellationToken cancellationToken) =>
         step.From != "pdf" ? Task.Run(() => ImageToPdf(step, progress, cancellationToken), cancellationToken)
+        : step.Preset.Pdf.RemoveMetadata ? Task.Run(() => RemoveMetadata(step, cancellationToken), cancellationToken) // fork
         : step.Preset.Pdf.Compression == PdfCompression.None ? Task.Run(() => SplitOrExtract(step, progress, cancellationToken), cancellationToken)
         : Task.Run(() => CompressAsync(step, progress, cancellationToken), cancellationToken);
 
@@ -103,6 +104,18 @@ public sealed class PdfSharpConverter : IConverter, IPdfMerger, IImageTransforme
             return [];
         document.Save(path);
         return [path];
+    }
+
+    /// <summary>fork: PDF → PDF without its metadata (<see cref="PdfOptions.RemoveMetadata"/>).</summary>
+    private static IReadOnlyList<string> RemoveMetadata(ConversionStep step, CancellationToken ct)
+    {
+        using var document = OpenForChanges(step.InputPath);
+        PdfMetadataRemover.Remove(document, ct);
+        var output = step.Output.Allocate("pdf");
+        if (output is null)
+            return [];
+        document.Save(output);
+        return [output];
     }
 
     /// <summary>PDF → PDF: split into single pages, or extract the configured page range.</summary>

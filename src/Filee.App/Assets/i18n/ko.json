@@ -87,6 +87,8 @@
   "wheel.tool.createPDF": "Create PDF",
   "wheel.tool.createCollage": "Collage",
   "wheel.tool.extractArchive": "Extract",
+  "tool.suffix.removeMetadata": "No Metadata",
+  "tool.suffix.muteVideo": "Muted",
   "donut.close_hint": "Esc로 닫기",
   "donut.edit": "프리셋 편집",
   "donut.empty": "프리셋을 끌어다 놓으세요",
