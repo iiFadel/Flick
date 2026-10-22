@@ -2,6 +2,7 @@
 
 using Filee.Core.Conversion;
 using Filee.Engines.Infrastructure;
+using Filee.Engines.Metadata;
 using ImageMagick;
 
 namespace Filee.Engines.Magick;
@@ -67,8 +68,11 @@ public sealed class MagickImageConverter : IConverter, ITiffMerger, IImageTransf
         }, cancellationToken);
 
     public Task<IReadOnlyList<string>> ConvertAsync(ConversionStep step, IProgress<double>? progress, CancellationToken cancellationToken) =>
-        Task.Run<IReadOnlyList<string>>(() =>
+        Task.Run<IReadOnlyList<string>>(async () =>
         {
+            // fork: the Tools wheel's Metadata rewrites the file without decoding it when it can.
+            if (await LosslessMetadata.TryRunAsync(step, cancellationToken) is { } stripped)
+                return stripped;
             // Animated PNGs are often saved as .png: read them as APNG, so they stay animated as GIF or WebP.
             var from = step.From == "png" && Apng.IsAnimated(step.InputPath) ? "apng" : step.From;
             using var images = ImageReader.Read(step.InputPath, from, step.Preset);

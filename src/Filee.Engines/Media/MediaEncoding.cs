@@ -260,7 +260,7 @@ internal static class MediaEncoding
         else
             args.AddRange(AudioCodecArguments(target, spec.AudioCodec, options, audio, inVideo: true));
 
-        args.AddRange(MetadataArguments());
+        args.AddRange(options.StripMetadata ? NoMetadataArguments : MetadataArguments()); // fork: StripMetadata
         args.AddRange(ContainerArguments(target));
         // Sparse or late-starting streams (subtitles-like audio) otherwise fail with "too many packets buffered".
         args.AddRange(["-max_muxing_queue_size", "4096", "-f", spec.Muxer, "-progress", "pipe:1", output]);
@@ -495,6 +495,29 @@ internal static class MediaEncoding
         _ => [],
     };
 
+    /// <summary>
+    /// fork: no tags (of the file or its streams), no chapters, and no "Lavf" encoder tag of FFmpeg's own
+    /// (<see cref="MediaOptions.StripMetadata"/>).
+    /// </summary>
+    private static readonly string[] NoMetadataArguments = ["-map_metadata", "-1", "-map_chapters", "-1", "-fflags", "+bitexact"];
+
+    /// <summary>
+    /// fork: codecs an audio target takes as they are, so removing the tags of a song (<see cref="MediaOptions.StripMetadata"/>)
+    /// doesn't re-encode it.
+    /// </summary>
+    private static readonly Dictionary<string, HashSet<string>> AudioCopyable = new()
+    {
+        ["mp3"] = ["mp3"],
+        ["m4a"] = ["aac", "alac"],
+        ["flac"] = ["flac"],
+        ["wav"] = ["pcm_u8", "pcm_s16le", "pcm_s24le", "pcm_s32le", "pcm_f32le"],
+    };
+
+    /// <summary>fork: True when an audio file only loses its tags: its audio is copied, not encoded again.</summary>
+    internal static bool CopiesAudioFile(string target, AudioStreamInfo audio, MediaOptions options) =>
+        options.StripMetadata && options.AudioBitrateKbps <= 0 && options.AudioChannels is not (1 or 2) && options.AudioSampleRate <= 0
+        && AudioCopyable.TryGetValue(target, out var codecs) && audio.Codec is { } codec && codecs.Contains(codec);
+
     private static IEnumerable<string> MetadataArguments(int from = 0)
     {
         // Keep title, artist, dates, … (chapters are kept by default); an empty value removes a tag.
@@ -513,6 +536,23 @@ internal static class MediaEncoding
         CoverExtras? extras)
     {
         var audio = info.Audio ?? throw new InvalidOperationException("The file has no audio track.");
+        // fork: StripMetadata leaves out the tags, the cover and its stand-ins, and copies the audio where it can.
+        if (options.StripMetadata)
+        {
+            List<string> bare = [.. Common, "-i", input, "-map", "0:a:0"];
+            if (CopiesAudioFile(target, audio, options))
+                bare.AddRange(["-c:a", "copy"]);
+            else
+            {
+                var encoder = AudioEncoder(target, spec.AudioCodec, options);
+                bare.AddRange(AudioCodecArguments(target, encoder, options, audio, inVideo: false));
+                bare.AddRange(ChannelAndRateArguments(target, encoder, options, audio.SampleRate));
+            }
+            bare.AddRange(NoMetadataArguments);
+            bare.AddRange(ContainerArguments(target));
+            bare.AddRange(["-f", spec.Muxer, "-progress", "pipe:1", output]);
+            return bare;
+        }
         List<string> args = [.. Common, "-i", input];
         // Ogg: the tags, and the picture as a comment, come from a metadata file (input 1) instead of the source.
         if (extras?.MetadataFile is { } metadata)

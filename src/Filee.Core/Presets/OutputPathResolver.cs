@@ -55,7 +55,7 @@ public static class OutputPathResolver
 
         for (var n = 2; ; n++)
         {
-            candidate = PathFor($"{name} ({n})");
+            candidate = PathFor(rule.PlainCopyNumbers ? $"{name} {n}" : $"{name} ({n})"); // fork: PlainCopyNumbers
             if (!exists(candidate) && !PathsEqual(candidate, tokens.SourcePath))
                 return candidate;
         }

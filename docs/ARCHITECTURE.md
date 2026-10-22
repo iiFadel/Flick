@@ -126,6 +126,18 @@ place as "coming soon", and the pill names that reason during a drag. Files with
 `ShowWheel` refuses it and the controller keeps the wheel showing; a drag opened with that key shows nothing
 (`HideWheel`) until the Convert key.
 
+**Tool operations.** A tool Flick runs itself is an operation: `Filee.Core/Wheels/ToolOperations` (pure, unit tested)
+builds a preset for the tool and the files' formats when the wheel opens, never saved: `TargetFormat = "*"` (the
+source's own format, a one-hop self-edge in `RoutePlanner`) plus the options that do the work, and Tangerine's name
+`{name} <suffix>` (`tool.suffix.<id>` in i18n), numbered `name Muted 2` (`OutputRule.PlainCopyNumbers`). So an
+operation runs through `ConversionService` and `JobQueue` like any conversion; `ToolsFace` asks it before
+`BuiltTools`, and `PresetAvailability` checks it as a conversion. Metadata on pictures sets
+`ImageOptions.OnlyRemoveMetadata`: the engines owning those self-edges (Magick; FFmpeg for HEIC) first ask
+`Filee.Engines/Metadata/LosslessMetadata`, which rewrites JPEG, PNG, WebP, GIF, TIFF and HEIF containers without their
+metadata blocks and never decodes the picture (Orientation and the ICC profile stay); a file it can't follow is
+converted as usual with `KeepMetadata` off. Audio and video use `MediaOptions.StripMetadata` (streams copied where the
+format allows), PDFs `PdfOptions.RemoveMetadata`, Mute `MediaOptions.RemoveAudio`.
+
 **After the drop** (`RadialController.Toast.cs`, Tangerine's "After the drop"). A drag wheel's conversion gets no
 progress ring: the slice stays lit 50 ms, the wheel goes, and 70 ms later `DropToastWindow` grows at the drop point
 (`RadialWindow.LastDragScreenPoint`, placed by `DropToastLayout`) with "Converting to MP3", the file and percentage,

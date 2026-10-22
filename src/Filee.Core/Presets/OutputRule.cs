@@ -78,6 +78,12 @@ public sealed class OutputRule
     /// </summary>
     public bool ZipResult { get; set; }
 
+    /// <summary>
+    /// fork: With <see cref="ConflictPolicy.Rename"/>, number a taken name "photo Compressed 2" instead of
+    /// "photo Compressed (2)", as Tangerine does (the Tools wheel's operations).
+    /// </summary>
+    public bool PlainCopyNumbers { get; set; }
+
     public OutputRule Clone()
     {
         var clone = (OutputRule)MemberwiseClone();

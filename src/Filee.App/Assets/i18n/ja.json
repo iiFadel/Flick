@@ -83,6 +83,8 @@
   "wheel.tool.createPDF": "Create PDF",
   "wheel.tool.createCollage": "Collage",
   "wheel.tool.extractArchive": "Extract",
+  "tool.suffix.removeMetadata": "No Metadata",
+  "tool.suffix.muteVideo": "Muted",
   "donut.close_hint": "Escキーで閉じる",
   "donut.edit": "プリセットを編集",
   "donut.empty": "ここにプリセットをドラッグ",

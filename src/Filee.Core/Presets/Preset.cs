@@ -263,6 +263,14 @@ public sealed class ImageOptions
     /// </summary>
     public bool KeepColorProfile { get; set; } = true;
 
+    /// <summary>
+    /// fork: Only remove the metadata, without decoding the picture: JPEG, PNG, WebP, GIF, TIFF and HEIC files are
+    /// rewritten without their metadata blocks (Orientation and the colour profile stay), so not one pixel changes.
+    /// The other options apply only to files that can't be rewritten so, which are converted with
+    /// <see cref="KeepMetadata"/> off instead (the Tools wheel's Metadata).
+    /// </summary>
+    public bool OnlyRemoveMetadata { get; set; }
+
     /// <summary>Convert to grayscale.</summary>
     public bool Grayscale { get; set; }
 
@@ -399,6 +407,12 @@ public sealed class PdfOptions
     /// </summary>
     public bool CompressWithGhostscript { get; set; }
 
+    /// <summary>
+    /// fork: For PDF → PDF: remove the document information (title, author, dates, …) and every XMP packet, leaving
+    /// the pages as they are (the Tools wheel's Metadata).
+    /// </summary>
+    public bool RemoveMetadata { get; set; }
+
     public PdfOptions Clone() => (PdfOptions)MemberwiseClone();
 }
 
@@ -502,6 +516,11 @@ public sealed class MediaOptions
     /// </summary>
     public const long MaxFrames = 100_000;
 
+    /// <summary>
+    /// fork: Write no tags, chapters or cover picture, copying the streams where the format allows it (the Tools
+    /// wheel's Metadata).
+    /// </summary>
+    public bool StripMetadata { get; set; }
 
     public MediaOptions Clone() => (MediaOptions)MemberwiseClone();
 }

@@ -51,8 +51,9 @@ Done when: side by side with the recording at normal speed, you can't immediatel
 ## Phase 3: Tools wheel, no-UI tools (M)
 
 - [x] Replace the Tools wheel stand-in: both drag wheels now show the spec's lists (`WheelCatalog`); tools not built yet are greyed out as "coming soon"
-- [ ] Add an "operation" concept next to target-format presets (a same-format transform with parameters). Design it in plan mode first: it must fit `Preset`, `ToolbarProfile`, `JobQueue` and `OutputPathResolver` without breaking conversions
-- [ ] Instant tools: Compress and Metadata (images, video, audio, PDF), Mute, Normalize, Extract (archives)
+- [x] Add an "operation" concept next to target-format presets: `ToolOperations` builds a same-format preset per tool, never saved (decided 21 Oct 2026: code-only, Tangerine names, instant tools use fixed defaults until Phase 5's windows)
+- [x] Metadata (lossless for JPEG, PNG, WebP, GIF, TIFF, HEIC; streams copied for audio and video; PDF), Mute
+- [ ] Instant tools: Compress (images, video, audio, PDF), Normalize, Extract (archives)
 - [ ] Small value popover (one shared control), then: Speed, Split (video, PDF), Channels, Snapshot, Visualize, Add BG
 - [ ] Tests per operation, inputs generated in the test (see `EngineFixture`)
 
@@ -82,7 +83,8 @@ Built from scratch in Swift (SwiftUI + AppKit), not on Avalonia, because the goa
 - Explorer selection + keyboard shortcut to open the wheel without dragging
 - Real backdrop blur behind the wheel's track and pill (Tangerine's glass). Avalonia can't blur behind part of a transparent window, so Flick uses the colours the glass shows over a light desktop; over a dark or busy desktop it looks flatter than Tangerine
 - The click-mode donut (hold gesture, Explorer menu) and the Donut toolbar editor still use upstream's toolbar profiles and progress ring; the drag wheels use the spec lists (`WheelCatalog`) and the drop toast. Decide whether click mode should follow
-- `EbookTests.Calibre_ranked_first_makes_a4_pdfs_of_e_books` fails in full runs of the whole solution and passes alone (load or timing); look into it
+- `EbookTests.Calibre_ranked_first_makes_a4_pdfs_of_e_books` and `HwpxReaderTests.A_hundred_pages_are_read_in_well_under_a_second` fail in full runs of the whole solution and pass alone (load or timing); look into them
 - Engine error texts (password-protected archives, DRM ebooks, CAD), log lines and the `filee` CLI still say Filee
+- Metadata on a HEIC runs without FFmpeg, but its slice still needs FFmpeg installed: the HEIC self-edge belongs to FFmpeg
 - Watch folders and CLI already exist upstream, keep them working
 - Pull upstream regularly: `git fetch upstream && git merge upstream/main`

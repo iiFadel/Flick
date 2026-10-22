@@ -14,7 +14,10 @@ namespace Filee.App.ViewModels;
 
 public sealed partial class RadialViewModel
 {
-    /// <summary>Tangerine's tools that a built-in preset already does (tool id → preset id). Compress: PDFs only.</summary>
+    /// <summary>
+    /// Tangerine's tools that a built-in preset already does (tool id → preset id). Compress: PDFs only. The others
+    /// Flick runs are <see cref="ToolOperations"/>.
+    /// </summary>
     private static readonly Dictionary<string, string> BuiltTools = new(StringComparer.Ordinal)
     {
         ["cropImage"] = "tool-crop",
@@ -101,13 +104,21 @@ public sealed partial class RadialViewModel
         {
             var label = loc["wheel.tool." + tool];
             var builtId = tool == "compress" ? sources.All(s => s == "pdf") ? "compress-pdf" : null : BuiltTools.GetValueOrDefault(tool);
+            var built = ToolOperations.For(tool, sources, id => loc["tool.suffix." + id]) is { } operation
+                ? Named(operation, label)
+                : builtId is null ? null : store.FindPreset(builtId);
             // Not built yet: a stand-in that never runs (its slice is disabled, so PresetAt never returns it).
-            var built = builtId is null ? null : store.FindPreset(builtId);
             var preset = built ?? new Preset { Id = "tool:" + tool, Name = label, Kind = PresetKind.Tool };
             presets.Add(preset);
             items.Add(Slice(preset, label, built is null ? loc["donut.tool_coming_soon"] : availability.Check(preset, _formats), tool));
         }
         return new Face(presets, presets.Select(_ => (IReadOnlyList<Preset>)[]).ToList(), items);
+    }
+
+    private static Preset Named(Preset preset, string name)
+    {
+        preset.Name = name;
+        return preset;
     }
 
     private static DonutItem Slice(Preset preset, string label, string? reason, string? tool = null) => new()

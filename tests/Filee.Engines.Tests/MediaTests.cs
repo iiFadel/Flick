@@ -21,7 +21,7 @@ namespace Filee.Engines.Tests;
 public sealed class FfmpegCollection;
 
 [Collection(nameof(FfmpegCollection))]
-public class MediaTests(EngineFixture fx) : IClassFixture<EngineFixture>
+public partial class MediaTests(EngineFixture fx) : IClassFixture<EngineFixture>
 {
     private static readonly (string Ffmpeg, string Ffprobe)? Tools = FfmpegConverter.Locate();
 

@@ -87,6 +87,8 @@
   "wheel.tool.createPDF": "Create PDF",
   "wheel.tool.createCollage": "Collage",
   "wheel.tool.extractArchive": "Extract",
+  "tool.suffix.removeMetadata": "No Metadata",
+  "tool.suffix.muteVideo": "Muted",
   "donut.close_hint": "按 Esc 关闭",
   "donut.edit": "编辑预设",
   "donut.empty": "把预设拖到这里",

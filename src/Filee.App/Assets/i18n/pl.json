@@ -87,6 +87,8 @@
   "wheel.tool.createPDF": "Create PDF",
   "wheel.tool.createCollage": "Collage",
   "wheel.tool.extractArchive": "Extract",
+  "tool.suffix.removeMetadata": "No Metadata",
+  "tool.suffix.muteVideo": "Muted",
   "donut.close_hint": "Esc zamyka",
   "donut.edit": "Edytuj ustawienie",
   "donut.empty": "Przeciągnij tu ustawienia",
