@@ -12,7 +12,7 @@
 
 - .NET 10, C#, Avalonia UI. Solution: `Filee.slnx`
 - Run: `dotnet run --project src/Filee.App`
-- Test: `dotnet test` (must pass before every commit)
+- Test: `dotnet test -m:1` (must pass before every commit; one project at a time, parallel projects crash the App test host from memory pressure)
 - Optional engines: `pwsh build/fetch-engines.ps1 -Only rhwp,pandoc` (FFmpeg is needed for video/audio work; install it from Settings → Engines)
 
 ## Map of the code

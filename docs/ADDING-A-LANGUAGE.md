@@ -10,7 +10,7 @@
 4. Add the code to `LocalizationTests.Languages` (`tests/Filee.App.Tests/LocalizationTests.cs`).
 5. If the script needs another font (Japanese, Arabic, …), add a static Noto font to `build/fetch-fonts.ps1`
    and to the font list in `ThemeService` (variable fonts are not supported by Avalonia).
-6. Run `dotnet test` and look at the screenshots in `tests/Filee.App.Tests/bin/.../screenshots`
+6. Run `dotnet test -m:1` and look at the screenshots in `tests/Filee.App.Tests/bin/.../screenshots`
    (add your language to `RenderTests.Pages` to render a few pages).
 
 Missing keys fall back to English at runtime, but the test suite requires every language to be complete.
