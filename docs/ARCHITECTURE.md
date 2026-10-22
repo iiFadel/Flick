@@ -142,6 +142,13 @@ Compress PDF's settings) and `OutputRule.NeverLarger`: `JobQueue` replaces a res
 of the source (`NeverLarger`, notice `notice.not_smaller`). Normalize is `MediaOptions.NormalizeLoudness` (loudnorm to
 -16 LUFS). Extract is a folder target named `name Extracted`.
 
+**Value popover** (`RadialController.Popover.cs`). An operation that needs one value has a `ToolParameter`
+(`ToolOperations.ParameterFor`: choices, each a label, a name suffix and a change to the preset). A drop on its slice,
+or Enter during the drag, hides the wheel and grows `ValuePopoverWindow` at the drop point; a pick applies the choice to
+a copy of the preset (`Channels Stereo`, `song Stereo.mp3`), starts the job and shows the drop toast in the same spot.
+While the drag goes on, the hook's arrows, Enter and Escape reach it through `WheelNavigated` / `WheelApplied` /
+`WheelCancelled`; after the drag the window takes the keyboard, and losing focus or Escape runs nothing.
+
 **After the drop** (`RadialController.Toast.cs`, Tangerine's "After the drop"). A drag wheel's conversion gets no
 progress ring: the slice stays lit 50 ms, the wheel goes, and 70 ms later `DropToastWindow` grows at the drop point
 (`RadialWindow.LastDragScreenPoint`, placed by `DropToastLayout`) with "Converting to MP3", the file and percentage,

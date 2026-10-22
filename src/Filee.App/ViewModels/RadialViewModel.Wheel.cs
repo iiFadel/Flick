@@ -57,12 +57,22 @@ public sealed partial class RadialViewModel
     /// <summary>The drag wheel showing (<see cref="ShowWheel"/>), or null.</summary>
     public WheelKind? Wheel { get; private set; }
 
+    /// <summary>The Tools wheel's operations that ask for a value after the drop, by slice.</summary>
+    private Dictionary<int, ToolParameter> _parameters = [];
+
+    /// <summary>The value slice <paramref name="index"/> of the Tools wheel asks for after the drop, or null.</summary>
+    public ToolParameter? ParameterAt(int index) => Wheel == WheelKind.Tools ? _parameters.GetValueOrDefault(index) : null;
+
     /// <summary>The drop toast for <paramref name="job"/>, started from slice <paramref name="index"/> of the wheel.</summary>
     public DropToastViewModel DropToastFor(JobViewModel job, int index)
     {
         var label = index >= 0 && index < Items.Count ? Items[index].Label : job.Job.PresetDisplayName;
         return new DropToastViewModel(job, DropToastLayout.Title(loc, label, conversion: Wheel != WheelKind.Tools), loc);
     }
+
+    /// <summary>The drop toast for <paramref name="job"/> of a tool, titled <paramref name="label"/> ("Channels Mono").</summary>
+    public DropToastViewModel DropToastForTool(JobViewModel job, string label) =>
+        new(job, DropToastLayout.Title(loc, label, conversion: false), loc);
 
     /// <summary>
     /// A drag that opened the Tools wheel with files that have none: nothing shows (the window still takes the drag)
@@ -99,6 +109,7 @@ public sealed partial class RadialViewModel
     {
         var presets = new List<Preset>();
         var items = new List<DonutItem>();
+        _parameters = [];
         foreach (var tool in WheelCatalog.Tools(sources))
         {
             var label = loc["wheel.tool." + tool];
@@ -106,6 +117,8 @@ public sealed partial class RadialViewModel
             var built = ToolOperations.For(tool, sources, id => loc["tool.suffix." + id]) is { } operation
                 ? Named(operation, label)
                 : builtId is null ? null : store.FindPreset(builtId);
+            if (built?.Id.StartsWith("op-", StringComparison.Ordinal) == true && ToolOperations.ParameterFor(tool, key => loc[key]) is { } parameter)
+                _parameters[presets.Count] = parameter;
             // Not built yet: a stand-in that never runs (its slice is disabled, so PresetAt never returns it).
             var preset = built ?? new Preset { Id = "tool:" + tool, Name = label, Kind = PresetKind.Tool };
             presets.Add(preset);

@@ -140,6 +140,7 @@ public sealed partial class RadialController( // fork: partial (RadialController
     /// <summary>The mouse button of the drag gesture was released somewhere.</summary>
     public void OnDragGestureEnded()
     {
+        PopoverAfterDrag(); // fork: RadialController.Popover.cs
         if (!_visible || viewModel.IsClickMode)
             return;
         // No drag ever entered the donut's window: nothing was dragged (a rubber-band selection), or Windows kept
@@ -339,6 +340,9 @@ public sealed partial class RadialController( // fork: partial (RadialController
             return;
         }
 
+        if (AskForValue(index, preset, sources, web)) // fork: an operation that asks for a value (RadialController.Popover.cs)
+            return;
+
         log.LogInformation("Converting {Count} file(s) with preset {Preset}{Web}", sources.Count, preset.Id,
             web is null ? "" : " (from a browser)");
         var job = conversions.Start(sources, preset, showInToast: false, web);
@@ -425,6 +429,7 @@ public sealed partial class RadialController( // fork: partial (RadialController
     /// <summary>A new gesture needs the window right now: move the job to the toast without animation.</summary>
     private void ReleaseProgressToToast()
     {
+        CancelPopover(); // fork: RadialController.Popover.cs
         ReleaseDropToast(); // fork: RadialController.Toast.cs
         if (_progressJob is not null)
             conversions.ShowInToast(_progressJob);
