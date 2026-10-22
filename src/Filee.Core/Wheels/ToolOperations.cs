@@ -30,6 +30,7 @@ public static class ToolOperations
             "removeMetadata" => Metadata(formats),
             "muteVideo" => formats.All(Video.Contains) ? Mute() : null,
             "normalizeAudio" => formats.All(Audio.Contains) ? Normalize() : null,
+            "audioChannels" => formats.All(Audio.Contains) ? SameFormat() : null,
             "extractArchive" => formats.All(Archives.Contains) ? Extract() : null,
             _ => null,
         };
@@ -40,6 +41,21 @@ public static class ToolOperations
         preset.Output.PlainCopyNumbers = true;
         return preset;
     }
+
+    /// <summary>
+    /// The value <paramref name="tool"/> asks for in the popover after the drop, or null for a tool that runs at once.
+    /// Only meaningful where <see cref="For"/> gives an operation.
+    /// </summary>
+    /// <param name="text">Flick's text for a key (<c>tool.choice.mono</c>).</param>
+    public static ToolParameter? ParameterFor(string tool, Func<string, string> text) => tool switch
+    {
+        "audioChannels" => new ToolParameter(
+        [
+            new ToolChoice(text("tool.choice.mono"), text("tool.choice.mono"), p => p.Media.AudioChannels = 1),
+            new ToolChoice(text("tool.choice.stereo"), text("tool.choice.stereo"), p => p.Media.AudioChannels = 2),
+        ]),
+        _ => null,
+    };
 
     /// <summary>
     /// Fixed defaults until Tangerine's Compress window (Phase 5): photos at quality 70, PNGs to a 256-colour palette,

@@ -29,12 +29,17 @@ public sealed partial class RadialController
     internal DropToastWindow? Toast => _toast;
 
     /// <summary>Shows the drop toast for <paramref name="job"/>, started from slice <paramref name="index"/> of a drag wheel.</summary>
-    private void ShowDropToast(JobViewModel job, int index)
+    private void ShowDropToast(JobViewModel job, int index) => ShowDropToast(job, viewModel.DropToastFor(job, index), null, index);
+
+    /// <summary>
+    /// Shows <paramref name="model"/>'s drop toast; at <paramref name="from"/> when the wheel already went (the value
+    /// popover was there), else where the drag was, after the lit slice <paramref name="index"/> lingered.
+    /// </summary>
+    private void ShowDropToast(JobViewModel job, DropToastViewModel model, PixelPoint? from, int index = -1)
     {
         ReleaseDropToast();
-        var model = viewModel.DropToastFor(job, index);
         var dropped = _dropped;
-        var at = _window?.LastDragScreenPoint ?? _window?.PointToScreen(new Point(_window.Bounds.Width / 2, _window.Bounds.Height / 2))
+        var at = from ?? _window?.LastDragScreenPoint ?? _window?.PointToScreen(new Point(_window.Bounds.Width / 2, _window.Bounds.Height / 2))
                  ?? new PixelPoint(0, 0);
         (_toastModel, _toastShown, _toastDone) = (model, false, false);
         model.Closing += () => CloseDropToast(model);
@@ -45,6 +50,25 @@ public sealed partial class RadialController
                 HandOffDropToast();
         }, HandOffAfter);
 
+        void Show()
+        {
+            if (_toastModel != model)
+                return;
+            var toast = _toast ??= new DropToastWindow();
+            toast.DataContext = model;
+            toast.ShowAt(at);
+            if (toast.TryGetPlatformHandle()?.Handle is { } handle)
+                platform.RaiseTopmost(handle);
+            _toastShown = true;
+            if (_toastDone)
+                After(DoneHold, () => CloseDropToast(model));
+        }
+
+        if (from is not null)
+        {
+            After(ToastDelay, Show);
+            return;
+        }
         // The drop cleared the highlight: the slice stays lit while the wheel lingers.
         if (dropped)
             _window?.DonutControl.SetExternalHighlight(index);
@@ -56,19 +80,7 @@ public sealed partial class RadialController
                 HideWindow();
             else
                 viewModel.HideWheel(); // Enter mid-drag: the window stays to take the drop
-            After(ToastDelay, () =>
-            {
-                if (_toastModel != model)
-                    return;
-                var toast = _toast ??= new DropToastWindow();
-                toast.DataContext = model;
-                toast.ShowAt(at);
-                if (toast.TryGetPlatformHandle()?.Handle is { } handle)
-                    platform.RaiseTopmost(handle);
-                _toastShown = true;
-                if (_toastDone)
-                    After(DoneHold, () => CloseDropToast(model));
-            });
+            After(ToastDelay, Show);
         });
     }
 

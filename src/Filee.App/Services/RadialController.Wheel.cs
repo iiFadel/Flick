@@ -37,16 +37,21 @@ public sealed partial class RadialController
         };
         triggers.WheelNavigated += step =>
         {
-            if (WheelShowsFiles)
+            if (_popoverModel is { } popover) // the popover a slice opened mid-drag (RadialController.Popover.cs)
+                popover.Move(step);
+            else if (WheelShowsFiles)
                 _window!.DonutControl.HandleDragKey(step > 0 ? Key.Right : Key.Left);
         };
         triggers.WheelApplied += () =>
         {
-            if (WheelShowsFiles)
+            if (_popoverModel is { } popover)
+                popover.Apply();
+            else if (WheelShowsFiles)
                 _window!.DonutControl.HandleDragKey(Key.Enter);
         };
         triggers.WheelCancelled += () =>
         {
+            _popoverModel?.Cancel();
             if (_visible && !viewModel.IsClickMode)
                 Close();
         };

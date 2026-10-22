@@ -24,7 +24,7 @@ using SharpHook.Data;
 namespace Filee.App.Tests;
 
 [Collection("Motion")]
-public class DropToastTests
+public partial class DropToastTests
 {
     private const string Captions = "1\n00:00:01,000 --> 00:00:02,500\nHello there\n\n2\n00:00:03,000 --> 00:00:04,000\nBye\n";
 
@@ -134,6 +134,7 @@ public class DropToastTests
         }
         finally
         {
+            radial.Popover?.Cancel();
             radial.Window?.Close();
             radial.Toast?.Close();
             Motion.Configure(false, () => false);

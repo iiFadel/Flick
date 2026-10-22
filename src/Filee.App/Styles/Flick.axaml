@@ -45,6 +45,7 @@
           <SolidColorBrush x:Key="ProgressTrackBrush" Color="#DCDFDC" />
           <SolidColorBrush x:Key="ToastCloseBrush" Color="#E2E4E2" />
           <SolidColorBrush x:Key="ToastCloseGlyphBrush" Color="#7A7F7B" />
+          <SolidColorBrush x:Key="ValueChoiceSelectedTextBrush" Color="#FFFFFF" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <!-- Our design: neutral near-black surfaces to go with the orange. -->
@@ -80,6 +81,7 @@
           <SolidColorBrush x:Key="ProgressTrackBrush" Color="#3E413F" />
           <SolidColorBrush x:Key="ToastCloseBrush" Color="#3A3D3B" />
           <SolidColorBrush x:Key="ToastCloseGlyphBrush" Color="#B5B8B4" />
+          <SolidColorBrush x:Key="ValueChoiceSelectedTextBrush" Color="#FFFFFF" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
 
@@ -160,5 +162,32 @@
   <Style Selector="Button.drop-toast-close PathIcon">
     <Setter Property="Width" Value="8" />
     <Setter Property="Height" Value="8" />
+  </Style>
+  <!-- fork: the value popover (Views/ValuePopoverWindow.axaml): pill choices, the selected one in the accent. -->
+  <Style Selector="Border.value-popover">
+    <Setter Property="Width" Value="NaN" />
+    <Setter Property="MinWidth" Value="200" />
+    <Setter Property="MaxWidth" Value="360" />
+  </Style>
+  <Style Selector="TextBlock.value-popover-title">
+    <Setter Property="Margin" Value="2,0,0,0" />
+  </Style>
+  <Style Selector="Button.value-choice">
+    <Setter Property="Margin" Value="0,0,6,6" />
+    <Setter Property="Padding" Value="12,5" />
+    <Setter Property="MinWidth" Value="44" />
+    <Setter Property="CornerRadius" Value="13" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="FontSize" Value="13" />
+    <Setter Property="Background" Value="{DynamicResource ToastCloseBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource ToastTitleBrush}" />
+  </Style>
+  <Style Selector="Button.value-choice:pointerover /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource ProgressTrackBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource ToastTitleBrush}" />
+  </Style>
+  <Style Selector="Button.value-choice.selected /template/ ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource ValueChoiceSelectedTextBrush}" />
   </Style>
 </Styles>
