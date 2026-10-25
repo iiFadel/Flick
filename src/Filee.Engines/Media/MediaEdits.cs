@@ -1,6 +1,6 @@
 // fork: what a video or audio editor window asked for (MediaOptions.Edit, Phase 5), added to MediaEncoding's ordinary
 // encode of the file into its own format: Trim seeks the input to the start and stops at the end; Redact hides boxes on
-// every frame; Crop puts a crop before the encode's own video filters, as fractions of the upright picture (FFmpeg turns phone videos before filtering), with
+// every frame; Bleep covers ranges of the sound with a tone or silence; Crop puts a crop before the encode's own video filters, as fractions of the upright picture (FFmpeg turns phone videos before filtering), with
 // even sides for H.264 and HEVC. FFmpeg seeks a decoded input exactly, and an edit never copies streams
 // (MediaEncoding.CanCopyVideo / CanCopyAudio).
 
@@ -67,6 +67,17 @@ internal static class MediaEdits
         return string.Join(";", chains);
     }
 
+    /// <summary>
+    /// Bleep: inside the ranges every channel's samples become a 1 kHz tone at a quarter of full scale, or silence;
+    /// outside them the sound stays as it is.
+    /// </summary>
+    internal static string BleepFilter(MediaEdit edit)
+    {
+        var inside = string.Join("+", edit.Bleeps.Select(r => $"between(t,{Number(r.Start)},{Number(r.End)})"));
+        var sound = edit.BleepSound == BleepSound.Tone ? "0.25*sin(2*PI*1000*t)" : "0";
+        return $"aeval=exprs='if(gt({inside},0),{sound},val(ch))':channel_layout=same";
+    }
+
     private static List<string> Edited(IReadOnlyList<string> arguments, MediaEdit edit)
     {
         var list = arguments.ToList();
@@ -76,6 +87,14 @@ internal static class MediaEdits
             if (filters < 0)
                 throw new InvalidOperationException("The video is not re-encoded, so it can't be edited.");
             list[filters + 1] = VideoFilters(edit, list[filters + 1]);
+        }
+        if (edit.Bleeps.Count > 0)
+        {
+            var filters = list.IndexOf("-af");
+            if (filters >= 0)
+                list[filters + 1] = BleepFilter(edit) + "," + list[filters + 1];
+            else
+                list.InsertRange(list.LastIndexOf("-f"), ["-af", BleepFilter(edit)]);
         }
         if (edit.Trim is { } trim)
         {

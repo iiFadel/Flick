@@ -33,6 +33,9 @@
     <DataTemplate DataType="ed:AdjustEditorViewModel">
       <ed:AdjustEditorView />
     </DataTemplate>
+    <DataTemplate DataType="ed:BleepEditorViewModel">
+      <ed:BleepEditorView />
+    </DataTemplate>
   </Window.DataTemplates>
 
   <Window.Styles>

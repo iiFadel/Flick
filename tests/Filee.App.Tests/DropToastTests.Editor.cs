@@ -101,6 +101,33 @@ public partial class DropToastTests
     });
 
     [AvaloniaFact]
+    public void A_drop_on_bleep_marks_a_range_and_apply_bleeps_it() => Run((provider, radial, vm, folder) =>
+    {
+        Assert.SkipUnless(Ffmpeg is not null, "FFmpeg is not installed");
+        var (file, _) = OpenToolsWheelOnASong(provider, radial, folder);
+        Assert.Equal("Bleep", vm.Items[6].Label);
+
+        Drop(radial.Window!, file, SliceCenter(radial.Window!.DonutControl, 6, 7));
+
+        var editor = Assert.IsType<BleepEditorViewModel>(radial.Editor);
+        Assert.True(Until(() => editor.Peaks.Length > 0, 30_000));
+        Assert.False(editor.ApplyCommand.CanExecute(null));
+
+        editor.Mark(0.6, 0.2);
+        editor.Mark(0.5, 0.8); // joins the first
+        Assert.Equal([new TrimRange(0.2, 0.8)], editor.Ranges);
+        Assert.Equal("0:00.2 – 0:00.8", editor.SelectedText);
+        editor.Undo();
+        Assert.Equal([new TrimRange(0.2, 0.6)], editor.Ranges);
+        editor.SetSoundCommand.Execute(BleepSound.Silence);
+        editor.ApplyCommand.Execute(null);
+
+        Assert.Null(radial.Editor);
+        Assert.True(Until(() => Finished(Path.Combine(folder, "song Bleeped.mp3")), 30_000));
+        provider.PostMouse(EventType.MouseReleased, 460, 400, EventMask.None);
+    });
+
+    [AvaloniaFact]
     public void An_exact_size_typed_sets_the_crop() => Run((provider, radial, vm, folder) =>
     {
         var (file, crop) = OpenToolsWheelOnAPicture(provider, radial, folder);

@@ -148,6 +148,38 @@ public partial class MediaTests
         return edges.Statistics().Composite().Mean;
     }
 
+    [Theory]
+    [InlineData("song.mp3", BleepSound.Tone)]
+    [InlineData("song.wav", BleepSound.Silence)]
+    [InlineData("song.flac", BleepSound.Tone)]
+    [InlineData("song.m4a", BleepSound.Silence)]
+    public async Task Bleep_covers_the_ranges_and_keeps_the_rest(string name, BleepSound sound)
+    {
+        SkipUnlessInstalled();
+        var folder = fx.NewFolder();
+        var source = await MakeToneAsync(folder, name, seconds: 4);
+
+        var output = await RunEditAsync("redactAudio", source,
+            new MediaEdit { Bleeps = [new TrimRange(1, 2)], BleepSound = sound });
+
+        Assert.Equal(Path.Combine(folder, "song Bleeped" + Path.GetExtension(name)), output);
+        Assert.InRange((await ProbeAsync(output)).Duration, 3.8, 4.2);
+        // The original is FFmpeg's 440 Hz sine at an eighth of full scale; the bleeped second is the tone at a quarter, or
+        // silent, and the rest stays as it was.
+        var peaks = await MediaPreview.PeaksAsync(output, 8, Path.Combine(folder, "peaks.pcm"), CancellationToken.None);
+        Assert.InRange(peaks[0], 0.06, 0.16);      // 0 – 0.5 s: the song
+        Assert.InRange(peaks[6], 0.06, 0.16);      // 3 – 3.5 s: the song
+        if (sound == BleepSound.Silence)
+            Assert.InRange(peaks[3], 0, 0.01);     // 1.5 – 2 s: nothing
+        else
+            Assert.InRange(peaks[3], 0.2, 0.3);    // the tone
+    }
+
+    [Fact]
+    public void The_bleep_filter_lists_every_range() =>
+        Assert.Equal("aeval=exprs='if(gt(between(t,1,2)+between(t,3.5,4),0),0,val(ch))':channel_layout=same",
+            MediaEdits.BleepFilter(new MediaEdit { Bleeps = [new TrimRange(1, 2), new TrimRange(3.5, 4)], BleepSound = BleepSound.Silence }));
+
     [Fact]
     public void The_crop_filter_is_relative_to_the_input_and_even() =>
         Assert.Equal("crop=w='max(2,trunc(iw*0.5/2)*2)':h='max(2,trunc(ih*0.25/2)*2)':x='trunc(iw*0.1/2)*2':y='trunc(ih*0/2)*2'",

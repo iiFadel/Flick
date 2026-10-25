@@ -71,6 +71,7 @@ public sealed class WindowService(ILocalizer loc, IServiceProvider services, Mem
             Core.Wheels.EditorKind.RedactVideo => new Editors.RedactEditorViewModel(title, source, video: true, log),
             Core.Wheels.EditorKind.Annotate => new Editors.AnnotateEditorViewModel(title, source, log, loc["editor.annotate.new_text"]),
             Core.Wheels.EditorKind.Adjust => new Editors.AdjustEditorViewModel(title, source, log),
+            Core.Wheels.EditorKind.Bleep => new Editors.BleepEditorViewModel(title, source, log),
             Core.Wheels.EditorKind.Organize => new Editors.OrganizeEditorViewModel(title, source, log, page => loc.Format("editor.organize.page", page)),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
         };

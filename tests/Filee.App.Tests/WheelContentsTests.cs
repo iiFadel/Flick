@@ -19,7 +19,7 @@ public class WheelContentsTests
             ["Compress", "Metadata", "Mute", "Trim", "Crop", "Speed", "Snapshot", "Split", "Redact"],
             ["Compress", "Metadata", "Mute", "Trim", "Crop", "Speed", "Snapshot", "Split", "Redact"] },
         { "song.mp3", ["M4A", "WAV", "FLAC", "OGG", "OPUS", "AIFF", "WMA"],
-            ["Compress", "Metadata", "Normalize", "Visualize", "Trim", "Channels", "Bleep"], ["Compress", "Metadata", "Normalize", "Visualize", "Trim", "Channels"] },
+            ["Compress", "Metadata", "Normalize", "Visualize", "Trim", "Channels", "Bleep"], ["Compress", "Metadata", "Normalize", "Visualize", "Trim", "Channels", "Bleep"] },
         { "notes.pdf", ["DOCX", "PAGES", "PPTX", "XLSX", "JPG", "PNG", "EPUB", "TXT", "MD"],
             ["Compress", "Metadata", "Split", "Organize"], ["Compress", "Metadata", "Split", "Organize"] },
         { "letter.docx", ["PAGES", "PDF", "TXT", "MD", "HTML", "EPUB", "PNG", "JPG"], [], [] },

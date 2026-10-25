@@ -45,6 +45,7 @@ public static class ToolOperations
             "organizePDF" => formats is ["pdf"] ? SameFormat() : null,
             "redactImage" => formats.Count == 1 && Images.Contains(formats[0]) && formats[0] != "gif" ? SameFormat() : null,
             "redactVideo" => formats.Count == 1 && Video.Contains(formats[0]) ? SameFormat() : null,
+            "redactAudio" => formats.Count == 1 && Audio.Contains(formats[0]) ? SameFormat() : null,
             "editImage" => formats.Count == 1 && Images.Contains(formats[0]) && formats[0] != "gif" ? SameFormat() : null,
             // Tangerine always writes the annotated picture as a PNG.
             "annotateImage" => formats.Count == 1 && Images.Contains(formats[0]) && formats[0] != "gif" ? SameFormat(p => p.TargetFormat = "png") : null,
@@ -113,6 +114,7 @@ public static class ToolOperations
         "organizePDF" => EditorKind.Organize,
         "redactImage" => EditorKind.RedactImage,
         "redactVideo" => EditorKind.RedactVideo,
+        "redactAudio" => EditorKind.Bleep,
         "annotateImage" => EditorKind.Annotate,
         "editImage" => EditorKind.Adjust,
         _ => null,

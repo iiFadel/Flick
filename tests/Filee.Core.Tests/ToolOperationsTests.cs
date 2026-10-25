@@ -219,6 +219,14 @@ public class ToolOperationsTests
     }
 
     [Fact]
+    public void Bleep_of_one_song_opens_the_bleep_editor()
+    {
+        Assert.Equal(BuiltInData.SameAsSource, For("redactAudio", "mp3")!.TargetFormat);
+        Assert.Null(For("redactAudio", "mp4"));
+        Assert.Equal(EditorKind.Bleep, ToolOperations.EditorFor("redactAudio"));
+    }
+
+    [Fact]
     public void Tools_without_a_window_open_no_editor()
     {
         Assert.Null(ToolOperations.EditorFor("compress"));

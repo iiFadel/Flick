@@ -15,4 +15,9 @@ public sealed record MediaEdit
     public IReadOnlyList<NormalizedRect> Redactions { get; init; } = [];
 
     public RedactStyle RedactStyle { get; init; }
+
+    /// <summary>Parts of the sound to cover (Bleep), in seconds, in order and apart.</summary>
+    public IReadOnlyList<TrimRange> Bleeps { get; init; } = [];
+
+    public BleepSound BleepSound { get; init; }
 }

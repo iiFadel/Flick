@@ -12,4 +12,5 @@ public enum EditorKind
     RedactVideo,
     Annotate,
     Adjust,
+    Bleep,
 }

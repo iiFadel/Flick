@@ -1,0 +1,35 @@
+<!-- fork: the Bleep editor's body (BleepEditorViewModel): the song's waveform to mark ranges on, then Tone or Silence,
+     the picked range's times, Delete and Clear. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ed="using:Filee.App.Editors"
+             xmlns:core="using:Filee.Core.Editing"
+             x:Class="Filee.App.Editors.BleepEditorView"
+             x:DataType="ed:BleepEditorViewModel">
+  <DockPanel Margin="18,0">
+    <Border DockPanel.Dock="Bottom" Padding="0,10,0,0">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+          <TextBlock Text="{Binding SelectedText}" FontFamily="Consolas, monospace" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"
+                     Foreground="{DynamicResource AccentBrush}" />
+          <Button Classes="editor-choice" Content="{DynamicResource editor.organize.delete}" Command="{Binding RemoveCommand}" />
+          <Button Classes="editor-choice" Content="{DynamicResource editor.redact.clear}" Command="{Binding ClearCommand}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+          <TextBlock Classes="editor-label" Text="{DynamicResource editor.bleep.sound}" Margin="0,0,4,0" />
+          <Button Classes="editor-choice" Classes.selected="{Binding IsTone}" Content="{DynamicResource editor.bleep.tone}"
+                  Command="{Binding SetSoundCommand}" CommandParameter="{x:Static core:BleepSound.Tone}" />
+          <Button Classes="editor-choice" Classes.selected="{Binding IsSilence}" Content="{DynamicResource editor.bleep.silence}"
+                  Command="{Binding SetSoundCommand}" CommandParameter="{x:Static core:BleepSound.Silence}" />
+          <TextBlock Text="{DynamicResource editor.bleep.hint}" FontSize="12" Margin="10,0,0,0" VerticalAlignment="Center"
+                     Foreground="{DynamicResource ToastTextBrush}" />
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <Border CornerRadius="10" ClipToBounds="True" Background="#14000000" Padding="12,24">
+      <ed:BleepTimeline x:Name="Timeline" Duration="{Binding Duration}" Peaks="{Binding Peaks}" Ranges="{Binding Ranges}"
+                        Selected="{Binding Selected}" Accent="{DynamicResource AccentBrush}" Wave="{DynamicResource ToastTextBrush}" />
+    </Border>
+  </DockPanel>
+</UserControl>
