@@ -90,8 +90,8 @@ public static class ExplorerMenuPackage
                 new XAttribute("Version", ManifestVersion.ToString(4)),
                 new XAttribute("ProcessorArchitecture", Architecture)),
             new XElement(Foundation + "Properties",
-                new XElement(Foundation + "DisplayName", "Filee"),
-                new XElement(Foundation + "PublisherDisplayName", "Filee contributors"),
+                new XElement(Foundation + "DisplayName", "Flick"), // fork: the names Windows shows; the identity stays
+                new XElement(Foundation + "PublisherDisplayName", "Flick"),
                 new XElement(Foundation + "Logo", LogoPath),
                 new XElement(Uap10 + "AllowExternalContent", "true")),
             new XElement(Foundation + "Resources",
@@ -113,8 +113,8 @@ public static class ExplorerMenuPackage
                     // AppListEntry="none": the package only carries the shell extension, it adds no Start menu entry.
                     new XElement(Uap + "VisualElements",
                         new XAttribute("AppListEntry", "none"),
-                        new XAttribute("DisplayName", "Filee"),
-                        new XAttribute("Description", "Filee File Explorer integration"),
+                        new XAttribute("DisplayName", "Flick"), // fork
+                        new XAttribute("Description", "Flick File Explorer integration"),
                         new XAttribute("BackgroundColor", "transparent"),
                         new XAttribute("Square150x150Logo", LogoPath),
                         new XAttribute("Square44x44Logo", LogoPath)),
@@ -133,7 +133,7 @@ public static class ExplorerMenuPackage
                             new XAttribute("Category", "windows.comServer"),
                             new XElement(Com + "ComServer",
                                 new XElement(Com + "SurrogateServer",
-                                    new XAttribute("DisplayName", "Filee context menu"),
+                                    new XAttribute("DisplayName", "Flick context menu"), // fork
                                     new XElement(Com + "Class",
                                         new XAttribute("Id", clsid),
                                         new XAttribute("Path", DllFileName),

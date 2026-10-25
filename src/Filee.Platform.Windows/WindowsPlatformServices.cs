@@ -14,7 +14,8 @@ public sealed class WindowsPlatformServices : IPlatformServices
 {
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string ContextMenuKey = @"Software\Classes\*\shell\Filee";
-    private const string AppName = "Filee";
+    private const string AppName = "Flick"; // fork: the name people see in Task Manager's startup list and Send To
+    private const string UpstreamAppName = "Filee"; // fork: what upstream registered under, removed when Flick writes its own
 
     /// <summary>Window classes that belong to Explorer windows and the desktop.</summary>
     private static readonly HashSet<string> FileManagerClasses = new(StringComparer.Ordinal)
@@ -173,6 +174,7 @@ public sealed class WindowsPlatformServices : IPlatformServices
     public void SetStartWithSystem(bool enabled, string executablePath)
     {
         using var key = Registry.CurrentUser.CreateSubKey(RunKey);
+        key.DeleteValue(UpstreamAppName, throwOnMissingValue: false); // fork
         if (enabled)
             key.SetValue(AppName, $"\"{executablePath}\" --background");
         else
@@ -190,6 +192,7 @@ public sealed class WindowsPlatformServices : IPlatformServices
     {
         if (ExplorerMenuRegistration.IsSupportedOs)
             ExplorerMenuRegistration.SetTitle(enabled ? label : null);
+        TryDelete(UpstreamSendToShortcutPath); // fork
 
         if (!enabled)
         {
@@ -273,7 +276,10 @@ public sealed class WindowsPlatformServices : IPlatformServices
     }
 
     private static string SendToShortcutPath =>
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.SendTo), "Filee.lnk");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.SendTo), AppName + ".lnk"); // fork
+
+    private static string UpstreamSendToShortcutPath => // fork
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.SendTo), UpstreamAppName + ".lnk");
 
     private static nint RootWindowAt(int x, int y)
     {
