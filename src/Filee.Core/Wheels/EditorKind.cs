@@ -8,4 +8,6 @@ public enum EditorKind
     Trim,
     CropVideo,
     Organize,
+    RedactImage,
+    RedactVideo,
 }

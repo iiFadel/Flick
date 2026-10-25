@@ -13,7 +13,13 @@ public partial class MediaTests
 {
     private static Preset Edited(string tool, string format, MediaEdit edit)
     {
-        var preset = ToolOperations.For(tool, [format], id => id.StartsWith("crop", StringComparison.Ordinal) ? "Cropped" : "Trimmed") ?? throw new InvalidOperationException($"No {tool} for {format}.");
+        var preset = ToolOperations.For(tool, [format], id => id switch
+        {
+            "cropVideo" => "Cropped",
+            "redactVideo" => "Redacted",
+            "redactAudio" => "Bleeped",
+            _ => "Trimmed",
+        }) ?? throw new InvalidOperationException($"No {tool} for {format}.");
         preset.Media.Edit = edit;
         return preset;
     }
@@ -95,6 +101,51 @@ public partial class MediaTests
         var probed = await ProbeAsync(output);
         Assert.Equal((160, 120), (probed.Video!.Width, probed.Video.Height));
         Assert.InRange(probed.Duration, 0.8, 1.2);
+    }
+
+    [Theory]
+    [InlineData(RedactStyle.Solid)]
+    [InlineData(RedactStyle.Blur)]
+    public async Task Redact_hides_boxes_on_every_frame_of_a_video(RedactStyle style)
+    {
+        SkipUnlessInstalled();
+        var folder = fx.NewFolder();
+        var source = await MakeClipAsync(folder, "clip.mp4", seconds: 2, size: "640x360");
+        var boxes = new[] { new NormalizedRect(0, 0, 0.25, 0.25), new NormalizedRect(0.5, 0.5, 0.3, 0.3) };
+
+        var output = await RunEditAsync("redactVideo", source, new MediaEdit { Redactions = boxes, RedactStyle = style });
+
+        Assert.Equal(Path.Combine(folder, "clip Redacted.mp4"), output);
+        var probed = await ProbeAsync(output);
+        Assert.Equal((640, 360), (probed.Video!.Width, probed.Video.Height));
+        Assert.InRange(probed.Duration, 1.8, 2.2);
+
+        // The last frame: the first box is black, or has lost the test pattern's sharp edges.
+        var frame = Path.Combine(folder, "frame.png");
+        await RunAsync(Tools!.Value.Ffmpeg, ["-hide_banner", "-nostdin", "-v", "error", "-y", "-sseof", "-0.2", "-i", output, "-frames:v", "1", "-update", "1", frame]);
+        using var picture = new ImageMagick.MagickImage(frame);
+        using var box = picture.CloneArea(8, 8, 140, 70);
+        if (style == RedactStyle.Solid)
+            Assert.True(box.Statistics().Composite().Maximum < 0.1 * ImageMagick.Quantum.Max, "the box is black");
+        else
+        {
+            var sourceFrame = Path.Combine(folder, "source.png");
+            await RunAsync(Tools!.Value.Ffmpeg, ["-hide_banner", "-nostdin", "-v", "error", "-y", "-sseof", "-0.2", "-i", source, "-frames:v", "1", "-update", "1", sourceFrame]);
+            using var original = new ImageMagick.MagickImage(sourceFrame);
+            using var originalBox = original.CloneArea(8, 8, 140, 70);
+            var (blurred, sharp) = (box.Statistics().Composite().StandardDeviation, originalBox.Statistics().Composite().StandardDeviation);
+            var (edgesAfter, edgesBefore) = (Edges(box), Edges(originalBox));
+            Assert.True(edgesAfter < edgesBefore * 0.3, $"the box is blurred: edges {edgesAfter} (was {edgesBefore}), deviation {blurred} (was {sharp})");
+        }
+    }
+
+    /// <summary>How much sharp detail a picture has: the mean of its edge image.</summary>
+    private static double Edges(ImageMagick.IMagickImage<byte> picture)
+    {
+        using var edges = picture.Clone();
+        edges.Grayscale();
+        edges.Edge(1);
+        return edges.Statistics().Composite().Mean;
     }
 
     [Fact]

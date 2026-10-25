@@ -24,6 +24,9 @@
     <DataTemplate DataType="ed:OrganizeEditorViewModel">
       <ed:OrganizeEditorView />
     </DataTemplate>
+    <DataTemplate DataType="ed:RedactEditorViewModel">
+      <ed:RedactEditorView />
+    </DataTemplate>
   </Window.DataTemplates>
 
   <Window.Styles>

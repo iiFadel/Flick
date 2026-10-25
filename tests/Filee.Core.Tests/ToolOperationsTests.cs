@@ -188,6 +188,17 @@ public class ToolOperationsTests
         Assert.Equal(EditorKind.Organize, ToolOperations.EditorFor("organizePDF"));
     }
 
+    [Theory]
+    [InlineData("redactImage", "png", EditorKind.RedactImage)]
+    [InlineData("redactImage", "heic", EditorKind.RedactImage)]
+    [InlineData("redactVideo", "mp4", EditorKind.RedactVideo)]
+    public void Redact_of_one_file_opens_the_redact_editor(string tool, string format, EditorKind kind)
+    {
+        Assert.Equal(BuiltInData.SameAsSource, For(tool, format)!.TargetFormat);
+        Assert.Null(For(tool, format, format));
+        Assert.Equal(kind, ToolOperations.EditorFor(tool));
+    }
+
     [Fact]
     public void Tools_without_a_window_open_no_editor()
     {

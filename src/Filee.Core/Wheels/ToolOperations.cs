@@ -43,6 +43,8 @@ public static class ToolOperations
             "trimAudio" => formats.Count == 1 && Audio.Contains(formats[0]) ? SameFormat() : null,
             "cropVideo" => formats.Count == 1 && Video.Contains(formats[0]) ? SameFormat() : null,
             "organizePDF" => formats is ["pdf"] ? SameFormat() : null,
+            "redactImage" => formats.Count == 1 && Images.Contains(formats[0]) && formats[0] != "gif" ? SameFormat() : null,
+            "redactVideo" => formats.Count == 1 && Video.Contains(formats[0]) ? SameFormat() : null,
             _ => null,
         };
         if (preset is null)
@@ -106,6 +108,8 @@ public static class ToolOperations
         "trimVideo" or "trimAudio" => EditorKind.Trim,
         "cropVideo" => EditorKind.CropVideo,
         "organizePDF" => EditorKind.Organize,
+        "redactImage" => EditorKind.RedactImage,
+        "redactVideo" => EditorKind.RedactVideo,
         _ => null,
     };
 

@@ -109,6 +109,54 @@ public class EditorToolTests(EngineFixture fx) : IClassFixture<EngineFixture>
         Assert.Equal(100u, first.Height);
     }
 
+    [Theory]
+    [InlineData("png", MagickFormat.Png)]
+    [InlineData("jpg", MagickFormat.Jpeg)]
+    public async Task Redact_fills_a_box_black_and_leaves_the_rest(string format, MagickFormat magick)
+    {
+        var folder = fx.NewFolder();
+        var source = Path.Combine(folder, "photo." + format);
+        using (var photo = new MagickImage(MagickColors.White, 400, 200))
+            photo.Write(source, magick);
+        var preset = ToolOperations.For("redactImage", [format], _ => "Redacted")!;
+        preset.Image.Edit = new ImageEdit { Redactions = [new NormalizedRect(0.25, 0.25, 0.25, 0.5)], RedactStyle = RedactStyle.Solid };
+
+        var job = await fx.ConvertAsync([source], preset);
+
+        var output = Assert.Single(job.Outputs);
+        Assert.Equal(Path.Combine(folder, $"photo Redacted.{format}"), output);
+        using var result = new MagickImage(output);
+        Assert.Equal((400u, 200u), (result.Width, result.Height));
+        using var pixels = result.GetPixels();
+        Assert.True(pixels.GetPixel(150, 100)!.ToColor()!.R < 20); // inside the box
+        Assert.True(pixels.GetPixel(50, 100)!.ToColor()!.R > 235); // outside it
+    }
+
+    [Fact]
+    public async Task Redact_blurs_a_box_beyond_reading()
+    {
+        var folder = fx.NewFolder();
+        var source = Path.Combine(folder, "stripes.png");
+        using (var stripes = new MagickImage("pattern:verticalsaw", new MagickReadSettings { Width = 400, Height = 200 }))
+        {
+            stripes.Threshold(new Percentage(50));
+            stripes.Write(source, MagickFormat.Png);
+        }
+        var preset = ToolOperations.For("redactImage", ["png"], _ => "Redacted")!;
+        preset.Image.Edit = new ImageEdit { Redactions = [new NormalizedRect(0, 0, 0.5, 1)], RedactStyle = RedactStyle.Blur };
+
+        var job = await fx.ConvertAsync([source], preset);
+
+        using var original = new MagickImage(source);
+        using var result = new MagickImage(Assert.Single(job.Outputs));
+        using var left = result.CloneArea(10, 10, 180, 180);
+        using var right = result.CloneArea(210, 10, 180, 180);
+        using var rightBefore = original.CloneArea(210, 10, 180, 180);
+        Assert.True(left.Statistics().Composite().StandardDeviation < right.Statistics().Composite().StandardDeviation / 4,
+            "the blurred half has hardly any contrast left");
+        Assert.Equal(0, right.Compare(rightBefore, ErrorMetric.Absolute)); // the other half is untouched
+    }
+
     [Fact]
     public async Task A_second_crop_is_numbered_without_brackets()
     {

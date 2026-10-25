@@ -10,4 +10,9 @@ public sealed record MediaEdit
 
     /// <summary>The part of the upright picture to keep (video only), or null for all of it. Sides come out even.</summary>
     public NormalizedRect? Crop { get; init; }
+
+    /// <summary>Boxes to hide on every frame (video only), as fractions of the upright picture.</summary>
+    public IReadOnlyList<NormalizedRect> Redactions { get; init; } = [];
+
+    public RedactStyle RedactStyle { get; init; }
 }

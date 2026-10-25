@@ -69,6 +69,7 @@ Decision 21 Oct 2026: Flick has two wheels only (Shift = Convert, Ctrl = Tools).
 - [x] Trim (video, audio): frame strip or waveform, two handles, frame under the handle, ← → a frame (audio 0.1 s), Shift a second, Tab the other handle, Remove silence at the ends; re-encodes in the source's format, `name Trimmed.ext`
 - [x] Crop (video): the Crop editor on the middle frame, sizes in the video's pixels rounded down to even; FFmpeg `crop` first in the filters, `name Cropped.ext`
 - [x] Organize (PDF): page cards, drag to move, ← → pick, Shift+← → move, turn left / right, Duplicate, Delete (never empty), `name Organized.pdf`; pages copy as they are, so bookmarks and form fields stay behind
+- [x] Redact (image, then video): boxes drawn by hand, Solid (black) or Blur, click to pick, Delete, Ctrl+Z; a video's boxes cover every frame, `name Redacted.ext`
 - [ ] Order: Crop (image) → Trim (video/audio, timeline + preview) → Crop (video) → Organize (PDF pages) → Redact (image, then video) → Annotate → Edit (basic adjustments) → Bleep
 - [ ] One tool per branch, each usable on its own before starting the next
 
@@ -94,5 +95,7 @@ Built from scratch in Swift (SwiftUI + AppKit), not on Avalonia, because the goa
 - Normalize is one loudnorm pass (dynamic); a two-pass linear normalize would match -16 LUFS more exactly on music with wide dynamics
 - Metadata on a HEIC runs without FFmpeg, but its slice still needs FFmpeg installed: the HEIC self-edge belongs to FFmpeg
 - Split video cuts at the next keyframe after each equal point: a video with very few keyframes gives uneven or fewer clips (Phase 5's split points could re-encode around the cut)
+- Redact finds nothing by itself: Tangerine detects faces and text on the device; Flick's boxes are drawn by hand (an ML model would be a big download)
+- Redact video hides its boxes for the whole clip; a box that follows something, or shows only for part of the clip, would need time ranges per box
 - Watch folders and CLI already exist upstream, keep them working
 - Pull upstream regularly: `git fetch upstream && git merge upstream/main`
