@@ -199,6 +199,17 @@ public class ToolOperationsTests
         Assert.Equal(kind, ToolOperations.EditorFor(tool));
     }
 
+    [Theory]
+    [InlineData("jpg")]
+    [InlineData("png")]
+    [InlineData("heic")]
+    public void Annotate_always_writes_a_png(string format)
+    {
+        Assert.Equal("png", For("annotateImage", format)!.TargetFormat);
+        Assert.Null(For("annotateImage", "gif"));
+        Assert.Equal(EditorKind.Annotate, ToolOperations.EditorFor("annotateImage"));
+    }
+
     [Fact]
     public void Tools_without_a_window_open_no_editor()
     {

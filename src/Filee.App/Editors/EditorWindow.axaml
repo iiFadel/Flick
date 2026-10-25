@@ -27,6 +27,9 @@
     <DataTemplate DataType="ed:RedactEditorViewModel">
       <ed:RedactEditorView />
     </DataTemplate>
+    <DataTemplate DataType="ed:AnnotateEditorViewModel">
+      <ed:AnnotateEditorView />
+    </DataTemplate>
   </Window.DataTemplates>
 
   <Window.Styles>

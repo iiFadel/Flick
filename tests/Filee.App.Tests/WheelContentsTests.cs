@@ -14,7 +14,7 @@ public class WheelContentsTests
     public static TheoryData<string, string[], string[], string[]> Categories => new()
     {
         { "photo.jpg", ["PNG", "WEBP", "HEIC", "TIFF", "AVIF", "BMP", "PDF"],
-            ["Compress", "Metadata", "Edit", "Annotate", "Add BG", "Crop", "Redact"], ["Compress", "Metadata", "Add BG", "Crop", "Redact"] },
+            ["Compress", "Metadata", "Edit", "Annotate", "Add BG", "Crop", "Redact"], ["Compress", "Metadata", "Annotate", "Add BG", "Crop", "Redact"] },
         { "clip.mov", ["MP4", "MKV", "WEBM", "AVI", "WMV", "GIF", "MP3"],
             ["Compress", "Metadata", "Mute", "Trim", "Crop", "Speed", "Snapshot", "Split", "Redact"],
             ["Compress", "Metadata", "Mute", "Trim", "Crop", "Speed", "Snapshot", "Split", "Redact"] },

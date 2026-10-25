@@ -69,6 +69,7 @@ public sealed class WindowService(ILocalizer loc, IServiceProvider services, Mem
             Core.Wheels.EditorKind.CropVideo => new Editors.CropVideoEditorViewModel(title, source, log),
             Core.Wheels.EditorKind.RedactImage => new Editors.RedactEditorViewModel(title, source, video: false, log),
             Core.Wheels.EditorKind.RedactVideo => new Editors.RedactEditorViewModel(title, source, video: true, log),
+            Core.Wheels.EditorKind.Annotate => new Editors.AnnotateEditorViewModel(title, source, log, loc["editor.annotate.new_text"]),
             Core.Wheels.EditorKind.Organize => new Editors.OrganizeEditorViewModel(title, source, log, page => loc.Format("editor.organize.page", page)),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
         };

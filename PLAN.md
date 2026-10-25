@@ -70,6 +70,7 @@ Decision 21 Oct 2026: Flick has two wheels only (Shift = Convert, Ctrl = Tools).
 - [x] Crop (video): the Crop editor on the middle frame, sizes in the video's pixels rounded down to even; FFmpeg `crop` first in the filters, `name Cropped.ext`
 - [x] Organize (PDF): page cards, drag to move, ← → pick, Shift+← → move, turn left / right, Duplicate, Delete (never empty), `name Organized.pdf`; pages copy as they are, so bookmarks and form fields stay behind
 - [x] Redact (image, then video): boxes drawn by hand, Solid (black) or Blur, click to pick, Delete, Ctrl+Z; a video's boxes cover every frame, `name Redacted.ext`
+- [x] Annotate (image): Arrow, Box, Ellipse, Text, numbered Callout (renumber after a delete), seven colours (the picked mark takes the colour), Undo / Redo, Delete; drawn by ImageMagick from the same geometry as the window, always `name Annotated.png`
 - [ ] Order: Crop (image) → Trim (video/audio, timeline + preview) → Crop (video) → Organize (PDF pages) → Redact (image, then video) → Annotate → Edit (basic adjustments) → Bleep
 - [ ] One tool per branch, each usable on its own before starting the next
 

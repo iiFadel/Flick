@@ -10,6 +10,9 @@ using PdfSharp.Pdf.IO;
 using PDFtoImage;
 using SkiaSharp;
 
+// As PdfiumConverter: PDFtoImage marks its API for the platforms PDFium ships for, which cover every desktop.
+#pragma warning disable CA1416
+
 namespace Filee.Engines.Pdf;
 
 internal static class PdfPages

@@ -158,6 +158,45 @@ public class EditorToolTests(EngineFixture fx) : IClassFixture<EngineFixture>
     }
 
     [Fact]
+    public async Task Annotate_draws_every_mark_into_a_png()
+    {
+        var folder = fx.NewFolder();
+        var source = Path.Combine(folder, "photo.jpg");
+        using (var photo = new MagickImage(MagickColors.White, 800, 500))
+            photo.Write(source, MagickFormat.Jpeg);
+        var preset = ToolOperations.For("annotateImage", ["jpg"], _ => "Annotated")!;
+        Assert.Equal("png", preset.TargetFormat);
+        const string Red = "#E5484D";
+        preset.Image.Edit = new ImageEdit
+        {
+            Annotations =
+            [
+                (new Annotation(AnnotationKind.Rectangle, 0.05, 0.1, 0.3, 0.5, Red), 0),
+                (new Annotation(AnnotationKind.Arrow, 0.4, 0.8, 0.7, 0.6, Red), 0),
+                (new Annotation(AnnotationKind.Ellipse, 0.6, 0.1, 0.9, 0.4, Red), 0),
+                (new Annotation(AnnotationKind.Text, 0.05, 0.75, 0, 0, "#000000", "Look here"), 0),
+                (new Annotation(AnnotationKind.Callout, 0.5, 0.3, 0, 0, Red), 1),
+            ],
+        };
+
+        var job = await fx.ConvertAsync([source], preset);
+
+        Assert.Equal(JobState.Completed, job.State);
+        var output = Assert.Single(job.Outputs);
+        Assert.Equal(Path.Combine(folder, "photo Annotated.png"), output);
+        using var result = new MagickImage(output);
+        Assert.Equal((800u, 500u), (result.Width, result.Height));
+        using var pixels = result.GetPixels();
+        bool Red_(int x, int y) => pixels.GetPixel(x, y)!.ToColor() is { } c && c.R > 200 && c.G < 120;
+        Assert.True(Red_(40, 150), "the box's left edge");          // x 0.05 * 800
+        Assert.False(Red_(140, 150), "inside the box stays white");
+        Assert.True(Red_(388, 140), "the callout's dot");             // 0.5, 0.3, beside its white number
+        Assert.True(Red_(560, 300), "the arrow's head");              // the tip 0.7, 0.6
+        using var text = result.CloneArea(40, 375, 200, 40);
+        Assert.True(text.Statistics().Composite().Minimum < 0.3 * Quantum.Max, "the text is drawn in black");
+    }
+
+    [Fact]
     public async Task A_second_crop_is_numbered_without_brackets()
     {
         var folder = fx.NewFolder();
