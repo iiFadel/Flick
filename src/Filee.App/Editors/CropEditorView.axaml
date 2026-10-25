@@ -1,0 +1,29 @@
+<!-- fork: the Crop editor's body (CropEditorViewModel): the picture with its crop box, aspect choices and the exact
+     size under it. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ed="using:Filee.App.Editors"
+             xmlns:c="using:Filee.App.Controls"
+             x:Class="Filee.App.Editors.CropEditorView"
+             x:DataType="ed:CropEditorViewModel">
+  <DockPanel>
+    <Border DockPanel.Dock="Bottom" Padding="18,10,18,0">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+          <TextBlock Classes="editor-label" Text="{DynamicResource editor.crop.size}" Margin="0,0,4,0" />
+          <TextBox x:Name="WidthBox" Text="{Binding WidthText}" Width="72" FontFamily="Consolas, monospace" FontSize="12" />
+          <TextBlock Text="×" VerticalAlignment="Center" Foreground="{DynamicResource ToastTextBrush}" />
+          <TextBox x:Name="HeightBox" Text="{Binding HeightText}" Width="72" FontFamily="Consolas, monospace" FontSize="12" />
+          <Button Classes="editor-choice" Content="{DynamicResource editor.reset}" Command="{Binding ResetCommand}" Margin="8,0,0,0" />
+        </StackPanel>
+        <StackPanel x:Name="AspectButtons" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+          <TextBlock Classes="editor-label" Text="{DynamicResource editor.crop.aspect}" Margin="0,0,4,0" />
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <Border Margin="18,0" CornerRadius="10" ClipToBounds="True" Background="#14000000">
+      <c:CropCanvas x:Name="Canvas" SourceImage="{Binding Preview}" />
+    </Border>
+  </DockPanel>
+</UserControl>

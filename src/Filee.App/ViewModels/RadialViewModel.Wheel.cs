@@ -16,7 +16,7 @@ public sealed partial class RadialViewModel
 {
     /// <summary>
     /// Tangerine's tools that a built-in preset already does (tool id → preset id). The others Flick runs are
-    /// <see cref="ToolOperations"/>.
+    /// <see cref="ToolOperations"/>, which come first: one picture opens the Crop editor, several the crop overlay.
     /// </summary>
     private static readonly Dictionary<string, string> BuiltTools = new(StringComparer.Ordinal)
     {
@@ -62,6 +62,13 @@ public sealed partial class RadialViewModel
 
     /// <summary>The value slice <paramref name="index"/> of the Tools wheel asks for after the drop, or null.</summary>
     public ToolParameter? ParameterAt(int index) => Wheel == WheelKind.Tools ? _parameters.GetValueOrDefault(index) : null;
+
+    /// <summary>The Tools wheel's operations that open an editor window after the drop, by slice.</summary>
+    private Dictionary<int, (string Tool, EditorKind Kind)> _editors = [];
+
+    /// <summary>The editor slice <paramref name="index"/> of the Tools wheel opens after the drop, or null.</summary>
+    public (string Tool, EditorKind Kind)? EditorAt(int index) =>
+        Wheel == WheelKind.Tools && _editors.TryGetValue(index, out var editor) ? editor : null;
 
     /// <summary>The drop toast for <paramref name="job"/>, started from slice <paramref name="index"/> of the wheel.</summary>
     public DropToastViewModel DropToastFor(JobViewModel job, int index)
@@ -109,7 +116,7 @@ public sealed partial class RadialViewModel
     {
         var presets = new List<Preset>();
         var items = new List<DonutItem>();
-        _parameters = [];
+        (_parameters, _editors) = ([], []);
         foreach (var tool in WheelCatalog.Tools(sources))
         {
             var label = loc["wheel.tool." + tool];
@@ -117,8 +124,11 @@ public sealed partial class RadialViewModel
             var built = ToolOperations.For(tool, sources, id => loc["tool.suffix." + id]) is { } operation
                 ? Named(operation, label)
                 : builtId is null ? null : store.FindPreset(builtId);
-            if (built?.Id.StartsWith("op-", StringComparison.Ordinal) == true && ToolOperations.ParameterFor(tool, key => loc[key]) is { } parameter)
+            var isOperation = built?.Id.StartsWith("op-", StringComparison.Ordinal) == true;
+            if (isOperation && ToolOperations.ParameterFor(tool, key => loc[key]) is { } parameter)
                 _parameters[presets.Count] = parameter;
+            if (isOperation && ToolOperations.EditorFor(tool) is { } editor)
+                _editors[presets.Count] = (tool, editor);
             // Not built yet: a stand-in that never runs (its slice is disabled, so PresetAt never returns it).
             var preset = built ?? new Preset { Id = "tool:" + tool, Name = label, Kind = PresetKind.Tool };
             presets.Add(preset);

@@ -156,6 +156,15 @@ gradient). Split, Snapshot and Visualize are runs of their own in `Filee.Engines
 While the drag goes on, the hook's arrows, Enter and Escape reach it through `WheelNavigated` / `WheelApplied` /
 `WheelCancelled`; after the drag the window takes the keyboard, and losing focus or Escape runs nothing.
 
+**Editor windows** (Phase 5, `RadialController.Editor.cs`, `Filee.App/Editors`). An operation with a window has an
+`EditorKind` (`ToolOperations.EditorFor`) and takes one file. A drop on its slice, or Enter during the drag, hides the
+wheel and opens `EditorWindow` with the tool's view (`CropEditorView`, ...) on the file; files from a browser are saved
+first. Apply never writes a file: the editor puts its choices on a copy of the operation (`EditorViewModel.ApplyTo`,
+for pictures `ImageOptions.Edit`, an `ImageEdit` never saved), the job runs as any tool's does and the drop toast shows
+at the drop point. The geometry is pure Core code (`Core/Editing`: `CropMath` keeps a crop as fractions of the upright
+picture); the engines do the edit (`Magick/ImageEdits`, right after `AutoOrient`). Crop on several pictures still opens
+upstream's crop overlay (`tool-crop`, `CropOverlayWindow`).
+
 **After the drop** (`RadialController.Toast.cs`, Tangerine's "After the drop"). A drag wheel's conversion gets no
 progress ring: the slice stays lit 50 ms, the wheel goes, and 70 ms later `DropToastWindow` grows at the drop point
 (`RadialWindow.LastDragScreenPoint`, placed by `DropToastLayout`) with "Converting to MP3", the file and percentage,

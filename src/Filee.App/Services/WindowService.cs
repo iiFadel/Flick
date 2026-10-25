@@ -54,6 +54,26 @@ public sealed class WindowService(ILocalizer loc, IServiceProvider services, Mem
     }
 
     /// <summary>
+    /// fork: opens <paramref name="kind"/>'s editor window on <paramref name="source"/>, titled <paramref name="title"/>,
+    /// on the screen of <paramref name="near"/>; it takes the keyboard when <paramref name="activate"/>.
+    /// </summary>
+    public (Editors.EditorWindow Window, Editors.EditorViewModel Model) ShowEditor(
+        Core.Wheels.EditorKind kind, string source, string title, PixelPoint? near, bool activate)
+    {
+        Motion.Refresh();
+        var log = services.GetService<ILogger<Editors.EditorViewModel>>();
+        Editors.EditorViewModel model = kind switch
+        {
+            Core.Wheels.EditorKind.CropImage => new Editors.CropEditorViewModel(title, source, log),
+            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
+        };
+        var window = new Editors.EditorWindow { DataContext = model };
+        window.ShowNear(near, activate);
+        _ = model.LoadAsync(ex => loc[ex is NotSupportedException ? "error.unsupported_source" : "error.conversion_failed"]);
+        return (window, model);
+    }
+
+    /// <summary>
     /// Shows (or brings to front) the main window, optionally on a page. Going to the tray closes it
     /// (<see cref="MainWindow.HideToTray"/>): a new one opens where and on the page the last one was.
     /// </summary>
