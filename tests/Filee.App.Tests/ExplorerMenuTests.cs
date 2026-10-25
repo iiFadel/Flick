@@ -55,6 +55,9 @@ public class ExplorerMenuTests
         Assert.Equal("mediumIL", (string?)app.Attribute(Uap10 + "TrustLevel"));
         Assert.Equal("win32App", (string?)app.Attribute(Uap10 + "RuntimeBehavior"));
         Assert.Equal("none", (string?)app.Element(Uap + "VisualElements")!.Attribute("AppListEntry"));
+        // fork: Windows shows the package as Flick; its identity stays upstream's.
+        Assert.Equal("Flick", (string?)manifest.Element(F + "Properties")!.Element(F + "DisplayName"));
+        Assert.Equal("Flick", (string?)app.Element(Uap + "VisualElements")!.Attribute("DisplayName"));
 
         var clsid = ExplorerMenuPackage.ClassId.ToString("D");
         var itemType = app.Descendants(Desktop4 + "FileExplorerContextMenus").Single().Element(Desktop5 + "ItemType")!;

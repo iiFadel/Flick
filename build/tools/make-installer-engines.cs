@@ -80,6 +80,8 @@ static string ToInnoMessage(string text)
 {
     if (text.Contains('%'))
         throw new InvalidOperationException($"'%' is not supported in installer texts: {text}");
+    // fork: the app shows these texts through Brand.Apply (src/Filee.App/Services/Brand.cs); Setup gets the same words.
+    text = Regex.Replace(text, @"(?<![A-Za-z0-9_/])Filee(?![A-Za-z0-9_]|\.[A-Za-z])", "Flick");
     return Regex.Replace(text, @"\{(\d)\}", m => "%" + (int.Parse(m.Groups[1].Value, CultureInfo.InvariantCulture) + 1))
         .ReplaceLineEndings("%n");
 }

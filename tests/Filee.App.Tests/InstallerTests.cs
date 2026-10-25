@@ -83,6 +83,19 @@ public class InstallerTests
     }
 
     [Fact]
+    public void Setup_shows_Flick_and_keeps_the_upstream_files_and_id()
+    {
+        var script = Script;
+        Assert.Contains("#define AppName \"Flick\"", script);
+        Assert.Contains("#define AppExe \"Filee.exe\"", script);
+        Assert.Contains("#define AppGuid \"C8686E06-8327-40A2-B0F7-3DEDD61D9248\"", script); // updates find the install
+        Assert.Contains(@"Name: ""{autoprograms}\Filee.lnk""", script); // the old Start menu shortcut goes
+        // Every message Setup shows says Flick; "filee" (the command) and Filee.exe are names of files.
+        var messages = Regex.Matches(script, @"^(en|ko|zhcn|ja)\.\w+=(.*)$", RegexOptions.Multiline).Select(m => m.Groups[2].Value);
+        Assert.All(messages, text => Assert.DoesNotContain("Filee", text, StringComparison.Ordinal));
+    }
+
+    [Fact]
     public void Script_finds_downloaded_engines_where_the_app_puts_them()
     {
         var marker = typeof(EngineInstaller).GetField("MarkerName", BindingFlags.NonPublic | BindingFlags.Static)?.GetRawConstantValue();

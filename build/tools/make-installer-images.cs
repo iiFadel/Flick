@@ -15,7 +15,8 @@ var logo = File.ReadAllText(Path.Combine("src", "Filee.App", "Assets", "Icons", 
 var logoSize = double.Parse(Regex.Match(logo, "width='(\\d+)'").Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture);
 var shapes = Regex.Match(logo, "<svg[^>]*>(.*)</svg>", RegexOptions.Singleline).Groups[1].Value;
 
-foreach (var (file, background, text) in new[] { ("wizard-light.png", "#F1F0FD", "#3C3489"), ("wizard-dark.png", "#221E4A", "#E4E2FB") })
+// fork: Flick's page and text colours (docs/TANGERINE-SPEC.md, "Windows" and "Dark mode").
+foreach (var (file, background, text) in new[] { ("wizard-light.png", "#F4F4F4", "#282B29"), ("wizard-dark.png", "#1C1D1C", "#EDEEEB") })
 {
     var scale = LogoSize / logoSize;
     var left = (Width - LogoSize) / 2.0;
@@ -24,7 +25,7 @@ foreach (var (file, background, text) in new[] { ("wizard-light.png", "#F1F0FD",
               $"<rect width='{Width}' height='{Height}' fill='{background}'/>" +
               $"<g transform='translate({left} {top}) scale({scale.ToString(System.Globalization.CultureInfo.InvariantCulture)})'>{shapes}</g>" +
               $"<text x='{Width / 2}' y='{(int)(top + LogoSize + 86)}' text-anchor='middle' font-family='Segoe UI Semibold, Segoe UI' " +
-              $"font-weight='600' font-size='64' fill='{text}'>Filee</text></svg>";
+              $"font-weight='600' font-size='64' fill='{text}'>Flick</text></svg>"; // fork
     var settings = new MagickReadSettings { BackgroundColor = MagickColors.Transparent, Format = MagickFormat.Svg };
     using var image = new MagickImage(Encoding.UTF8.GetBytes(svg), settings);
     image.Strip();
