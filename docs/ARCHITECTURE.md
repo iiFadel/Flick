@@ -163,7 +163,10 @@ first. Apply never writes a file: the editor puts its choices on a copy of the o
 for pictures `ImageOptions.Edit`, an `ImageEdit` never saved), the job runs as any tool's does and the drop toast shows
 at the drop point. The geometry is pure Core code (`Core/Editing`: `CropMath` keeps a crop as fractions of the upright
 picture); the engines do the edit (`Magick/ImageEdits`, right after `AutoOrient`). Crop on several pictures still opens
-upstream's crop overlay (`tool-crop`, `CropOverlayWindow`).
+upstream's crop overlay (`tool-crop`, `CropOverlayWindow`). Video and audio edits go on `MediaOptions.Edit` (a
+`MediaEdit`): `Media/MediaEdits` adds them to MediaEncoding's ordinary same-format encode (Trim: `-ss` / `-to` before
+the input), and any edit turns stream copy off so cuts are exact. What the editors show comes from
+`Media/MediaPreview`: length, a frame strip, the frame at a time, waveform peaks, silencedetect spans.
 
 **After the drop** (`RadialController.Toast.cs`, Tangerine's "After the drop"). A drag wheel's conversion gets no
 progress ring: the slice stays lit 50 ms, the wheel goes, and 70 ms later `DropToastWindow` grows at the drop point

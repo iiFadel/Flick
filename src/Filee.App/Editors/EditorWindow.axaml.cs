@@ -85,6 +85,12 @@ public partial class EditorWindow : Window
                 model.ApplyCommand.Execute(null);
                 e.Handled = true;
                 break;
+            case Key.Left or Key.Right when e.Source is not TextBox:
+                e.Handled = model.Arrow(e.Key == Key.Left ? -1 : 1, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
+                break;
+            case Key.Tab:
+                e.Handled = model.Tab();
+                break;
         }
     }
 }

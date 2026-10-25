@@ -74,6 +74,33 @@ public partial class DropToastTests
     });
 
     [AvaloniaFact]
+    public void A_drop_on_trim_opens_the_waveform_and_apply_cuts_the_song() => Run((provider, radial, vm, folder) =>
+    {
+        Assert.SkipUnless(Ffmpeg is not null, "FFmpeg is not installed");
+        var (file, _) = OpenToolsWheelOnASong(provider, radial, folder);
+        Assert.Equal("Trim", vm.Items[4].Label);
+
+        Drop(radial.Window!, file, SliceCenter(radial.Window!.DonutControl, 4, 7));
+
+        var editor = Assert.IsType<TrimEditorViewModel>(radial.Editor);
+        Assert.True(Until(() => editor.Peaks.Length > 0, 30_000));
+        Assert.False(editor.IsVideo);
+        Assert.InRange(editor.Duration, 0.9, 1.1);
+        Assert.False(editor.ApplyCommand.CanExecute(null));
+
+        editor.Move(TrimHandle.End, 0.5);
+        editor.Arrow(1, large: false); // a tenth of a second later
+        Assert.Equal(0.6, editor.Range.End, 3);
+        Assert.Equal("0:00.6", editor.LengthText);
+        editor.ApplyCommand.Execute(null);
+
+        Assert.Null(radial.Editor);
+        Assert.True(Until(() => radial.Toast is not null));
+        Assert.True(Until(() => Finished(Path.Combine(folder, "song Trimmed.mp3")), 30_000));
+        provider.PostMouse(EventType.MouseReleased, 460, 400, EventMask.None);
+    });
+
+    [AvaloniaFact]
     public void An_exact_size_typed_sets_the_crop() => Run((provider, radial, vm, folder) =>
     {
         var (file, crop) = OpenToolsWheelOnAPicture(provider, radial, folder);

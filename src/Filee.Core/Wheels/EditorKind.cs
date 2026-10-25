@@ -5,4 +5,5 @@ namespace Filee.Core.Wheels;
 public enum EditorKind
 {
     CropImage,
+    Trim,
 }

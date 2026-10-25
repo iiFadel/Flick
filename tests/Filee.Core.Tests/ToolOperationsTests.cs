@@ -140,7 +140,9 @@ public class ToolOperationsTests
     [InlineData("removeMetadata", "docx")]
     [InlineData("removeMetadata", "jpg", "mp4")]
     [InlineData("editImage", "jpg")]
-    [InlineData("trimVideo", "mp4")]
+    [InlineData("trimVideo", "mp3")]
+    [InlineData("trimVideo", "mp4", "mov")]
+    [InlineData("trimAudio", "mp4")]
     [InlineData("cropImage", "gif")]
     [InlineData("cropImage", "jpg", "png")]
     public void Tools_Flick_cant_run_there_have_no_operation(string tool, params string[] formats) =>
@@ -160,6 +162,20 @@ public class ToolOperationsTests
         Assert.Equal(BuiltInData.SameAsSource, preset.TargetFormat);
         Assert.Null(preset.Image.Edit); // the editor puts the crop on when Apply is pressed
         Assert.Equal(EditorKind.CropImage, ToolOperations.EditorFor("cropImage"));
+    }
+
+    [Theory]
+    [InlineData("trimVideo", "mp4")]
+    [InlineData("trimVideo", "mkv")]
+    [InlineData("trimAudio", "mp3")]
+    [InlineData("trimAudio", "flac")]
+    public void Trim_of_one_file_opens_the_trim_editor_and_keeps_its_format(string tool, string format)
+    {
+        var preset = For(tool, format)!;
+
+        Assert.Equal(BuiltInData.SameAsSource, preset.TargetFormat);
+        Assert.Null(preset.Media.Edit);
+        Assert.Equal(EditorKind.Trim, ToolOperations.EditorFor(tool));
     }
 
     [Fact]

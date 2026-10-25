@@ -64,6 +64,59 @@ public class EditorWindowTests
         }
     }
 
+    [AvaloniaTheory]
+    [InlineData(ThemeMode.Light)]
+    [InlineData(ThemeMode.Dark)]
+    public void The_trim_editor_shows_frames_and_the_handles(ThemeMode mode)
+    {
+        TestServices.EnsureInitialized("en");
+        var status = AppHost.Get<Core.Conversion.ConverterCatalog>()
+            .StatusOf(AppHost.Get<IReadOnlyList<Core.Conversion.IConverter>>().Single(c => c.Id == "ffmpeg"));
+        Assert.SkipUnless(status.IsAvailable, "FFmpeg is not installed");
+        var folder = Directory.CreateTempSubdirectory("flick-editor-").FullName;
+        var store = AppHost.Get<UserDataStore>();
+        var before = store.Settings.Theme.Mode;
+        store.Settings.Theme.Mode = mode;
+        AppHost.Get<ThemeService>().Apply(store.Settings.Theme, "en");
+        Application.Current!.RequestedThemeVariant = mode == ThemeMode.Dark ? ThemeVariant.Dark : ThemeVariant.Light;
+        try
+        {
+            var file = Path.Combine(folder, "clip.mp4");
+            var made = Task.Run(() => Engines.Infrastructure.ProcessRunner.RunAsync(status.Detail!, ["-hide_banner", "-nostdin", "-v", "error", "-y",
+                "-f", "lavfi", "-i", "testsrc2=size=640x360:rate=25:duration=4", "-pix_fmt", "yuv420p", file],
+                TimeSpan.FromMinutes(1), CancellationToken.None)).GetAwaiter().GetResult();
+            Assert.True(made.ExitCode == 0, made.StandardError);
+
+            var (window, model) = AppHost.Get<WindowService>().ShowEditor(Core.Wheels.EditorKind.Trim, file, "Trim", null, activate: true);
+            var trim = Assert.IsType<TrimEditorViewModel>(model);
+            Assert.True(Pump(() => trim.Frames.Count > 0 && trim.Frame is not null, 1500));
+            Assert.True(trim.IsVideo);
+            Assert.Equal(0.04, trim.Step, 3);
+
+            trim.Move(TrimHandle.Start, 1);
+            trim.Move(TrimHandle.End, 3);
+            Assert.Equal("0:02.0", trim.LengthText);
+            Assert.True(trim.ApplyCommand.CanExecute(null));
+            Pump(() => false, 40);
+            using (var frame = window.CaptureRenderedFrame())
+            {
+                Assert.NotNull(frame);
+                using var stream = File.Create(Path.Combine(TestServices.ScreenshotDirectory, $"editor-trim-{mode.ToString().ToLowerInvariant()}.png"));
+                frame.Save(stream, new Avalonia.Media.Imaging.PngBitmapEncoderOptions());
+            }
+
+            window.Close();
+            Assert.Empty(trim.Frames); // closing frees the frames and deletes the scratch folder
+        }
+        finally
+        {
+            store.Settings.Theme.Mode = before;
+            AppHost.Get<ThemeService>().Apply(store.Settings.Theme, "en");
+            Application.Current!.RequestedThemeVariant = ThemeVariant.Default;
+            try { Directory.Delete(folder, true); } catch (IOException) { }
+        }
+    }
+
     private static bool Pump(Func<bool> done, int rounds = 200)
     {
         for (var i = 0; i < rounds; i++)

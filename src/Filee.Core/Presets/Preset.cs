@@ -572,6 +572,10 @@ public sealed class MediaOptions
     /// </summary>
     public double Speed { get; set; } = 1;
 
+    /// <summary>fork: what an editor window (trim, ...) asks for. Built when Apply is pressed, never saved.</summary>
+    [JsonIgnore]
+    public Editing.MediaEdit? Edit { get; set; }
+
     /// <summary>
     /// fork: Cut a video into this many parts of about equal length, at keyframes, without encoding it again, into a
     /// folder; 0 keeps it whole (the Tools wheel's Split).

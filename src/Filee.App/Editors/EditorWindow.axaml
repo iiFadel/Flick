@@ -18,6 +18,9 @@
     <DataTemplate DataType="ed:CropEditorViewModel">
       <ed:CropEditorView />
     </DataTemplate>
+    <DataTemplate DataType="ed:TrimEditorViewModel">
+      <ed:TrimEditorView />
+    </DataTemplate>
   </Window.DataTemplates>
 
   <Window.Styles>
