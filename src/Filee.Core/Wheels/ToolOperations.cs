@@ -42,6 +42,7 @@ public static class ToolOperations
             "trimVideo" => formats.Count == 1 && Video.Contains(formats[0]) ? SameFormat() : null,
             "trimAudio" => formats.Count == 1 && Audio.Contains(formats[0]) ? SameFormat() : null,
             "cropVideo" => formats.Count == 1 && Video.Contains(formats[0]) ? SameFormat() : null,
+            "organizePDF" => formats is ["pdf"] ? SameFormat() : null,
             _ => null,
         };
         if (preset is null)
@@ -104,6 +105,7 @@ public static class ToolOperations
         "cropImage" => EditorKind.CropImage,
         "trimVideo" or "trimAudio" => EditorKind.Trim,
         "cropVideo" => EditorKind.CropVideo,
+        "organizePDF" => EditorKind.Organize,
         _ => null,
     };
 

@@ -429,6 +429,10 @@ public sealed class PdfOptions
     /// </summary>
     public bool RemoveMetadata { get; set; }
 
+    /// <summary>fork: what an editor window (Organize) asks for. Built when Apply is pressed, never saved.</summary>
+    [JsonIgnore]
+    public Editing.PdfEdit? Edit { get; set; }
+
     public PdfOptions Clone() => (PdfOptions)MemberwiseClone();
 }
 

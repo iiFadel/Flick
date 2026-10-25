@@ -180,6 +180,15 @@ public class ToolOperationsTests
     }
 
     [Fact]
+    public void Organize_of_one_pdf_opens_the_organize_editor()
+    {
+        Assert.Equal(BuiltInData.SameAsSource, For("organizePDF", "pdf")!.TargetFormat);
+        Assert.Null(For("organizePDF", "pdf", "pdf"));
+        Assert.Null(For("organizePDF", "docx"));
+        Assert.Equal(EditorKind.Organize, ToolOperations.EditorFor("organizePDF"));
+    }
+
+    [Fact]
     public void Tools_without_a_window_open_no_editor()
     {
         Assert.Null(ToolOperations.EditorFor("compress"));

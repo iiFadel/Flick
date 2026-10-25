@@ -21,6 +21,9 @@
     <DataTemplate DataType="ed:TrimEditorViewModel">
       <ed:TrimEditorView />
     </DataTemplate>
+    <DataTemplate DataType="ed:OrganizeEditorViewModel">
+      <ed:OrganizeEditorView />
+    </DataTemplate>
   </Window.DataTemplates>
 
   <Window.Styles>

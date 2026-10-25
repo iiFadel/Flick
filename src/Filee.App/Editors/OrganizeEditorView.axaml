@@ -1,0 +1,68 @@
+<!-- fork: the Organize editor's body (OrganizeEditorViewModel): the pages as cards in a grid (the picked one framed in
+     orange), then turn left / right, Duplicate, Delete and Reset. Drag a card onto another to move it there; ← → pick,
+     Shift+← → move. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ed="using:Filee.App.Editors"
+             x:Class="Filee.App.Editors.OrganizeEditorView"
+             x:DataType="ed:OrganizeEditorViewModel">
+  <UserControl.Resources>
+    <ed:RotationTransformConverter x:Key="Rotation" />
+  </UserControl.Resources>
+  <UserControl.Styles>
+    <Style Selector="Border.page">
+      <Setter Property="Width" Value="150" />
+      <Setter Property="Height" Value="196" />
+      <Setter Property="Margin" Value="6" />
+      <Setter Property="Padding" Value="8" />
+      <Setter Property="CornerRadius" Value="10" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+      <Setter Property="BorderThickness" Value="2" />
+      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Border.page.selected">
+      <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <DockPanel Margin="18,0">
+    <Border DockPanel.Dock="Bottom" Padding="0,10,0,0">
+      <DockPanel>
+        <Button DockPanel.Dock="Right" Classes="editor-choice" Content="{DynamicResource editor.reset}" Command="{Binding ResetCommand}" />
+        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+          <Button Classes="editor-choice" Content="↺" FontSize="16" Padding="12,1" ToolTip.Tip="{DynamicResource editor.organize.rotate_left}" Command="{Binding RotateLeftCommand}" />
+          <Button Classes="editor-choice" Content="↻" FontSize="16" Padding="12,1" ToolTip.Tip="{DynamicResource editor.organize.rotate_right}" Command="{Binding RotateRightCommand}" />
+          <Button Classes="editor-choice" Content="{DynamicResource editor.organize.duplicate}" Command="{Binding DuplicateCommand}" />
+          <Button Classes="editor-choice" Content="{DynamicResource editor.organize.delete}" Command="{Binding RemoveCommand}" />
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <Border CornerRadius="10" ClipToBounds="True" Background="#14000000">
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled" Padding="6">
+        <ItemsControl x:Name="Grid" ItemsSource="{Binding Pages}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="ed:PageCard">
+              <Border Classes="page" Classes.selected="{Binding IsSelected}">
+                <DockPanel>
+                  <TextBlock DockPanel.Dock="Bottom" Text="{Binding Label}" FontSize="11" HorizontalAlignment="Center" Margin="0,6,0,0"
+                             Foreground="{DynamicResource ToastTextBrush}" />
+                  <LayoutTransformControl LayoutTransform="{Binding Rotation, Converter={StaticResource Rotation}}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <Image Source="{Binding Picture}" Stretch="Uniform" MaxWidth="130" MaxHeight="150" />
+                  </LayoutTransformControl>
+                </DockPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+  </DockPanel>
+</UserControl>

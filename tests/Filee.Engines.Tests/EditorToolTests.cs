@@ -64,6 +64,52 @@ public class EditorToolTests(EngineFixture fx) : IClassFixture<EngineFixture>
     }
 
     [Fact]
+    public async Task Organize_writes_the_pages_in_the_new_order_turned_and_copied()
+    {
+        var folder = fx.NewFolder();
+        var source = Path.Combine(folder, "notes.pdf");
+        using (var document = new PdfSharp.Pdf.PdfDocument())
+        {
+            foreach (var width in new[] { 100, 200, 300 })
+                document.AddPage().Width = PdfSharp.Drawing.XUnit.FromPoint(width);
+            document.Save(source);
+        }
+        var before = ToolOperationTests.Hash(source);
+        var preset = ToolOperations.For("organizePDF", ["pdf"], _ => "Organized")!;
+        preset.Pdf.Edit = new PdfEdit { Pages = [new PagePlacement(2), new PagePlacement(0, 90), new PagePlacement(0)] };
+
+        var job = await fx.ConvertAsync([source], preset);
+
+        Assert.Equal(JobState.Completed, job.State);
+        var output = Assert.Single(job.Outputs);
+        Assert.Equal(Path.Combine(folder, "notes Organized.pdf"), output);
+        using var result = PdfSharp.Pdf.IO.PdfReader.Open(output, PdfSharp.Pdf.IO.PdfDocumentOpenMode.Import);
+        Assert.Equal(3, result.PageCount);
+        Assert.Equal([300, 100, 100], result.Pages.Cast<PdfSharp.Pdf.PdfPage>().Select(p => (int)Math.Round(p.Width.Point)));
+        Assert.Equal([0, 90, 0], result.Pages.Cast<PdfSharp.Pdf.PdfPage>().Select(p => p.Rotate));
+        Assert.Equal(before, ToolOperationTests.Hash(source));
+    }
+
+    [Fact]
+    public void Organize_shows_every_page_as_a_small_picture()
+    {
+        var folder = fx.NewFolder();
+        var source = Path.Combine(folder, "notes.pdf");
+        using (var document = new PdfSharp.Pdf.PdfDocument())
+        {
+            document.AddPage();
+            document.AddPage();
+            document.Save(source);
+        }
+
+        var pictures = Pdf.PdfPages.Thumbnails(source, 100, CancellationToken.None);
+
+        Assert.Equal(2, pictures.Count);
+        using var first = new MagickImage(pictures[0]);
+        Assert.Equal(100u, first.Height);
+    }
+
+    [Fact]
     public async Task A_second_crop_is_numbered_without_brackets()
     {
         var folder = fx.NewFolder();

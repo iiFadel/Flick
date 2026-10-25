@@ -95,16 +95,17 @@ public class FlickWheelRenderTests
         TestServices.EnsureInitialized("en");
         var vm = AppHost.Get<Filee.App.ViewModels.RadialViewModel>();
         vm.ResetForDrag();
-        vm.Load([@"C:\flick\notes.pdf"], clickMode: false);
+        vm.Load([@"C:\flick\one.mov", @"C:\flick\two.mov"], clickMode: false);
         Assert.True(vm.ShowWheel(Filee.Core.Settings.WheelKind.Tools));
+        Assert.Equal("Join", vm.Items[3].Label); // Compress, Metadata, Mute, Join: several videos
         var (window, donut) = Show(vm.Items);
-        donut.SetExternalHighlight(3); // Organize: coming soon
+        donut.SetExternalHighlight(3); // Join: coming soon
         Settle(donut);
-        using var frame = Capture(window, "flick-wheel-pdf-tools.png");
+        using var frame = Capture(window, "flick-wheel-video-tools.png");
 
         // Hovering a greyed-out slice doesn't light it.
-        var organize = PixelAt(frame, window, donut, OnPetal(donut, 3, donut.Layout.Outer - 6));
-        Assert.True(Math.Abs(organize.R - organize.B) < 16, $"a coming-soon petal is {organize}");
+        var join = PixelAt(frame, window, donut, OnPetal(donut, 3, donut.Layout.Outer - 6));
+        Assert.True(Math.Abs(join.R - join.B) < 16, $"a coming-soon petal is {join}");
         window.Close();
     }
 
