@@ -39,6 +39,16 @@ public static class ToolOperations
             "audioToVideo" => formats.All(Audio.Contains) ? SameFormat(p => p.Media.Visualizer = VisualizerShape.Landscape) : null,
             "frameImage" => formats.All(f => Images.Contains(f) && f != "gif") ? SameFormat(p => p.Image.Backdrop = ImageBackdrop.White) : null,
             "cropImage" => formats.Count == 1 && Images.Contains(formats[0]) && formats[0] != "gif" ? SameFormat() : null,
+            "trimVideo" => formats.Count == 1 && Video.Contains(formats[0]) ? SameFormat() : null,
+            "trimAudio" => formats.Count == 1 && Audio.Contains(formats[0]) ? SameFormat() : null,
+            "cropVideo" => formats.Count == 1 && Video.Contains(formats[0]) ? SameFormat() : null,
+            "organizePDF" => formats is ["pdf"] ? SameFormat() : null,
+            "redactImage" => formats.Count == 1 && Images.Contains(formats[0]) && formats[0] != "gif" ? SameFormat() : null,
+            "redactVideo" => formats.Count == 1 && Video.Contains(formats[0]) ? SameFormat() : null,
+            "redactAudio" => formats.Count == 1 && Audio.Contains(formats[0]) ? SameFormat() : null,
+            "editImage" => formats.Count == 1 && Images.Contains(formats[0]) && formats[0] != "gif" ? SameFormat() : null,
+            // Tangerine always writes the annotated picture as a PNG.
+            "annotateImage" => formats.Count == 1 && Images.Contains(formats[0]) && formats[0] != "gif" ? SameFormat(p => p.TargetFormat = "png") : null,
             _ => null,
         };
         if (preset is null)
@@ -99,6 +109,14 @@ public static class ToolOperations
     public static EditorKind? EditorFor(string tool) => tool switch
     {
         "cropImage" => EditorKind.CropImage,
+        "trimVideo" or "trimAudio" => EditorKind.Trim,
+        "cropVideo" => EditorKind.CropVideo,
+        "organizePDF" => EditorKind.Organize,
+        "redactImage" => EditorKind.RedactImage,
+        "redactVideo" => EditorKind.RedactVideo,
+        "redactAudio" => EditorKind.Bleep,
+        "annotateImage" => EditorKind.Annotate,
+        "editImage" => EditorKind.Adjust,
         _ => null,
     };
 

@@ -297,7 +297,7 @@ internal static class MediaEncoding
     /// </summary>
     internal static bool CanCopyVideo(string target, VideoStreamInfo video, MediaOptions options)
     {
-        if (options.Quality == MediaQuality.Small || options.Speed != 1 /* fork */ || options.MaxHeight > 0 && video.DisplayHeight > Math.Max(16, options.MaxHeight)
+        if (options.Quality == MediaQuality.Small || options.Speed != 1 || options.Edit is not null /* fork */ || options.MaxHeight > 0 && video.DisplayHeight > Math.Max(16, options.MaxHeight)
             || video.Codec is not { } codec || !Remuxable.TryGetValue(target, out var codecs))
             return false;
         var takes = MediaCodecs.Effective(target, options.VideoCodec) switch
@@ -339,7 +339,7 @@ internal static class MediaEncoding
     /// as they are.
     /// </summary>
     internal static bool CanCopyAudio(string target, AudioStreamInfo audio, MediaOptions options) =>
-        options.Quality != MediaQuality.Small && options.Speed == 1 /* fork */ && options.AudioBitrateKbps <= 0
+        options.Quality != MediaQuality.Small && options.Speed == 1 && options.Edit is null /* fork */ && options.AudioBitrateKbps <= 0
         && (options.AudioChannels is not (1 or 2) || options.AudioChannels == audio.Channels)
         && Remuxable.TryGetValue(target, out var codecs) && audio.Codec is { } codec && codecs.Audio.Contains(codec);
 

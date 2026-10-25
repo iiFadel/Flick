@@ -18,6 +18,24 @@
     <DataTemplate DataType="ed:CropEditorViewModel">
       <ed:CropEditorView />
     </DataTemplate>
+    <DataTemplate DataType="ed:TrimEditorViewModel">
+      <ed:TrimEditorView />
+    </DataTemplate>
+    <DataTemplate DataType="ed:OrganizeEditorViewModel">
+      <ed:OrganizeEditorView />
+    </DataTemplate>
+    <DataTemplate DataType="ed:RedactEditorViewModel">
+      <ed:RedactEditorView />
+    </DataTemplate>
+    <DataTemplate DataType="ed:AnnotateEditorViewModel">
+      <ed:AnnotateEditorView />
+    </DataTemplate>
+    <DataTemplate DataType="ed:AdjustEditorViewModel">
+      <ed:AdjustEditorView />
+    </DataTemplate>
+    <DataTemplate DataType="ed:BleepEditorViewModel">
+      <ed:BleepEditorView />
+    </DataTemplate>
   </Window.DataTemplates>
 
   <Window.Styles>

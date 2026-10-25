@@ -12,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Filee.App.Editors;
 
-public sealed partial class CropEditorViewModel(string title, string source, ILogger? log) : EditorViewModel(title, source, log)
+public partial class CropEditorViewModel(string title, string source, ILogger? log) : EditorViewModel(title, source, log)
 {
     /// <summary>The aspect choices, in the order the window shows them.</summary>
     public static readonly string[] Aspects = ["free", "original", "1:1", "4:3", "16:9", "9:16"];
@@ -35,11 +35,20 @@ public sealed partial class CropEditorViewModel(string title, string source, ILo
     /// <summary>The canvas should show this crop (an exact size was typed, or Reset).</summary>
     public event Action<NormalizedRect>? CropRequested;
 
+    /// <summary>True for video: the sizes shown are rounded down to even, as the crop will be.</summary>
+    protected virtual bool EvenSizes => false;
+
     protected override bool HasChanges => CropMath.ToPixels(_crop, PixelWidth, PixelHeight) != new PixelRect(0, 0, PixelWidth, PixelHeight);
 
     protected override async Task LoadPreviewAsync()
     {
         var (bitmap, width, height) = await CropService.LoadPreviewAsync(Source);
+        ShowPreview(bitmap, width, height);
+    }
+
+    /// <summary>The picture to crop and its size in the file's own pixels.</summary>
+    protected void ShowPreview(Bitmap bitmap, int width, int height)
+    {
         (Preview, PixelWidth, PixelHeight) = (bitmap, width, height);
         Reset();
     }
@@ -48,7 +57,7 @@ public sealed partial class CropEditorViewModel(string title, string source, ILo
     public void CropChanged(NormalizedRect crop)
     {
         _crop = CropMath.Clamp(crop);
-        var pixels = CropMath.ToPixels(_crop, PixelWidth, PixelHeight);
+        var pixels = CropMath.ToPixels(_crop, PixelWidth, PixelHeight, EvenSizes);
         WidthText = pixels.Width.ToString(CultureInfo.InvariantCulture);
         HeightText = pixels.Height.ToString(CultureInfo.InvariantCulture);
         ChangesChanged();

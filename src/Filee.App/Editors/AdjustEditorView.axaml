@@ -1,0 +1,67 @@
+<!-- fork: the Edit editor's body (AdjustEditorViewModel): the picture, and beside it the five sliders with their values,
+     Original (hold to compare) and Reset. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ed="using:Filee.App.Editors"
+             x:Class="Filee.App.Editors.AdjustEditorView"
+             x:DataType="ed:AdjustEditorViewModel">
+  <UserControl.Styles>
+    <Style Selector="Slider">
+      <Setter Property="Minimum" Value="-100" />
+      <Setter Property="Maximum" Value="100" />
+      <Setter Property="SmallChange" Value="1" />
+      <Setter Property="LargeChange" Value="10" />
+      <Setter Property="IsSnapToTickEnabled" Value="True" />
+      <Setter Property="TickFrequency" Value="1" />
+      <Setter Property="Margin" Value="0,-6,0,4" />
+    </Style>
+    <Style Selector="TextBlock.value">
+      <Setter Property="FontFamily" Value="Consolas, monospace" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="Foreground" Value="{DynamicResource ToastTextBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <DockPanel Margin="18,0">
+    <Border DockPanel.Dock="Right" Width="230" Padding="18,4,0,0">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
+          <Button x:Name="OriginalButton" Classes="editor-choice" Content="{DynamicResource editor.adjust.original}" />
+          <Button Classes="editor-choice" Content="{DynamicResource editor.reset}" Command="{Binding ResetCommand}" />
+        </StackPanel>
+        <StackPanel Spacing="2">
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Right" Classes="value" Text="{Binding Exposure}" />
+            <TextBlock Classes="editor-label" Text="{DynamicResource editor.adjust.exposure}" />
+          </DockPanel>
+          <Slider Value="{Binding Exposure}" />
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Right" Classes="value" Text="{Binding Contrast}" />
+            <TextBlock Classes="editor-label" Text="{DynamicResource editor.adjust.contrast}" />
+          </DockPanel>
+          <Slider Value="{Binding Contrast}" />
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Right" Classes="value" Text="{Binding Saturation}" />
+            <TextBlock Classes="editor-label" Text="{DynamicResource editor.adjust.saturation}" />
+          </DockPanel>
+          <Slider Value="{Binding Saturation}" />
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Right" Classes="value" Text="{Binding Warmth}" />
+            <TextBlock Classes="editor-label" Text="{DynamicResource editor.adjust.warmth}" />
+          </DockPanel>
+          <Slider Value="{Binding Warmth}" />
+          <DockPanel>
+            <TextBlock DockPanel.Dock="Right" Classes="value" Text="{Binding Sharpness}" />
+            <TextBlock Classes="editor-label" Text="{DynamicResource editor.adjust.sharpness}" />
+          </DockPanel>
+          <Slider Value="{Binding Sharpness}" Minimum="0" />
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <Border CornerRadius="10" ClipToBounds="True" Background="#14000000">
+      <Image Source="{Binding Shown}" Stretch="Uniform" />
+    </Border>
+  </DockPanel>
+</UserControl>

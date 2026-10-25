@@ -5,4 +5,12 @@ namespace Filee.Core.Wheels;
 public enum EditorKind
 {
     CropImage,
+    Trim,
+    CropVideo,
+    Organize,
+    RedactImage,
+    RedactVideo,
+    Annotate,
+    Adjust,
+    Bleep,
 }

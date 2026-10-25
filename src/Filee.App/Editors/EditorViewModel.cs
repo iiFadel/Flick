@@ -66,6 +66,21 @@ public abstract partial class EditorViewModel(string title, string source, ILogg
 
     protected abstract Task LoadPreviewAsync();
 
+    /// <summary>← or → (<paramref name="direction"/> −1 or 1), with Shift when <paramref name="large"/>; true when the tool used it.</summary>
+    public virtual bool Arrow(int direction, bool large) => false;
+
+    /// <summary>Tab; true when the tool used it.</summary>
+    public virtual bool Tab() => false;
+
+    /// <summary>Ctrl+Z; true when the tool took something back.</summary>
+    public virtual bool Undo() => false;
+
+    /// <summary>Ctrl+Y or Ctrl+Shift+Z; true when the tool did something again.</summary>
+    public virtual bool Redo() => false;
+
+    /// <summary>Delete or Backspace; true when the tool removed something.</summary>
+    public virtual bool Delete() => false;
+
     /// <summary>True while the edit would change something (a crop of the whole picture changes nothing).</summary>
     protected virtual bool HasChanges => true;
 

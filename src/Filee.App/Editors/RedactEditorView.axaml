@@ -1,0 +1,33 @@
+<!-- fork: the Redact editor's body (RedactEditorViewModel): the picture (a video's middle frame) to draw boxes on, then
+     Solid or Blur, Delete for the picked box and Clear. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ed="using:Filee.App.Editors"
+             xmlns:core="using:Filee.Core.Editing"
+             x:Class="Filee.App.Editors.RedactEditorView"
+             x:DataType="ed:RedactEditorViewModel">
+  <DockPanel Margin="18,0">
+    <Border DockPanel.Dock="Bottom" Padding="0,10,0,0">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+          <Button Classes="editor-choice" Content="{DynamicResource editor.organize.delete}" Command="{Binding RemoveCommand}" />
+          <Button Classes="editor-choice" Content="{DynamicResource editor.redact.clear}" Command="{Binding ClearCommand}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+          <TextBlock Classes="editor-label" Text="{DynamicResource editor.redact.style}" Margin="0,0,4,0" />
+          <Button Classes="editor-choice" Classes.selected="{Binding IsSolid}" Content="{DynamicResource editor.redact.solid}"
+                  Command="{Binding SetStyleCommand}" CommandParameter="{x:Static core:RedactStyle.Solid}" />
+          <Button Classes="editor-choice" Classes.selected="{Binding IsBlur}" Content="{DynamicResource editor.redact.blur}"
+                  Command="{Binding SetStyleCommand}" CommandParameter="{x:Static core:RedactStyle.Blur}" />
+          <TextBlock Text="{DynamicResource editor.redact.hint}" FontSize="12" Margin="10,0,0,0" VerticalAlignment="Center"
+                     Foreground="{DynamicResource ToastTextBrush}" />
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <Border CornerRadius="10" ClipToBounds="True" Background="#14000000">
+      <ed:RegionCanvas x:Name="Canvas" Picture="{Binding Preview}" Boxes="{Binding Boxes}" Selected="{Binding Selected}"
+                       Style="{Binding Style}" Accent="{DynamicResource AccentBrush}" />
+    </Border>
+  </DockPanel>
+</UserControl>

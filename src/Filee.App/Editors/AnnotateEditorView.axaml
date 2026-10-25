@@ -1,0 +1,45 @@
+<!-- fork: the Annotate editor's body (AnnotateEditorViewModel): the picture to mark, then the tools, the colours, the
+     picked text's box, and Undo / Redo / Delete. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ed="using:Filee.App.Editors"
+             x:Class="Filee.App.Editors.AnnotateEditorView"
+             x:DataType="ed:AnnotateEditorViewModel">
+  <UserControl.Styles>
+    <Style Selector="Button.swatch">
+      <Setter Property="Width" Value="22" />
+      <Setter Property="Height" Value="22" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="CornerRadius" Value="11" />
+      <Setter Property="BorderThickness" Value="2" />
+      <Setter Property="BorderBrush" Value="{DynamicResource SubtleBorderBrush}" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.swatch.selected">
+      <Setter Property="BorderBrush" Value="{DynamicResource ToastTitleBrush}" />
+    </Style>
+  </UserControl.Styles>
+
+  <DockPanel Margin="18,0">
+    <Border DockPanel.Dock="Bottom" Padding="0,10,0,0">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+          <TextBox Width="180" FontSize="12" Text="{Binding Text}" IsVisible="{Binding SelectedIsText}"
+                   PlaceholderText="{DynamicResource editor.annotate.text}" />
+          <Button Classes="editor-choice" Content="{DynamicResource editor.annotate.undo}" Command="{Binding UndoLastCommand}" />
+          <Button Classes="editor-choice" Content="{DynamicResource editor.annotate.redo}" Command="{Binding RedoLastCommand}" />
+          <Button Classes="editor-choice" Content="{DynamicResource editor.organize.delete}" Command="{Binding RemoveCommand}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+          <StackPanel x:Name="Tools" Orientation="Horizontal" Spacing="6" />
+          <StackPanel x:Name="Swatches" Orientation="Horizontal" Spacing="6" Margin="12,0,0,0" VerticalAlignment="Center" />
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <Border CornerRadius="10" ClipToBounds="True" Background="#14000000">
+      <ed:AnnotationCanvas x:Name="Canvas" Picture="{Binding Preview}" Marks="{Binding Marks}" Selected="{Binding Selected}"
+                           Tool="{Binding Tool}" Color="{Binding Color}" Accent="{DynamicResource AccentBrush}" />
+    </Border>
+  </DockPanel>
+</UserControl>

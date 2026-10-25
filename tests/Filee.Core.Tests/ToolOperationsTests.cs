@@ -139,8 +139,10 @@ public class ToolOperationsTests
     [InlineData("muteVideo", "mp3")]
     [InlineData("removeMetadata", "docx")]
     [InlineData("removeMetadata", "jpg", "mp4")]
-    [InlineData("editImage", "jpg")]
-    [InlineData("trimVideo", "mp4")]
+    [InlineData("editImage", "gif")]
+    [InlineData("trimVideo", "mp3")]
+    [InlineData("trimVideo", "mp4", "mov")]
+    [InlineData("trimAudio", "mp4")]
     [InlineData("cropImage", "gif")]
     [InlineData("cropImage", "jpg", "png")]
     public void Tools_Flick_cant_run_there_have_no_operation(string tool, params string[] formats) =>
@@ -160,6 +162,68 @@ public class ToolOperationsTests
         Assert.Equal(BuiltInData.SameAsSource, preset.TargetFormat);
         Assert.Null(preset.Image.Edit); // the editor puts the crop on when Apply is pressed
         Assert.Equal(EditorKind.CropImage, ToolOperations.EditorFor("cropImage"));
+    }
+
+    [Theory]
+    [InlineData("trimVideo", "mp4")]
+    [InlineData("trimVideo", "mkv")]
+    [InlineData("trimAudio", "mp3")]
+    [InlineData("trimAudio", "flac")]
+    [InlineData("cropVideo", "mov")]
+    public void Trim_and_crop_video_of_one_file_open_their_editor_and_keep_its_format(string tool, string format)
+    {
+        var preset = For(tool, format)!;
+
+        Assert.Equal(BuiltInData.SameAsSource, preset.TargetFormat);
+        Assert.Null(preset.Media.Edit);
+        Assert.Equal(tool == "cropVideo" ? EditorKind.CropVideo : EditorKind.Trim, ToolOperations.EditorFor(tool));
+    }
+
+    [Fact]
+    public void Organize_of_one_pdf_opens_the_organize_editor()
+    {
+        Assert.Equal(BuiltInData.SameAsSource, For("organizePDF", "pdf")!.TargetFormat);
+        Assert.Null(For("organizePDF", "pdf", "pdf"));
+        Assert.Null(For("organizePDF", "docx"));
+        Assert.Equal(EditorKind.Organize, ToolOperations.EditorFor("organizePDF"));
+    }
+
+    [Theory]
+    [InlineData("redactImage", "png", EditorKind.RedactImage)]
+    [InlineData("redactImage", "heic", EditorKind.RedactImage)]
+    [InlineData("redactVideo", "mp4", EditorKind.RedactVideo)]
+    public void Redact_of_one_file_opens_the_redact_editor(string tool, string format, EditorKind kind)
+    {
+        Assert.Equal(BuiltInData.SameAsSource, For(tool, format)!.TargetFormat);
+        Assert.Null(For(tool, format, format));
+        Assert.Equal(kind, ToolOperations.EditorFor(tool));
+    }
+
+    [Theory]
+    [InlineData("jpg")]
+    [InlineData("png")]
+    [InlineData("heic")]
+    public void Annotate_always_writes_a_png(string format)
+    {
+        Assert.Equal("png", For("annotateImage", format)!.TargetFormat);
+        Assert.Null(For("annotateImage", "gif"));
+        Assert.Equal(EditorKind.Annotate, ToolOperations.EditorFor("annotateImage"));
+    }
+
+    [Fact]
+    public void Edit_of_one_picture_opens_the_sliders_and_keeps_its_format()
+    {
+        Assert.Equal(BuiltInData.SameAsSource, For("editImage", "jpg")!.TargetFormat);
+        Assert.Null(For("editImage", "jpg", "jpg"));
+        Assert.Equal(EditorKind.Adjust, ToolOperations.EditorFor("editImage"));
+    }
+
+    [Fact]
+    public void Bleep_of_one_song_opens_the_bleep_editor()
+    {
+        Assert.Equal(BuiltInData.SameAsSource, For("redactAudio", "mp3")!.TargetFormat);
+        Assert.Null(For("redactAudio", "mp4"));
+        Assert.Equal(EditorKind.Bleep, ToolOperations.EditorFor("redactAudio"));
     }
 
     [Fact]

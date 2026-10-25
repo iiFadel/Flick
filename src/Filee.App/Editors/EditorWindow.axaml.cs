@@ -1,5 +1,6 @@
 // fork: see EditorWindow.axaml. Opens centred on the screen of the drop and fades in (150 ms; Reduce animations shows
-// it at once). Escape cancels, Enter applies, the header moves the window. Closing it any way cancels unless Apply
+// it at once). Escape cancels, Enter applies, the header moves the window; arrows, Tab, Ctrl+Z / Ctrl+Y and Delete go to
+// the tool. Closing it any way cancels unless Apply
 // went first.
 
 using Avalonia;
@@ -84,6 +85,22 @@ public partial class EditorWindow : Window
             case Key.Enter when e.Source is not TextBox:
                 model.ApplyCommand.Execute(null);
                 e.Handled = true;
+                break;
+            case Key.Left or Key.Right when e.Source is not TextBox:
+                e.Handled = model.Arrow(e.Key == Key.Left ? -1 : 1, e.KeyModifiers.HasFlag(KeyModifiers.Shift));
+                break;
+            case Key.Tab:
+                e.Handled = model.Tab();
+                break;
+            case Key.Z when e.KeyModifiers == KeyModifiers.Control:
+                e.Handled = model.Undo();
+                break;
+            case Key.Y when e.KeyModifiers == KeyModifiers.Control:
+            case Key.Z when e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift):
+                e.Handled = model.Redo();
+                break;
+            case Key.Delete or Key.Back when e.Source is not TextBox:
+                e.Handled = model.Delete();
                 break;
         }
     }

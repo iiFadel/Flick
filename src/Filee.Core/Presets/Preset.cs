@@ -429,6 +429,10 @@ public sealed class PdfOptions
     /// </summary>
     public bool RemoveMetadata { get; set; }
 
+    /// <summary>fork: what an editor window (Organize) asks for. Built when Apply is pressed, never saved.</summary>
+    [JsonIgnore]
+    public Editing.PdfEdit? Edit { get; set; }
+
     public PdfOptions Clone() => (PdfOptions)MemberwiseClone();
 }
 
@@ -571,6 +575,10 @@ public sealed class MediaOptions
     /// wheel's Speed).
     /// </summary>
     public double Speed { get; set; } = 1;
+
+    /// <summary>fork: what an editor window (trim, ...) asks for. Built when Apply is pressed, never saved.</summary>
+    [JsonIgnore]
+    public Editing.MediaEdit? Edit { get; set; }
 
     /// <summary>
     /// fork: Cut a video into this many parts of about equal length, at keyframes, without encoding it again, into a
