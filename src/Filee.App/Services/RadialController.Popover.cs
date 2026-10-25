@@ -69,6 +69,7 @@ public sealed partial class RadialController
     /// <summary>The drag ended while the popover was up (it opened on Enter): it takes the keyboard now.</summary>
     private void PopoverAfterDrag()
     {
+        EditorAfterDrag(); // RadialController.Editor.cs
         if (_popover is { } popover)
             Dispatcher.UIThread.Post(popover.TakeKeyboard);
     }

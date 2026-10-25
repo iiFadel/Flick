@@ -312,6 +312,10 @@ public sealed class ImageOptions
     [JsonConverter(typeof(LenientEnumJsonConverter<ImageBackdrop>))]
     public ImageBackdrop Backdrop { get; set; }
 
+    /// <summary>fork: what an editor window (crop, ...) asks for. Built when Apply is pressed, never saved.</summary>
+    [JsonIgnore]
+    public Editing.ImageEdit? Edit { get; set; }
+
     /// <summary>Use lossless WEBP encoding.</summary>
     public bool WebpLossless { get; set; }
 

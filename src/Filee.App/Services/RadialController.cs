@@ -342,6 +342,8 @@ public sealed partial class RadialController( // fork: partial (RadialController
 
         if (AskForValue(index, preset, sources, web)) // fork: an operation that asks for a value (RadialController.Popover.cs)
             return;
+        if (OpenEditor(index, preset, sources, web)) // fork: an operation with an editor window (RadialController.Editor.cs)
+            return;
 
         log.LogInformation("Converting {Count} file(s) with preset {Preset}{Web}", sources.Count, preset.Id,
             web is null ? "" : " (from a browser)");

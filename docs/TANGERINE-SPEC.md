@@ -212,6 +212,7 @@ Decided so far (values in `src/Filee.App/Styles/Flick.axaml`):
 - **Bottom-right toast:** the same card, × and bar; its buttons, errors and notes as upstream. **(our design)**
 - **Windows (Settings and the rest):** page `#F4F4F4`, cards white, hairlines `#E9ECE8`, text `#282B29`, muted text `#636D64` (the site's `#828782` is too faint for small captions: 3.7:1 on white), font Segoe UI (static: Avalonia draws the variable Segoe UI Variable at one weight). **(our design)**
 - **Dark mode:** page `#1C1D1C`, cards `#262827`, text `#EDEEEB` / `#A3A6A2`; wheel track `#2A2D2F`, petals `#43474A` → `#36393C`, toast `#2A2C2B`. **(our design)**
+- **Editor windows:** 960 × 680, borderless, the drop toast's card (fill, border, shadow) with the soft radius. Header: the tool's name in small orange capitals, then the file name; × on the right; the header moves the window. Body: the tool's view, the preview on a faint grey well. Footer: pill-shaped choices (selected = orange), Cancel and an orange Apply on the right. Fades in over 150 ms, centred on the drop's screen; Escape cancels, Enter applies. Apply never writes the file itself: the tool's job runs and the drop toast shows at the drop point. One file at a time; several pictures on Crop open upstream's crop overlay. **(our design)**
 
 ## Not usable in the repo
 

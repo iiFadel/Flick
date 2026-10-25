@@ -1,0 +1,91 @@
+<!-- fork: the editor windows' shell (Phase 5, our design): a frosted card like the drop toast's, the tool's name in small
+     capitals and the file in the header, the tool's own view in the middle, Cancel and Apply at the bottom. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ed="using:Filee.App.Editors"
+        x:Class="Filee.App.Editors.EditorWindow"
+        x:DataType="ed:EditorViewModel"
+        Title="{Binding Title}"
+        Icon="avares://Filee/Assets/Icons/filee.ico"
+        Width="960" Height="680" MinWidth="640" MinHeight="460"
+        WindowDecorations="None"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent"
+        Topmost="True"
+        CanResize="True">
+
+  <Window.DataTemplates>
+    <DataTemplate DataType="ed:CropEditorViewModel">
+      <ed:CropEditorView />
+    </DataTemplate>
+  </Window.DataTemplates>
+
+  <Window.Styles>
+    <Style Selector="Button.editor-choice">
+      <Setter Property="Padding" Value="12,5" />
+      <Setter Property="CornerRadius" Value="14" />
+      <Setter Property="FontSize" Value="12" />
+      <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.editor-choice.selected">
+      <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.editor-choice.selected:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AccentStrongBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}" />
+    </Style>
+    <Style Selector="TextBlock.editor-label">
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="LetterSpacing" Value="0.6" />
+      <Setter Property="Foreground" Value="{DynamicResource TextSecondaryBrush}" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </Window.Styles>
+
+  <Border x:Name="Card" Margin="16" CornerRadius="{DynamicResource SoftRadius}"
+          Background="{DynamicResource ToastSurfaceBrush}"
+          BorderBrush="{DynamicResource ToastBorderBrush}" BorderThickness="1"
+          ClipToBounds="True"
+          BoxShadow="{DynamicResource ToastShadow}">
+    <DockPanel>
+      <Border x:Name="Header" DockPanel.Dock="Top" Height="48" Padding="18,0" Background="Transparent">
+        <DockPanel VerticalAlignment="Center">
+          <Button DockPanel.Dock="Right" Classes="icon" Command="{Binding CancelCommand}"
+                  ToolTip.Tip="{DynamicResource common.cancel}">
+            <PathIcon Width="12" Height="12" Data="{StaticResource Icon.Close}" Foreground="{DynamicResource TextSecondaryBrush}" />
+          </Button>
+          <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+            <TextBlock x:Name="ToolTitle" FontFamily="{DynamicResource WheelFontFamily}" FontSize="12" FontWeight="Bold"
+                       LetterSpacing="1" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding FileName}" FontSize="13" Foreground="{DynamicResource ToastTextBrush}"
+                       TextTrimming="CharacterEllipsis" MaxWidth="520" VerticalAlignment="Center" />
+          </StackPanel>
+        </DockPanel>
+      </Border>
+
+      <Border DockPanel.Dock="Bottom" Padding="18,12">
+        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+          <Button Content="{DynamicResource common.cancel}" Command="{Binding CancelCommand}" Classes="editor-choice" Padding="16,6" />
+          <Button x:Name="ApplyButton" Content="{DynamicResource editor.apply}" Command="{Binding ApplyCommand}"
+                  Classes="accent" FontWeight="SemiBold" Padding="18,6" CornerRadius="14" />
+        </StackPanel>
+      </Border>
+
+      <Grid>
+        <ContentControl Content="{Binding}" IsVisible="{Binding !HasError}" />
+        <TextBlock Text="{Binding Error}" IsVisible="{Binding HasError}" TextWrapping="Wrap" MaxWidth="480"
+                   HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"
+                   Foreground="{DynamicResource ToastTextBrush}" />
+        <Border IsVisible="{Binding IsBusy}" Background="Transparent">
+          <ProgressBar Classes="soft" IsIndeterminate="True" Width="80" Height="4" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </Border>
+      </Grid>
+    </DockPanel>
+  </Border>
+</Window>

@@ -230,6 +230,7 @@ internal static class ImageEncoder
     {
         var turned = options.TurnsOrMirrors || image.Orientation is not (OrientationType.TopLeft or OrientationType.Undefined);
         image.AutoOrient();
+        ImageEdits.Apply(image, options.Edit); // fork: an editor window's crop, on the picture as it looks
 
         // After AutoOrient, so a phone photo turns the way it looks, not the way its pixels are stored.
         Turn(image, options);

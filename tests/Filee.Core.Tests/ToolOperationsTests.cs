@@ -141,11 +141,33 @@ public class ToolOperationsTests
     [InlineData("removeMetadata", "jpg", "mp4")]
     [InlineData("editImage", "jpg")]
     [InlineData("trimVideo", "mp4")]
+    [InlineData("cropImage", "gif")]
+    [InlineData("cropImage", "jpg", "png")]
     public void Tools_Flick_cant_run_there_have_no_operation(string tool, params string[] formats) =>
         Assert.Null(For(tool, formats));
 
     [Fact]
     public void No_files_no_operation() => Assert.Null(For("removeMetadata"));
+
+    [Theory]
+    [InlineData("jpg")]
+    [InlineData("png")]
+    [InlineData("heic")]
+    public void Crop_of_one_picture_opens_the_crop_editor_and_keeps_its_format(string format)
+    {
+        var preset = For("cropImage", format)!;
+
+        Assert.Equal(BuiltInData.SameAsSource, preset.TargetFormat);
+        Assert.Null(preset.Image.Edit); // the editor puts the crop on when Apply is pressed
+        Assert.Equal(EditorKind.CropImage, ToolOperations.EditorFor("cropImage"));
+    }
+
+    [Fact]
+    public void Tools_without_a_window_open_no_editor()
+    {
+        Assert.Null(ToolOperations.EditorFor("compress"));
+        Assert.Null(ToolOperations.EditorFor("audioChannels"));
+    }
 
     [Fact]
     public void A_taken_name_is_numbered_the_way_Tangerine_does()

@@ -38,6 +38,7 @@ public static class ToolOperations
             "videoSnapshots" => formats.All(Video.Contains) ? Snapshot() : null,
             "audioToVideo" => formats.All(Audio.Contains) ? SameFormat(p => p.Media.Visualizer = VisualizerShape.Landscape) : null,
             "frameImage" => formats.All(f => Images.Contains(f) && f != "gif") ? SameFormat(p => p.Image.Backdrop = ImageBackdrop.White) : null,
+            "cropImage" => formats.Count == 1 && Images.Contains(formats[0]) && formats[0] != "gif" ? SameFormat() : null,
             _ => null,
         };
         if (preset is null)
@@ -88,6 +89,16 @@ public static class ToolOperations
             new ToolChoice(text("tool.choice.black"), text("tool.suffix.frameImage"), p => p.Image.Backdrop = ImageBackdrop.Black),
             new ToolChoice(text("tool.choice.orange"), text("tool.suffix.frameImage"), p => p.Image.Backdrop = ImageBackdrop.OrangeGradient),
         ]),
+        _ => null,
+    };
+
+    /// <summary>
+    /// The editor window <paramref name="tool"/> opens after the drop (Phase 5), or null for a tool that runs at once
+    /// or asks in the popover. Only meaningful where <see cref="For"/> gives an operation; editors take one file.
+    /// </summary>
+    public static EditorKind? EditorFor(string tool) => tool switch
+    {
+        "cropImage" => EditorKind.CropImage,
         _ => null,
     };
 
