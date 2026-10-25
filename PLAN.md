@@ -73,12 +73,14 @@ Decision 21 Oct 2026: Flick has two wheels only (Shift = Convert, Ctrl = Tools).
 - [x] Annotate (image): Arrow, Box, Ellipse, Text, numbered Callout (renumber after a delete), seven colours (the picked mark takes the colour), Undo / Redo, Delete; drawn by ImageMagick from the same geometry as the window, always `name Annotated.png`
 - [x] Edit (image): Exposure, Contrast, Saturation, Warmth, Sharpness with a live preview (the engine's own code on a 1400 px copy), hold Original to compare, Reset; `name Edited.ext` in the picture's format
 - [x] Bleep (audio): drag over the waveform to mark ranges (overlapping ones join), click to pick, Delete, Ctrl+Z, Tone (1 kHz) or Silence; FFmpeg `aeval`, `name Bleeped.ext`
-- [ ] Order: Crop (image) → Trim (video/audio, timeline + preview) → Crop (video) → Organize (PDF pages) → Redact (image, then video) → Annotate → Edit (basic adjustments) → Bleep
-- [ ] One tool per branch, each usable on its own before starting the next
+- [x] Order: Crop (image) → Trim (video/audio, timeline + preview) → Crop (video) → Organize (PDF pages) → Redact (image, then video) → Annotate → Edit (basic adjustments) → Bleep
+- [x] One tool per branch (`phase-5-editor-shell` … `phase-5-bleep`, each on the one before), each usable on its own before starting the next
+
+Decided 25 Oct 2026: the hand checks were taken as passed so the phase could run straight through; each tool has its checklist in the session that built it, and anything found by hand goes under Later.
 
 ## Phase 6: macOS, native Swift app (L, separate repo)
 
-Built from scratch in Swift (SwiftUI + AppKit), not on Avalonia, because the goal is to look and feel exactly like Tangerine, which is itself a native Mac app.
+Built from scratch in Swift (SwiftUI + AppKit), not on Avalonia, because the goal is to look and feel exactly like Tangerine, which is itself a native Mac app. How to start it on the Mac: `docs/MACOS-START.md`.
 
 - [ ] Spike first (2 to 3 evenings): menu bar app, global drag detection, tap Shift during a Finder drag, non-activating NSPanel wheel at the cursor that accepts the drop. Nothing else. If this works, the rest is ordinary app work
 - [ ] Permission flow (Accessibility / Input Monitoring) with a clear onboarding screen
@@ -98,6 +100,8 @@ Built from scratch in Swift (SwiftUI + AppKit), not on Avalonia, because the goa
 - Normalize is one loudnorm pass (dynamic); a two-pass linear normalize would match -16 LUFS more exactly on music with wide dynamics
 - Metadata on a HEIC runs without FFmpeg, but its slice still needs FFmpeg installed: the HEIC self-edge belongs to FFmpeg
 - Split video cuts at the next keyframe after each equal point: a video with very few keyframes gives uneven or fewer clips (Phase 5's split points could re-encode around the cut)
+- Editor windows take one file: several pictures on Crop open upstream's crop overlay; the other editors are not on the wheel for several files (WheelCatalog's batch tools)
+- Tools whose Tangerine window is not built yet still run with fixed defaults or the value popover: Compress (target size), Metadata (edit tags), Add BG (image, ratio, spacing), Normalize, Channels, Visualize (image background), Split (split points), Speed (1× shown), Snapshot (pick frames), Join, Merge PDF (order), Collage
 - Edit has the five basic sliders; Tangerine's "effects" (filters, vignette, ...) and "detail" beyond sharpness are not built
 - Redact finds nothing by itself: Tangerine detects faces and text on the device; Flick's boxes are drawn by hand (an ML model would be a big download)
 - Redact video hides its boxes for the whole clip; a box that follows something, or shows only for part of the clip, would need time ranges per box

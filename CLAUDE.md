@@ -31,7 +31,7 @@
 - Keep pure logic (gesture state machine, wheel selection, geometry) free of Avalonia types so it can be unit tested. Every change to `GestureDetector` or `DonutGeometry` needs tests.
 - Prefer new files over large edits to upstream files, so `git pull upstream main` stays mergeable. When an upstream file must change, keep the diff small and mark it with `// fork:`.
 - The app is called Flick in everything the user sees (window titles, tray, toasts, settings, i18n strings). Do NOT rename namespaces, projects, folders or `Filee.*` identifiers: that would break every upstream merge.
-- New user-facing strings go in all three `Assets/i18n/*.json` files (English text is fine for ko and zh-CN).
+- New user-facing strings go in all eight `Assets/i18n/*.json` files (English text is fine for every language but en; `LocalizationTests` checks the keys match).
 - Settings format changes: bump `AppSettings.CurrentSchemaVersion` and add a step to `SettingsMigrations`.
 - Respect `Motion.Enabled` (Reduce animations) for every new animation.
 

@@ -167,6 +167,12 @@ upstream's crop overlay (`tool-crop`, `CropOverlayWindow`). Video and audio edit
 `MediaEdit`): `Media/MediaEdits` adds them to MediaEncoding's ordinary same-format encode (Trim: `-ss` / `-to` before
 the input), and any edit turns stream copy off so cuts are exact. What the editors show comes from
 `Media/MediaPreview`: length, a frame strip, the frame at a time, waveform peaks, silencedetect spans.
+The editors: Crop (image and video), Trim, Organize (`PdfOptions.Edit`, a `PdfEdit` that `Pdf/PdfPages` copies page
+by page), Redact (image and video), Annotate (always PNG), Edit (`Adjustments`, which the window's preview runs
+through `ImageEdits.Adjust` too) and Bleep (`aeval`). Each has a pure Core class for its state (`CropMath`,
+`TrimMath`, `PageOrganizer`, `RedactRegions`, `AnnotationDocument`, `Adjustments`, `BleepRanges`), a view model
+under `Filee.App/Editors` and, where it draws, its own control (`TrimTimeline`, `RegionCanvas`, `AnnotationCanvas`,
+`BleepTimeline`). `EditorWindow` passes the keys on: arrows, Tab, Ctrl+Z / Ctrl+Y and Delete.
 
 **After the drop** (`RadialController.Toast.cs`, Tangerine's "After the drop"). A drag wheel's conversion gets no
 progress ring: the slice stays lit 50 ms, the wheel goes, and 70 ms later `DropToastWindow` grows at the drop point
