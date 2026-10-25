@@ -11,7 +11,8 @@ namespace Filee.Engines.Media;
 /// <summary>A video or song as an editor window shows it.</summary>
 /// <param name="Duration">Seconds.</param>
 /// <param name="FrameRate">Frames per second, 0 for audio (or when unknown).</param>
-internal sealed record MediaSummary(double Duration, double FrameRate, bool HasVideo, bool HasAudio);
+/// <param name="Width">Width of the picture upright (a phone video turned), in its own pixels; 0 for audio.</param>
+internal sealed record MediaSummary(double Duration, double FrameRate, bool HasVideo, bool HasAudio, int Width = 0, int Height = 0);
 
 internal static partial class MediaPreview
 {
@@ -26,7 +27,8 @@ internal static partial class MediaPreview
         var info = await MediaInfo.ProbeAsync(Tools.Ffprobe, input, cancellationToken);
         if (info.Duration is not { TotalSeconds: > 0 } duration)
             throw new NotSupportedException("The length of the file is unknown.");
-        return new MediaSummary(duration.TotalSeconds, info.Video?.FrameRate ?? 0, info.Video is not null, info.Audio is not null);
+        var (width, height) = info.Video is { } video ? (video.IsRotated ? (video.Height, video.Width) : (video.Width, video.Height)) : (0, 0);
+        return new MediaSummary(duration.TotalSeconds, info.Video?.FrameRate ?? 0, info.Video is not null, info.Audio is not null, width, height);
     }
 
     /// <summary>
@@ -51,7 +53,7 @@ internal static partial class MediaPreview
         RunAsync(Tools.Ffmpeg,
         [
             .. MediaEncoding.Common, "-ss", Number(seconds), "-i", input, "-map", "0:V:0",
-            "-vf", $"scale=-2:{height},setsar=1", "-frames:v", "1", "-update", "1", "-c:v", "png", "-f", "image2", output,
+            "-vf", $"scale=-2:'min({height},ih)',setsar=1", "-frames:v", "1", "-update", "1", "-c:v", "png", "-f", "image2", output,
         ], cancellationToken);
 
     /// <summary>

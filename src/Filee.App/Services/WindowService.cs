@@ -66,6 +66,7 @@ public sealed class WindowService(ILocalizer loc, IServiceProvider services, Mem
         {
             Core.Wheels.EditorKind.CropImage => new Editors.CropEditorViewModel(title, source, log),
             Core.Wheels.EditorKind.Trim => new Editors.TrimEditorViewModel(title, source, log),
+            Core.Wheels.EditorKind.CropVideo => new Editors.CropVideoEditorViewModel(title, source, log),
             _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
         };
         var window = new Editors.EditorWindow { DataContext = model };

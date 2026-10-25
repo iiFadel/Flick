@@ -169,13 +169,14 @@ public class ToolOperationsTests
     [InlineData("trimVideo", "mkv")]
     [InlineData("trimAudio", "mp3")]
     [InlineData("trimAudio", "flac")]
-    public void Trim_of_one_file_opens_the_trim_editor_and_keeps_its_format(string tool, string format)
+    [InlineData("cropVideo", "mov")]
+    public void Trim_and_crop_video_of_one_file_open_their_editor_and_keep_its_format(string tool, string format)
     {
         var preset = For(tool, format)!;
 
         Assert.Equal(BuiltInData.SameAsSource, preset.TargetFormat);
         Assert.Null(preset.Media.Edit);
-        Assert.Equal(EditorKind.Trim, ToolOperations.EditorFor(tool));
+        Assert.Equal(tool == "cropVideo" ? EditorKind.CropVideo : EditorKind.Trim, ToolOperations.EditorFor(tool));
     }
 
     [Fact]

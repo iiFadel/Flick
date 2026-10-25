@@ -6,4 +6,5 @@ public enum EditorKind
 {
     CropImage,
     Trim,
+    CropVideo,
 }

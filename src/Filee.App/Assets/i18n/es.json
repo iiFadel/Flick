@@ -95,6 +95,7 @@
   "editor.crop.original": "Original",
   "tool.suffix.trimVideo": "Trimmed",
   "tool.suffix.trimAudio": "Trimmed",
+  "tool.suffix.cropVideo": "Cropped",
   "editor.trim.start": "START",
   "editor.trim.end": "END",
   "editor.trim.length": "LENGTH",

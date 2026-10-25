@@ -13,7 +13,7 @@ public partial class MediaTests
 {
     private static Preset Edited(string tool, string format, MediaEdit edit)
     {
-        var preset = ToolOperations.For(tool, [format], _ => "Trimmed") ?? throw new InvalidOperationException($"No {tool} for {format}.");
+        var preset = ToolOperations.For(tool, [format], id => id.StartsWith("crop", StringComparison.Ordinal) ? "Cropped" : "Trimmed") ?? throw new InvalidOperationException($"No {tool} for {format}.");
         preset.Media.Edit = edit;
         return preset;
     }
@@ -64,6 +64,44 @@ public partial class MediaTests
         Assert.InRange((await ProbeAsync(output)).Duration, 1.4, 1.65);
     }
 
+    [Theory]
+    [InlineData("clip.mp4")]
+    [InlineData("clip.mkv")]
+    public async Task Crop_keeps_the_part_chosen_of_every_frame_with_even_sides(string name)
+    {
+        SkipUnlessInstalled();
+        var folder = fx.NewFolder();
+        var source = await MakeClipAsync(folder, name, seconds: 2, size: "640x360");
+
+        var output = await RunEditAsync("cropVideo", source, new MediaEdit { Crop = new NormalizedRect(0.1, 0.2, 0.333, 0.5) });
+
+        Assert.Equal(Path.Combine(folder, "clip Cropped" + Path.GetExtension(name)), output);
+        var probed = await ProbeAsync(output);
+        Assert.Equal((212, 180), (probed.Video!.Width, probed.Video.Height)); // 213.1 and 180, rounded down to even
+        Assert.NotNull(probed.Audio);
+        Assert.InRange(probed.Duration, 1.8, 2.2);
+    }
+
+    [Fact]
+    public async Task Trim_and_crop_together_do_both()
+    {
+        SkipUnlessInstalled();
+        var folder = fx.NewFolder();
+        var source = await MakeClipAsync(folder, "clip.mov", seconds: 4, size: "320x240");
+
+        var output = await RunEditAsync("cropVideo", source,
+            new MediaEdit { Crop = new NormalizedRect(0, 0, 0.5, 0.5), Trim = new TrimRange(1, 2) });
+
+        var probed = await ProbeAsync(output);
+        Assert.Equal((160, 120), (probed.Video!.Width, probed.Video.Height));
+        Assert.InRange(probed.Duration, 0.8, 1.2);
+    }
+
+    [Fact]
+    public void The_crop_filter_is_relative_to_the_input_and_even() =>
+        Assert.Equal("crop=w='max(2,trunc(iw*0.5/2)*2)':h='max(2,trunc(ih*0.25/2)*2)':x='trunc(iw*0.1/2)*2':y='trunc(ih*0/2)*2'",
+            MediaEdits.CropFilter(new NormalizedRect(0.1, -1, 0.5, 0.25)));
+
     [Fact]
     public async Task The_preview_reads_the_length_frames_peaks_and_silence()
     {
@@ -79,6 +117,7 @@ public partial class MediaTests
         Assert.InRange(summary.Duration, 2.9, 3.1);
         Assert.Equal(25, summary.FrameRate, 1);
         Assert.True(summary.HasVideo && summary.HasAudio);
+        Assert.Equal((320, 240), (summary.Width, summary.Height));
 
         var frames = await MediaPreview.FramesAsync(clip, summary.Duration, 6, 48, Directory.CreateDirectory(Path.Combine(folder, "strip")).FullName, CancellationToken.None);
         Assert.InRange(frames.Count, 5, 6);

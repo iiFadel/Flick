@@ -117,6 +117,42 @@ public class EditorWindowTests
         }
     }
 
+    [AvaloniaFact]
+    public void The_video_crop_editor_shows_the_middle_frame_in_the_videos_pixels()
+    {
+        TestServices.EnsureInitialized("en");
+        var status = AppHost.Get<Core.Conversion.ConverterCatalog>()
+            .StatusOf(AppHost.Get<IReadOnlyList<Core.Conversion.IConverter>>().Single(c => c.Id == "ffmpeg"));
+        Assert.SkipUnless(status.IsAvailable, "FFmpeg is not installed");
+        var folder = Directory.CreateTempSubdirectory("flick-editor-").FullName;
+        try
+        {
+            var file = Path.Combine(folder, "clip.mkv");
+            var made = Task.Run(() => Engines.Infrastructure.ProcessRunner.RunAsync(status.Detail!, ["-hide_banner", "-nostdin", "-v", "error", "-y",
+                "-f", "lavfi", "-i", "testsrc2=size=1920x1080:rate=25:duration=2", file],
+                TimeSpan.FromMinutes(1), CancellationToken.None)).GetAwaiter().GetResult();
+            Assert.True(made.ExitCode == 0, made.StandardError);
+
+            var (window, model) = AppHost.Get<WindowService>().ShowEditor(Core.Wheels.EditorKind.CropVideo, file, "Crop", null, activate: true);
+            var crop = Assert.IsType<CropVideoEditorViewModel>(model);
+            Assert.True(Pump(() => crop.Preview is not null, 1500));
+            Assert.Equal((1920, 1080), (crop.PixelWidth, crop.PixelHeight));
+
+            crop.CropChanged(new NormalizedRect(0, 0, 0.333, 0.333));
+            Assert.Equal(("638", "360"), (crop.WidthText, crop.HeightText)); // 639 and 360: even, as the video will be
+
+            var preset = new Core.Presets.Preset();
+            crop.ApplyTo(preset);
+            Assert.Equal(crop.Crop, preset.Media.Edit?.Crop);
+            Assert.Null(preset.Image.Edit);
+            window.Close();
+        }
+        finally
+        {
+            try { Directory.Delete(folder, true); } catch (IOException) { }
+        }
+    }
+
     private static bool Pump(Func<bool> done, int rounds = 200)
     {
         for (var i = 0; i < rounds; i++)

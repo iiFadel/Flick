@@ -7,4 +7,7 @@ public sealed record MediaEdit
 {
     /// <summary>The part to keep, in seconds from the start, or null for all of it.</summary>
     public TrimRange? Trim { get; init; }
+
+    /// <summary>The part of the upright picture to keep (video only), or null for all of it. Sides come out even.</summary>
+    public NormalizedRect? Crop { get; init; }
 }
