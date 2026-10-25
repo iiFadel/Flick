@@ -71,6 +71,7 @@ Decision 21 Oct 2026: Flick has two wheels only (Shift = Convert, Ctrl = Tools).
 - [x] Organize (PDF): page cards, drag to move, ← → pick, Shift+← → move, turn left / right, Duplicate, Delete (never empty), `name Organized.pdf`; pages copy as they are, so bookmarks and form fields stay behind
 - [x] Redact (image, then video): boxes drawn by hand, Solid (black) or Blur, click to pick, Delete, Ctrl+Z; a video's boxes cover every frame, `name Redacted.ext`
 - [x] Annotate (image): Arrow, Box, Ellipse, Text, numbered Callout (renumber after a delete), seven colours (the picked mark takes the colour), Undo / Redo, Delete; drawn by ImageMagick from the same geometry as the window, always `name Annotated.png`
+- [x] Edit (image): Exposure, Contrast, Saturation, Warmth, Sharpness with a live preview (the engine's own code on a 1400 px copy), hold Original to compare, Reset; `name Edited.ext` in the picture's format
 - [ ] Order: Crop (image) → Trim (video/audio, timeline + preview) → Crop (video) → Organize (PDF pages) → Redact (image, then video) → Annotate → Edit (basic adjustments) → Bleep
 - [ ] One tool per branch, each usable on its own before starting the next
 
@@ -96,6 +97,7 @@ Built from scratch in Swift (SwiftUI + AppKit), not on Avalonia, because the goa
 - Normalize is one loudnorm pass (dynamic); a two-pass linear normalize would match -16 LUFS more exactly on music with wide dynamics
 - Metadata on a HEIC runs without FFmpeg, but its slice still needs FFmpeg installed: the HEIC self-edge belongs to FFmpeg
 - Split video cuts at the next keyframe after each equal point: a video with very few keyframes gives uneven or fewer clips (Phase 5's split points could re-encode around the cut)
+- Edit has the five basic sliders; Tangerine's "effects" (filters, vignette, ...) and "detail" beyond sharpness are not built
 - Redact finds nothing by itself: Tangerine detects faces and text on the device; Flick's boxes are drawn by hand (an ML model would be a big download)
 - Redact video hides its boxes for the whole clip; a box that follows something, or shows only for part of the clip, would need time ranges per box
 - Watch folders and CLI already exist upstream, keep them working

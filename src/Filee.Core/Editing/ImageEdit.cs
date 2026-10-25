@@ -8,6 +8,9 @@ public sealed record ImageEdit
     /// <summary>The part of the upright picture (after its EXIF turn) to keep, or null for all of it.</summary>
     public NormalizedRect? Crop { get; init; }
 
+    /// <summary>Edit's sliders, or null to leave the colours as they are.</summary>
+    public Adjustments? Adjust { get; init; }
+
     /// <summary>Boxes to hide, as fractions of the upright picture.</summary>
     public IReadOnlyList<NormalizedRect> Redactions { get; init; } = [];
 

@@ -11,4 +11,5 @@ public enum EditorKind
     RedactImage,
     RedactVideo,
     Annotate,
+    Adjust,
 }

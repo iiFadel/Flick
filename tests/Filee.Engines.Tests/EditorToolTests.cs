@@ -196,6 +196,51 @@ public class EditorToolTests(EngineFixture fx) : IClassFixture<EngineFixture>
         Assert.True(text.Statistics().Composite().Minimum < 0.3 * Quantum.Max, "the text is drawn in black");
     }
 
+    [Theory]
+    [InlineData("jpg", MagickFormat.Jpeg)]
+    [InlineData("png", MagickFormat.Png)]
+    [InlineData("webp", MagickFormat.WebP)]
+    public async Task Edit_writes_the_picture_brighter_and_grey_in_its_own_format(string format, MagickFormat magick)
+    {
+        var folder = fx.NewFolder();
+        var source = Path.Combine(folder, "photo." + format);
+        using (var photo = new MagickImage(new MagickColor("#806040"), 200, 100))
+            photo.Write(source, magick);
+        var before = ToolOperationTests.Hash(source);
+        var preset = ToolOperations.For("editImage", [format], _ => "Edited")!;
+        preset.Image.Edit = new ImageEdit { Adjust = new Adjustments { Exposure = 50, Saturation = -100 } };
+
+        var job = await fx.ConvertAsync([source], preset);
+
+        var output = Assert.Single(job.Outputs);
+        Assert.Equal(Path.Combine(folder, $"photo Edited.{format}"), output);
+        using var result = new MagickImage(output);
+        var color = result.GetPixels().GetPixel(100, 50)!.ToColor()!;
+        Assert.True(Math.Abs(color.R - color.B) < 12, $"no colour left: {color}");
+        Assert.True(color.G > 0x60 + 20, $"brighter than it was: {color}");
+        Assert.Equal(before, ToolOperationTests.Hash(source));
+    }
+
+    [Fact]
+    public void Each_slider_moves_the_pixels_its_way()
+    {
+        static IMagickColor<byte> After(Adjustments adjust)
+        {
+            using var image = new MagickImage(new MagickColor("#806040"), 20, 20);
+            Magick.ImageEdits.Adjust(image, adjust);
+            return image.GetPixels().GetPixel(10, 10)!.ToColor()!;
+        }
+
+        var warm = After(new Adjustments { Warmth = 100 });
+        var cool = After(new Adjustments { Warmth = -100 });
+        Assert.True(warm.R > cool.R && warm.B < cool.B);
+        Assert.True(After(new Adjustments { Exposure = -100 }).R < 0x50);
+        var vivid = After(new Adjustments { Saturation = 100 });
+        Assert.True(vivid.R - vivid.B > 0x80 - 0x40);
+        var flat = After(new Adjustments { Contrast = -100 });
+        Assert.True(flat.R - flat.B < 0x80 - 0x40);
+    }
+
     [Fact]
     public async Task A_second_crop_is_numbered_without_brackets()
     {

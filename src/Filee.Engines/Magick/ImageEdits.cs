@@ -1,5 +1,5 @@
 // fork: what an editor window asked for (ImageOptions.Edit, Phase 5), done on the upright picture before any other
-// option: Redact's boxes first (they are placed on the whole picture), then Annotate's marks, then Crop. A blurred box is made coarse before it
+// option: Edit's sliders, Redact's boxes (they are placed on the whole picture), Annotate's marks, then Crop. A blurred box is made coarse before it
 // is blurred, so no pass of sharpening brings the text back.
 
 using Filee.Core.Editing;
@@ -16,17 +16,44 @@ internal static class ImageEdits
         if (edit is null)
             return;
         var (width, height) = ((int)image.Width, (int)image.Height);
+        if (edit.Adjust is { IsNone: false } adjust)
+            Adjust(image, adjust);
         foreach (var box in edit.Redactions)
             Redact(image, CropMath.ToPixels(box, width, height), edit.RedactStyle);
         foreach (var (mark, number) in edit.Annotations)
             Annotate(image, mark, number, width, height);
-        if (edit.Redactions.Count > 0 || edit.Annotations.Count > 0 || edit.Crop is not null)
+        if (edit.Redactions.Count > 0 || edit.Annotations.Count > 0 || edit.Crop is not null || edit.Adjust is { IsNone: false })
             DropThumbnail(image); // the small EXIF preview would still show the picture as it was
         if (edit.Crop is not { } crop)
             return;
         var pixels = CropMath.ToPixels(crop, width, height);
         image.Crop(new MagickGeometry(pixels.X, pixels.Y, (uint)pixels.Width, (uint)pixels.Height));
         image.ResetPage();
+    }
+
+    /// <summary>
+    /// Edit's sliders, in this order: exposure (a multiply in stops), contrast (an S-curve around the middle grey, or its
+    /// inverse), saturation, warmth (red up and blue down, or the other way), sharpness (an unsharp mask). The Edit
+    /// window's preview runs this on its small copy.
+    /// </summary>
+    internal static void Adjust(IMagickImage<byte> image, Adjustments adjust)
+    {
+        var a = adjust.Clamped();
+        if (a.Exposure != 0)
+            image.Evaluate(Channels.RGB, EvaluateOperator.Multiply, a.ExposureFactor);
+        if (a.Contrast > 0)
+            image.SigmoidalContrast(a.Contrast / 100.0 * 8, new Percentage(50));
+        else if (a.Contrast < 0)
+            image.InverseSigmoidalContrast(-a.Contrast / 100.0 * 8, new Percentage(50));
+        if (a.Saturation != 0)
+            image.Modulate(new Percentage(100), new Percentage(100 + a.Saturation), new Percentage(100));
+        if (a.Warmth != 0)
+        {
+            image.Evaluate(Channels.Red, EvaluateOperator.Multiply, 1 + a.Warmth / 500.0);
+            image.Evaluate(Channels.Blue, EvaluateOperator.Multiply, 1 - a.Warmth / 500.0);
+        }
+        if (a.Sharpness > 0)
+            image.UnsharpMask(0, 1.2, a.Sharpness / 100.0 * 2, 0.02);
     }
 
     private static void Redact(IMagickImage<byte> image, PixelRect box, RedactStyle style)

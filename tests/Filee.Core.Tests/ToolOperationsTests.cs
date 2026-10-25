@@ -139,7 +139,7 @@ public class ToolOperationsTests
     [InlineData("muteVideo", "mp3")]
     [InlineData("removeMetadata", "docx")]
     [InlineData("removeMetadata", "jpg", "mp4")]
-    [InlineData("editImage", "jpg")]
+    [InlineData("editImage", "gif")]
     [InlineData("trimVideo", "mp3")]
     [InlineData("trimVideo", "mp4", "mov")]
     [InlineData("trimAudio", "mp4")]
@@ -208,6 +208,14 @@ public class ToolOperationsTests
         Assert.Equal("png", For("annotateImage", format)!.TargetFormat);
         Assert.Null(For("annotateImage", "gif"));
         Assert.Equal(EditorKind.Annotate, ToolOperations.EditorFor("annotateImage"));
+    }
+
+    [Fact]
+    public void Edit_of_one_picture_opens_the_sliders_and_keeps_its_format()
+    {
+        Assert.Equal(BuiltInData.SameAsSource, For("editImage", "jpg")!.TargetFormat);
+        Assert.Null(For("editImage", "jpg", "jpg"));
+        Assert.Equal(EditorKind.Adjust, ToolOperations.EditorFor("editImage"));
     }
 
     [Fact]

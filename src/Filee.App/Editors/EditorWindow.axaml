@@ -30,6 +30,9 @@
     <DataTemplate DataType="ed:AnnotateEditorViewModel">
       <ed:AnnotateEditorView />
     </DataTemplate>
+    <DataTemplate DataType="ed:AdjustEditorViewModel">
+      <ed:AdjustEditorView />
+    </DataTemplate>
   </Window.DataTemplates>
 
   <Window.Styles>
